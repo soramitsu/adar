@@ -299,17 +299,16 @@ Sentry.init({
   integrations: [
     new BrowserTracing({
       routingInstrumentation: Sentry.vueRouterInstrumentation(router),
-      // I don't know the exact regexes that we should add here.
+     
       // As the documentation mention:
       // If your frontend is making requests to a different domain, you'll need to add it there to propagate
       // the sentry-trace and baggage headers to the backend services, which is required to link transactions
       // together as part of a single trace.
-      tracingOrigins: ['localhost', 'adar.com', /^\//],
+      tracingOrigins: ['localhost', 'adar.com', /^\//, 'api.subquery.network' , 'whitelist.polkaswap2.io'],
     }),
   ],
-  // Set tracesSampleRate to 1.0 to capture 100%
+  // tracesSampleRate == 1.0 is to capture 100%
   // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
   tracesSampleRate: 1.0,
 });
 
