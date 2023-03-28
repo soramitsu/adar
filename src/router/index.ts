@@ -295,7 +295,7 @@ router.beforeEach((to, from, next) => {
 
 Sentry.init({
   Vue,
-  dsn: 'https://71e73a867f6f4e0ca045bdb27347c525@sentry.soramitsu.co.jp/7',
+  dsn: 'https://9aa0954e211541a5a36eaf27016f3d3e@sentry.soramitsu.co.jp/12',
   integrations: [
     new BrowserTracing({
       routingInstrumentation: Sentry.vueRouterInstrumentation(router),
