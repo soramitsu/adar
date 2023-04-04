@@ -165,6 +165,8 @@ const actions = defineActions({
     const syntheticBaseAssetId = api.dex.getSyntheticBaseAssetId(dexId);
 
     const { paths, liquiditySources } = getPathsAndPairLiquiditySources(
+      inputAssetId,
+      outputAssetId,
       payload,
       enabledAssets,
       baseAssetId,
@@ -487,7 +489,7 @@ function calcTxParams(
 }
 
 function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: number | string) {
-  const { rootState, getters, rootGetters } = routeAssetsActionContext(context);
+  const { rootState, getters, rootGetters, state } = routeAssetsActionContext(context);
   const fiatPriceObject = rootState.wallet.account.fiatPriceObject;
   const tokenEquivalent = getTokenEquivalent(fiatPriceObject, assetTo, usd);
   const exchangeRate = getAssetUSDPrice(assetTo, fiatPriceObject);
@@ -499,6 +501,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   }
   const { paths, payload, liquiditySources, dexQuoteData } = subscription;
   const dexes = api.dex.dexList;
+  const enabledAssets = state.enabledAssets;
   const results = dexes.reduce<{ [dexId: number]: SwapResult }>((buffer, { dexId }) => {
     const swapResult = api.swap.getResult(
       assetFrom,
@@ -506,8 +509,9 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
       tokenEquivalent.toString(),
       true,
       [rootGetters.swap.swapLiquiditySource].filter(Boolean) as Array<LiquiditySourceTypes>,
+      enabledAssets,
       (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].paths,
-      (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].payload as QuotePayload,
+      (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].payload,
       dexId as DexId
     );
 
