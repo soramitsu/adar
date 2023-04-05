@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter, { NavigationGuardNext, RouteConfig } from 'vue-router';
+import VueRouter, { RouteConfig } from 'vue-router';
 import { WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { api } from '@sora-substrate/util';
 
@@ -22,7 +22,14 @@ const WALLET_DEFAULT_ROUTE = WALLET_CONSTS.RouteNames.Wallet;
 const lazyComponent = (name: string) => () => import(`@/components/${name}.vue`);
 const lazyView = (name: string) => () => import(`@/views/${name}.vue`);
 
-function goTo(name: PageNames): void {
+/**
+ * Use this function instead just `router.push` when page loading is required.
+ *
+ * It checks wallet routing, page loading and the current route.
+ * if the current route isn't the same as param, then it will wait for `router.push`
+ */
+async function goTo(name: PageNames): Promise<void> {
+  const current = router.currentRoute.name;
   if (name === PageNames.Wallet) {
     if (!store.getters.wallet.account.isLoggedIn) {
       store.commit.wallet.router.navigate({ name: WALLET_CONSTS.RouteNames.WalletConnection });
@@ -30,10 +37,15 @@ function goTo(name: PageNames): void {
       store.commit.wallet.router.navigate({ name: WALLET_DEFAULT_ROUTE });
     }
   }
-  if (router.currentRoute.name === name) {
+  if (current === name) {
     return;
   }
-  router.push({ name });
+  try {
+    store.commit.router.setLoading(true);
+    await router.push({ name });
+  } finally {
+    store.commit.router.setLoading(false);
+  }
 }
 
 const routes: Array<RouteConfig> = [
@@ -244,9 +256,6 @@ const routes: Array<RouteConfig> = [
   {
     path: '*',
     redirect: '/swap',
-    // TODO: Turn on redirect to PageNotFound
-    // name: PageNames.PageNotFound,
-    // component: lazyComponent(PageNames.PageNotFound)
   },
 ];
 
@@ -286,16 +295,12 @@ router.beforeEach((to, from, next) => {
       return;
     }
   }
-  if (!store.getters.settings.soraCardEnabled && to.name === PageNames.SoraCard) {
-    setRoute(PageNames.Swap);
-    return;
-  }
   setRoute(current, false);
 });
 
 Sentry.init({
   Vue,
-  dsn: 'https://71e73a867f6f4e0ca045bdb27347c525@sentry.soramitsu.co.jp/7',
+  dsn: 'https://9aa0954e211541a5a36eaf27016f3d3e@sentry.soramitsu.co.jp/12',
   integrations: [
     new BrowserTracing({
       routingInstrumentation: Sentry.vueRouterInstrumentation(router),
