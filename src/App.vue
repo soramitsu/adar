@@ -44,7 +44,7 @@
 <script lang="ts">
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 import { FPNumber, History, connection, HistoryItem, TransactionStatus, Operation } from '@sora-substrate/util';
-import { components, mixins, getExplorerLinks, settingsStorage } from '@soramitsu/soraneo-wallet-web';
+import { components, mixins, getExplorerLinks, settingsStorage, api } from '@soramitsu/soraneo-wallet-web';
 import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 import type { WALLET_CONSTS, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 import type DesignSystem from '@soramitsu/soramitsu-js-ui/lib/types/DesignSystem';
@@ -227,6 +227,8 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
       await this.runAppConnectionToNode();
       updateDocumentTitle(); // For the first load
       this.showDisclaimer();
+      const apiInstanceAtBlock = await api.api.at('0xd1f0cd35dee313ad70eef229b7c57bd17d0a87f344d5ae2f3794f743eac61342');
+      console.dir((await apiInstanceAtBlock.query.system.number()).toNumber());
     });
   }
 
@@ -681,6 +683,7 @@ $sora-logo-width: 173.7px;
     display: flex;
     flex: 1;
     flex-flow: column nowrap;
+    max-width: 100%;
     &__about {
       overflow: hidden;
       .app-footer {

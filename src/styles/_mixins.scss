@@ -477,6 +477,7 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     }
     &__arrow {
       margin-right: 0;
+      flex-shrink: 0;
     }
 
     &.is-active {
@@ -651,10 +652,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     &-pagination {
       display: flex;
       margin-top: $inner-spacing-medium;
-    
-      .el-pagination__total {
-        margin: auto;
-      }
     }
   }
 
