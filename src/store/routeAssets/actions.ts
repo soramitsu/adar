@@ -290,10 +290,8 @@ function getTransferParams(context, inputAsset, recipient) {
     };
   } else {
     try {
-      console.dir({ recipient, inputAsset });
       const swapData = getAmountAndDexId(context, inputAsset, recipient.asset, recipient.usd);
       if (!swapData) return null;
-      console.dir(swapData);
 
       const { amountFrom, amountTo, exchangeRate, bestDexId } = swapData;
       commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
@@ -505,10 +503,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   if (!subscription) {
     throw new Error('Subscription did not found');
   }
-  console.dir(subscription);
   const { paths, payload, liquiditySources, dexQuoteData } = subscription;
-  console.dir(dexQuoteData);
-  console.dir(subscription);
   const dexes = api.dex.dexList;
   const enabledAssets = state.enabledAssets;
   const results = dexes.reduce<{ [dexId: number]: SwapResult }>((buffer, { dexId }) => {
