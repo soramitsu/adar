@@ -266,6 +266,10 @@ const actions = defineActions({
     commit.setSubscriptions([]);
     commit.cleanEnabledAssetsSubscription();
   },
+
+  async getBlockNumber(context, blockId): Promise<string> {
+    return (await api.system.getBlockNumber(blockId)).toString();
+  },
 });
 
 function getTransferParams(context, inputAsset, recipient) {
@@ -392,7 +396,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     };
   });
 
-  const maxInputAmount = inputTokenAmount.mul(new FPNumber(slippageMultiplier)).toCodecString();
+  const maxInputAmount = inputTokenAmount.add(inputTokenAmount.mul(new FPNumber(slippageMultiplier))).toCodecString();
   const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
     try {
