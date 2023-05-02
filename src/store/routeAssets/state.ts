@@ -15,6 +15,8 @@ function initialState(): RouteAssetsState {
     processingState: {
       currentStageIndex: 0,
       inputToken: XOR,
+      datetime: undefined,
+      txInfo: undefined,
     },
   };
 }
