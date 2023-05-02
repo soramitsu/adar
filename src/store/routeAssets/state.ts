@@ -8,6 +8,8 @@ function initialState(): RouteAssetsState {
     subscriptions: [],
     enabledAssetsSubscription: null,
     enabledAssets: {
+      tbc: [],
+      xst: {},
       lockedSources: [],
     },
     processingState: {

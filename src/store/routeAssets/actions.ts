@@ -105,7 +105,7 @@ const actions = defineActions({
     commit.deleteRecipient(id);
   },
 
-  subscribeOnReserves(context, tkn: Asset = XOR): void {
+  async subscribeOnReserves(context, tkn: Asset = XOR): Promise<void> {
     const { commit, rootGetters, getters, dispatch } = routeAssetsActionContext(context);
     const liquiditySources = rootGetters.swap.swapLiquiditySource;
     const sourceToken = getters.inputToken;
@@ -116,38 +116,34 @@ const actions = defineActions({
     const currentsPulls = [] as Array<RouteAssetsSubscription>;
 
     dispatch.cleanSwapReservesSubscription();
-    const enabledAssetsSubscription = api.swap
-      .subscribeOnPrimaryMarketsEnabledAssets()
-      .subscribe((enabledAssetsList) => {
-        commit.setPrimaryMarketsEnabledAssets(enabledAssetsList);
-        tokens.forEach(async (tokenAddress) => {
-          const reservesSubscribe = api.swap
-            .subscribeOnAllDexesReserves(
-              sourceToken.address,
-              tokenAddress,
-              enabledAssetsList,
-              liquiditySources as LiquiditySourceTypes
-            )
-            .subscribe((results) => {
-              results.forEach((result) =>
-                dispatch.setSubscriptionPayload({
-                  data: result,
-                  inputAssetId: sourceToken.address,
-                  outputAssetId: tokenAddress,
-                })
-              );
-            });
-          currentsPulls.push({
-            liquidityReservesSubscription: reservesSubscribe,
-            payload: null,
-            paths: null,
-            liquiditySources: null,
-            assetAddress: tokenAddress,
-          });
+    const enabledAssets = await api.swap.getPrimaryMarketsEnabledAssets();
+    commit.setPrimaryMarketsEnabledAssets(enabledAssets);
+    tokens.forEach(async (tokenAddress) => {
+      const reservesSubscribe = api.swap
+        .subscribeOnAllDexesReserves(
+          sourceToken.address,
+          tokenAddress,
+          enabledAssets,
+          liquiditySources as LiquiditySourceTypes
+        )
+        .subscribe((results) => {
+          results.forEach((result) =>
+            dispatch.setSubscriptionPayload({
+              data: result,
+              inputAssetId: sourceToken.address,
+              outputAssetId: tokenAddress,
+            })
+          );
         });
+      currentsPulls.push({
+        liquidityReservesSubscription: reservesSubscribe,
+        payload: null,
+        paths: null,
+        liquiditySources: null,
+        assetAddress: tokenAddress,
       });
+    });
     commit.setSubscriptions(currentsPulls);
-    commit.setEnabledAssetsSubscription(enabledAssetsSubscription);
   },
 
   async setSubscriptionPayload(context, { data, inputAssetId, outputAssetId }): Promise<void> {
@@ -160,7 +156,7 @@ const actions = defineActions({
     }
 
     // tbc & xst is enabled only on dex 0
-    const enabledAssets = dexId === DexId.XOR ? state.enabledAssets : { tbc: [], xst: [], lockedSources: [] };
+    const enabledAssets = dexId === DexId.XOR ? state.enabledAssets : { tbc: [], xst: {}, lockedSources: [] };
     const baseAssetId = api.dex.getBaseAssetId(dexId);
     const syntheticBaseAssetId = api.dex.getSyntheticBaseAssetId(dexId);
 
