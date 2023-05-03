@@ -15,7 +15,8 @@ def pipeline = new org.js.AppPipeline(steps: this,
     copyToBranches: ['fleek-pre', 'fleek'],
     copyFile: 'env.json',
     // ipfsHashNotification: true,
-    fleekDefaultSiteName: 'dawn-block-3896'
+    fleekDefaultSiteName: 'dawn-block-3896',
+    secretScannerExclusion: '.*env.json',
     // ipfsHashChatID: '-1001375555544'
 )
 pipeline.runPipeline()

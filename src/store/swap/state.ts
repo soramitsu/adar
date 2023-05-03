@@ -13,10 +13,12 @@ export function initialState(): SwapState {
     liquidityProviderFee: '',
     isExchangeB: false,
     enabledAssets: {
+      tbc: [],
+      xst: {},
       lockedSources: [],
     },
     rewards: [],
-    path: [],
+    route: [],
     selectedDexId: DexId.XOR,
     dexQuoteData: {},
   };

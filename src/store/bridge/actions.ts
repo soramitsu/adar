@@ -8,7 +8,14 @@ import type { AccountBalance } from '@sora-substrate/util/build/assets/types';
 import { bridgeActionContext } from '@/store/bridge';
 import { MaxUint256 } from '@/consts';
 import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
-import { appBridge, bridgeApi, EthBridgeHistory, STATES, waitForApprovedRequest } from '@/utils/bridge';
+import {
+  appBridge,
+  bridgeApi,
+  EthBridgeHistory,
+  STATES,
+  waitForApprovedRequest,
+  waitForEvmTransactionMined,
+} from '@/utils/bridge';
 import ethersUtil, { ABI, KnownBridgeAsset, OtherContractType } from '@/utils/ethers-util';
 import { isEthereumAddress } from '@/utils';
 import type { SignTxResult } from './types';
@@ -146,6 +153,26 @@ const actions = defineActions({
 
     return historyItem;
   },
+  async signSoraTransactionSoraToEvm(context, id: string) {
+    const { rootGetters, rootDispatch } = bridgeActionContext(context);
+
+    const tx = bridgeApi.getHistory(id);
+
+    if (!tx) throw new Error(`Transaction not found: ${id}`);
+
+    const { to, amount, assetAddress } = tx;
+
+    if (!amount) throw new Error('Transaction "amount" cannot be empty');
+    if (!assetAddress) throw new Error('Transaction "assetAddress" cannot be empty');
+    if (!to) throw new Error('Transaction "to" cannot be empty');
+
+    const asset = rootGetters.assets.assetDataByAddress(assetAddress);
+
+    if (!asset || !asset.externalAddress) throw new Error(`Transaction asset is not registered: ${assetAddress}`);
+
+    await rootDispatch.wallet.transactions.beforeTransactionSign();
+    await bridgeApi.transferToEth(asset, to, amount, id);
+  },
   async signEvmTransactionSoraToEvm(context, id: string): Promise<SignTxResult> {
     const { getters, rootState, rootGetters } = bridgeActionContext(context);
     const tx = bridgeApi.getHistory(id) as Nullable<BridgeHistory>;
@@ -265,8 +292,8 @@ const actions = defineActions({
           ];
           checkEvmNetwork(context);
           const transaction = await tokenInstance.approve(...methodArgs);
-          await transaction.wait(2);
-          commit.removeTxIdFromApprove(tx.id);
+          commit.removeTxIdFromApprove(tx.id); // change ui state after approve in client
+          await waitForEvmTransactionMined(transaction.hash); // wait for 1 confirm block
         }
       }
 
