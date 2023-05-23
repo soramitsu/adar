@@ -1,4 +1,4 @@
-@Library('jenkins-library') _
+@Library('jenkins-library@feature/DOPS-2406-limit-the-execution-time') _
 
 def pipeline = new org.js.AppPipeline(steps: this,
     dockerImageName: 'adar/web',
