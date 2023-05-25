@@ -71,17 +71,24 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
   drop(event) {
     event.preventDefault();
     this.dragOver = false;
+    const file = event.dataTransfer.files[0];
+    const allowedExtensions = /(\.csv)$/i;
+    if (!allowedExtensions.exec(file.name)) {
+      this.parsingError = true;
+      return;
+    }
     (this as any).$refs.file.files = event.dataTransfer.files;
-    this.uploadFile();
+    this.uploadFile((this as any).$refs.file.files[0]);
   }
 
   onRestartClick() {
     this.cancelProcessing();
     this.parsingError = false;
+    (this as any).$refs.file = null;
   }
 
-  async uploadFile() {
-    this.updateRecipients(this.fileElement.files[0])
+  async uploadFile(file: File) {
+    this.updateRecipients(file)
       .then(() => {
         this.nextStage();
       })
