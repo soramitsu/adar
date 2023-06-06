@@ -7,6 +7,7 @@ import { settingsStorage } from '@/utils/storage';
 
 import en from './en.json';
 import enCard from './card/en.json';
+import enAdar from './adar/en.json';
 
 Vue.use(VueI18n);
 
@@ -14,7 +15,7 @@ const i18n = new VueI18n({
   locale: Language.EN,
   fallbackLocale: Language.EN,
   messages: {
-    [Language.EN]: { ...en, ...enCard },
+    [Language.EN]: { ...en, ...enCard, ...enAdar },
   },
   silentTranslationWarn: process.env.NODE_ENV === 'production',
 });
@@ -84,7 +85,13 @@ export async function setI18nLocale(lang: Language): Promise<void> {
       `@/lang/card/${filename}.json`
     );
 
-    i18n.setLocaleMessage(locale, { ...messages, ...messagesCard });
+    const { default: messagesAdar } = await import(
+      /* webpackChunkName: "lang-card-[request]" */
+      /* webpackMode: "lazy" */
+      `@/lang/adar/${filename}.json`
+    );
+
+    i18n.setLocaleMessage(locale, { ...messages, ...messagesCard, ...messagesAdar });
     loadedLanguages.push(locale);
   }
 

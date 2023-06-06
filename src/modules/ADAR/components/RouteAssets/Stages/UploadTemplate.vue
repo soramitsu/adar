@@ -1,6 +1,6 @@
 <template>
   <div v-if="!parsingError" class="container route-assets-upload-template">
-    <div class="route-assets__page-header-title">Upload Routing Template for processing</div>
+    <div class="route-assets__page-header-title">{{ t('ADAR.routeAssets.stages.uploadTemplate.title') }}</div>
     <div class="route-assets__page-header-description">
       {{ `Upload your Process Routing Template as a .CSV file` }}
     </div>

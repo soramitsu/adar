@@ -1,0 +1,115 @@
+{
+    "ADAR": {
+        "routeAssets": {
+            "uploadCSV": {
+                "title": "Advanced Digital Asset Routing",
+                "description": "ADAR is an Advanced Digital Asset Routing solution for businesses to seamlessy transmit digital assets to payeers around the world, in multiple currencies, at a fraction of today’s prevailing transaction costs, without excessive paperwork and settlement times.",
+                "nextButton": "Process routing template",
+                "downloadButton": "Download routing template",
+                "uploadDialog": {
+                    "title": "Upload",
+                    "body": "Upload .CSV file to initiate assets routing ",
+                    "browseButton": "Browse files"
+                }
+            },
+            "routingTemplate": {
+                "submitButton": "Route Assets",
+                "downloadOverviewButton": "download transaction overview",
+                "backButton": "Back to Upload",
+                "summary": {
+                    "title": "Routing Template Summary",
+                    "asset": "Input Asset",
+                    "usdCount": "Total usd to be routed",
+                    "usdRouted": "Total usd routed",
+                    "usdAuthorized": "Total usd authorized",
+                    "estimatedTokes": "Total estimated {token} required (+5%)",
+                    "available": "Total {token} available",
+                    "tokenRouted": "Total {token} routed",
+                    "add": "add",
+                    "detailsToggle": "Summary details",
+                    "table": {
+                        "asset": "output Asset",
+                        "usd": "usd equivalent",
+                        "usdRouted": "total USD routed",
+                        "total": "total estimated",
+                        "totalRouted": "Total {token} routed",
+                        "required": "estimated {token} required",
+                        "transactions": "total transaction success"
+                    }
+                },
+                "overview": {
+                    "title": "Transaction Overview",
+                    "name": "name",
+                    "wallet": "WALLET",
+                    "usd": "USD Equivalent",
+                    "asset": "Asset",
+                    "amount": "estimated Amount ",
+                    "status": "Status"
+                },
+                "authorizeDialog": {
+                    "title": "Authorize Routing Template",
+                    "asset": "Input Asset",
+                    "total": "Total",
+                    "termsAndConditions": "Terms and Conditions",
+                    "agreement": "By clicking Submit Routing i accept the ADAR",
+                    "submit": "route assets"
+                },
+                "messages": {
+                    "routeAssetsCompleted": "All transactions completed"
+                }
+            },
+            "continue": "Continue",
+            "cancelProcessing": "Cancel processing",
+            "stagesNames": {
+                "authorize": "Authorize",
+                "done": "Done",
+                "processTemplate": "Process template",
+                "reviewDetails": "Review Details",
+                "routing": "Routing",
+                "transactionOverview": "Transaction overview",
+                "uploadTemplate": "Upload tempolte"
+            },
+            "stages": {
+                "uploadTemplate": {
+                    "title": "Upload Routing Template for processing",
+                    "description": "Upload your Process Routing Template as a .CSV file",
+                    "instruction": "Drop your completed process routing template or click to upload",
+                    "typesInfo": "Supported file types: CSV",
+                    "uploadButtonTitle": "upload",
+                    "templateHelp": "Dont have a template?",
+                    "download": "Download"
+                },
+                "processTemplate": {
+                    "recipients": "Recipients",
+                    "assets": "Assets",
+                    "usd": "usd",
+                    "wallets": "wallets",
+                    "amount": "ESTIMATED AMOUNTS",
+                    "calculated": "calculated",
+                    "issues": "issues found",
+                    "payeers": "payeers",
+                    "processing": "processing",
+                    "waiting": "waiting",
+                    "title": "Process routing template",
+                    "description": "Our system is processing your uploaded Routing Template",
+                    "fixButton": "fix issues"
+                }
+            },
+            "dialogs": {
+                "fixIssuesDialog": {
+                    "title": "Fix or remove issues",
+                    "recipient": "recipient",
+                    "wallets": "wallets",
+                    "fieldStatusCorrect": "{field} correct",
+                    "fieldStatusIncorrect": "{field} incorrect",
+                    "usd": "usd",
+                    "assets": "Assets",
+                    "amount": "estimated amount",
+                    "fixButton": "fix issue",
+                    "deleteButton": "delete recipient"
+                }
+            },
+            "messages": {}
+        }
+    }
+}
