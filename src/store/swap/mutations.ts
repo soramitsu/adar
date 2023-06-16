@@ -58,10 +58,10 @@ const mutations = defineMutations<SwapState>()({
     state.enabledAssets = Object.freeze({ ...assets });
   },
   setRewards(state, rewards: Array<LPRewardsInfo>): void {
-    state.rewards = Object.freeze([...rewards]);
+    state.rewards = [...rewards];
   },
-  setRoute(state, route: string[]): void {
-    state.route = Object.freeze([...route]);
+  setPath(state, path: string[]): void {
+    state.path = [...path];
   },
   setSubscriptionPayload(
     state,

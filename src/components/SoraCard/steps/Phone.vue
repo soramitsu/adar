@@ -13,7 +13,7 @@
         <s-input
           ref="phone"
           class="phone-number"
-          :placeholder="t('card.phonePlaceholder')"
+          placeholder="Phone number"
           v-maska="'############'"
           v-model="phoneNumber"
           :disabled="phoneInputDisabled"
@@ -34,7 +34,7 @@
     </div>
     <s-input
       ref="otp"
-      :placeholder="t('card.otpPlaceholder')"
+      placeholder="Verification code"
       v-maska="'######'"
       v-model="verificationCode"
       :disabled="otpInputDisabled"
@@ -57,7 +57,7 @@ import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { action, getter, mutation, state } from '@/store/decorators';
+import { action, getter, state } from '@/store/decorators';
 import { VerificationStatus } from '@/types/card';
 
 const MIN_PHONE_LENGTH_WITH_CODE = 8;
@@ -65,20 +65,15 @@ const OTP_CODE_LENGTH = 6;
 const RESEND_INTERVAL = 59;
 
 @Component
-export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin, mixins.NotificationMixin) {
+export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin) {
   @state.soraCard.authLogin private authLogin!: any;
-  @state.soraCard.hasFreeAttempts private hasFreeAttempts!: boolean;
-  @state.soraCard.wantsToPassKycAgain private wantsToPassKycAgain!: boolean;
   @state.wallet.settings.soraNetwork private soraNetwork!: WALLET_CONSTS.SoraNetwork;
 
   @getter.soraCard.currentStatus private currentStatus!: VerificationStatus;
   @getter.soraCard.isEuroBalanceEnough private isEuroBalanceEnough!: boolean;
 
-  @mutation.soraCard.setWillToPassKycAgain private setWillToPassKycAgain!: (boolean) => void;
-
   @action.soraCard.getUserStatus private getUserStatus!: AsyncFnWithoutArgs;
   @action.soraCard.initPayWingsAuthSdk private initPayWingsAuthSdk!: AsyncFnWithoutArgs;
-  @action.soraCard.getUserKycAttempt private getUserKycAttempt!: AsyncFnWithoutArgs;
 
   @Prop({ default: false, type: Boolean }) readonly userApplied!: boolean;
 
@@ -88,19 +83,19 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
 
   private countryCodeInternal = '';
   private phoneNumberInternal = '';
-  private smsCountDown = '';
+  private smsResendText = '';
   private smsResendCount = RESEND_INTERVAL;
   private notPassedKycAndNotHasXorEnough = false;
 
   verificationCode = '';
   smsSent = false;
   sendOtpBtnLoading = false;
-  notFoundPhoneWhenApplied = false;
 
   @Watch('smsResendCount', { immediate: true })
   private handleSmsCountChange(value: number): void {
     const digit = value.toString().length > 1 ? '' : '0';
-    this.smsCountDown = `0:${digit}${value}`;
+    const countDown = `${digit}${value}`;
+    this.smsResendText = `RESEND IN 0:${countDown}`;
   }
 
   @Watch('isEuroBalanceEnough', { immediate: true })
@@ -116,8 +111,11 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
     this.authLogin.PayWingsOtpCredentialVerification(this.verificationCode).catch((error) => {
       this.sendOtpBtnLoading = false;
       this.verificationCode = '';
-
-      this.showAppNotification(this.t('card.infoMessageWrongOtp'), 'error');
+      this.$notify({
+        message: 'Code is incorrect',
+        type: 'error',
+        title: '',
+      });
       console.error('[SoraCard]: Auth', error);
     });
 
@@ -158,7 +156,7 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
 
   /** Real example when `countryCode` is empty */
   get countryCodePlaceholder(): string {
-    return this.countryCode ? this.t('card.code') : '+44';
+    return this.countryCode ? 'Code' : '+44';
   }
 
   get buttonDisabled() {
@@ -166,19 +164,19 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
   }
 
   get otpInputDisabled(): boolean {
-    return !this.smsSent || !this.isPhoneNumberValid || this.notFoundPhoneWhenApplied;
+    return !this.smsSent || !this.isPhoneNumberValid;
   }
 
   get buttonText(): string {
     if (this.verificationCode.length !== OTP_CODE_LENGTH) {
-      return this.t('card.enterCodeBtn');
+      return 'ENTER THE VERIFICATION CODE';
     }
 
     if (this.notPassedKycAndNotHasXorEnough) {
       return this.t('insufficientBalanceText', { tokenSymbol: XOR.symbol });
     }
 
-    return this.t('card.confirmCodeBtn');
+    return 'CONFIRM SMS CODE';
   }
 
   set buttonText(value) {
@@ -186,8 +184,8 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
   }
 
   get sendSmsButtonText(): string {
-    if (this.smsSent) return this.t('card.resendInBtn', { value: this.smsCountDown });
-    return this.t('card.sendCodeBtn');
+    if (this.smsSent) return this.smsResendText;
+    return 'SEND SMS CODE';
   }
 
   get isMainnet(): boolean {
@@ -209,9 +207,11 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
 
   get phoneInputDescription(): string {
     if (this.smsSent) {
-      return this.isMainnet ? this.t('card.phoneInputAfterSendDesc') : 'Your code for testing purposes: 123456';
+      return this.isMainnet
+        ? 'We’ve sent you an SMS code. Check your messages!'
+        : 'Your code for testing purposes: 123456';
     }
-    return this.t('card.phoneInputBeforeSendDesc');
+    return 'We’ll send you an SMS code.';
   }
 
   startSmsCountDown(): void {
@@ -221,7 +221,6 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
       if (this.smsResendCount < 0) {
         this.smsSent = false;
         this.verificationCode = '';
-        this.notFoundPhoneWhenApplied = false;
         this.smsResendCount = RESEND_INTERVAL;
         clearInterval(interval);
       }
@@ -231,8 +230,6 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
   async mounted(): Promise<void> {
     await this.$nextTick();
     this.inputCode.focus();
-
-    localStorage.removeItem('PW-Email');
 
     await this.initPayWingsAuthSdk();
 
@@ -249,10 +246,11 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
         this.sendOtpBtnLoading = false;
 
         if (this.userApplied) {
-          this.showAppNotification(this.t('card.userNotFound'), 'info');
-          this.notFoundPhoneWhenApplied = true;
-          this.verificationCode = '';
-          return;
+          this.$notify({
+            title: '',
+            message: 'KYC process has not been finished.',
+            type: 'info',
+          });
         }
 
         if (!this.isEuroBalanceEnough) {
@@ -273,25 +271,13 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
       .on('Otp-Verification-Success', async () => {
         await this.getUserStatus();
 
-        if (this.currentStatus === VerificationStatus.Rejected) {
-          await this.getUserKycAttempt();
-
-          if (this.wantsToPassKycAgain && this.hasFreeAttempts) {
-            const state = {
-              goToEmail: false,
-              startKyc: true,
-              showBanner: false,
-            };
-
-            this.$emit('confirm', state);
-            this.setWillToPassKycAgain(false);
-            return;
-          }
-        }
-
         if (!this.currentStatus) {
           if (this.userApplied) {
-            this.showAppNotification(this.t('card.infoMessageNoKYC'), 'info');
+            this.$notify({
+              title: '',
+              message: 'KYC process has not been finished.',
+              type: 'info',
+            });
           }
 
           if (!this.isEuroBalanceEnough) {
@@ -317,28 +303,6 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
 
           this.$emit('confirm', state);
         }
-      })
-      .on('Verification-Email-Sent-Success', () => {
-        this.sendOtpBtnLoading = false;
-
-        if (this.userApplied) {
-          this.showAppNotification(this.t('card.infoMessageNoKYC'), 'info');
-        }
-
-        if (!this.isEuroBalanceEnough) {
-          this.notPassedKycAndNotHasXorEnough = true;
-
-          return;
-        }
-
-        const state = {
-          goToEmail: true,
-          startKyc: false,
-          showBanner: false,
-        };
-
-        this.$emit('confirm', state);
-        this.sendOtpBtnLoading = false;
       });
   }
 }
@@ -395,7 +359,6 @@ export default class Phone extends Mixins(TranslationMixin, mixins.LoadingMixin,
 }
 
 input[type='number'] {
-  appearance: textfield;
   -moz-appearance: textfield;
 }
 

@@ -83,8 +83,6 @@ export default class ClaimDialog extends Mixins(
 .claim-dialog {
   @include full-width-button('action-button');
 
-  padding-bottom: $inner-spacing-medium;
-
   & > *:not(:last-child) {
     margin-top: $inner-spacing-medium;
   }
@@ -103,6 +101,7 @@ export default class ClaimDialog extends Mixins(
     font-size: var(--s-font-size-large);
     font-weight: 700;
     line-height: var(--s-line-height-reset);
+    letter-spacing: var(--s-letter-spacing-small);
 
     &--fiat {
       font-size: var(--s-font-size-big);

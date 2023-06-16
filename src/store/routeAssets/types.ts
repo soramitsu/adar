@@ -22,7 +22,7 @@ export type Recipient = {
 };
 
 export type RouteAssetsSubscription = {
-  liquidityReservesSubscription: Nullable<Subscription>;
+  liquidityReservesSubscription: Subscription;
   payload: Nullable<QuotePayload>;
   paths: Nullable<QuotePaths>;
   liquiditySources: Nullable<LiquiditySourceTypes[]>;

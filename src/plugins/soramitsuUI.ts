@@ -42,6 +42,7 @@ import STableColumn from '@soramitsu/soramitsu-js-ui/lib/components/Table/STable
 import STooltip from '@soramitsu/soramitsu-js-ui/lib/components/Tooltip';
 import SDatePicker from '@soramitsu/soramitsu-js-ui/lib/components/DatePicker/SDatePicker';
 
+import ElProgress from 'element-ui/lib/progress';
 import ElPopover from 'element-ui/lib/popover';
 import ElCheckbox from 'element-ui/lib/checkbox';
 import ElCheckboxGroup from 'element-ui/lib/checkbox-group';
@@ -50,6 +51,7 @@ import store from '@/store';
 
 Vue.use(ElementUIPlugin);
 Vue.use(SoramitsuUIStorePlugin, { store: store.original });
+Vue.use(ElProgress);
 Vue.use(ElPopover);
 Vue.use(ElCheckbox);
 Vue.use(ElCheckboxGroup);

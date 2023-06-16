@@ -9,7 +9,7 @@
       class="explore-table"
     >
       <!-- Index -->
-      <s-table-column width="280" label="#" fixed-position="left">
+      <s-table-column width="320" label="#" fixed-position="left">
         <template #header>
           <div class="explore-table-item-index">
             <span @click="handleResetSort" :class="['explore-table-item-index--head', { active: isDefaultSort }]">
@@ -28,8 +28,7 @@
           <span class="explore-table-item-index explore-table-item-index--body">{{ $index + startIndex + 1 }}</span>
           <token-logo class="explore-table-item-logo" :token-symbol="row.symbol" />
           <div class="explore-table-item-info explore-table-item-info--body">
-            <div class="explore-table-item-name">{{ row.symbol }}</div>
-            <div class="explore-table__secondary">{{ row.name }}</div>
+            <div class="explore-table-item-name">{{ row.name }}</div>
             <div class="explore-table-item-address">
               <token-address
                 class="explore-table-item-address__value"
@@ -40,6 +39,17 @@
               />
             </div>
           </div>
+        </template>
+      </s-table-column>
+      <!-- Symbol -->
+      <s-table-column width="108" header-align="center" align="center" prop="symbol">
+        <template #header>
+          <sort-button name="symbol" :sort="{ order, property }" @change-sort="changeSort">
+            <span class="explore-table__primary">{{ t('tokens.symbol') }}</span>
+          </sort-button>
+        </template>
+        <template v-slot="{ row }">
+          <div class="explore-table-item-symbol">{{ row.symbol }}</div>
         </template>
       </s-table-column>
       <!-- Price -->
@@ -86,7 +96,7 @@
         <!-- 1D Volume -->
         <s-table-column width="104" header-align="right" align="right">
           <template #header>
-            <sort-button name="volumeDay" :sort="{ order, property }" @change-sort="changeSort">
+            <sort-button name="volumeWeek" :sort="{ order, property }" @change-sort="changeSort">
               <span class="explore-table__primary">1D Vol.</span>
             </sort-button>
           </template>
@@ -94,10 +104,10 @@
             <formatted-amount
               is-fiat-value
               :font-weight-rate="FontWeightRate.MEDIUM"
-              :value="row.volumeDayFormatted.amount"
+              :value="row.volumeWeekFormatted.amount"
               class="explore-table-item-price explore-table-item-amount"
             >
-              {{ row.volumeDayFormatted.suffix }}
+              {{ row.volumeWeekFormatted.suffix }}
             </formatted-amount>
           </template>
         </s-table-column>
@@ -122,46 +132,22 @@
             </formatted-amount>
           </template>
         </s-table-column>
-        <!-- Velocity -->
-        <s-table-column width="88" header-align="right" align="right">
-          <template #header>
-            <sort-button name="velocity" :sort="{ order, property }" @change-sort="changeSort">
-              <span class="explore-table__primary">VC.</span>
-              <s-tooltip border-radius="mini">
-                <s-icon name="info-16" size="14px" />
-                <template #content>
-                  <div>{{ t('tooltips.velocity') }}</div>
-                  <br />
-                  <span style="font-weight: 500">Velocity = Trading Volume USD / Market Cap USD</span>
-                </template>
-              </s-tooltip>
-            </sort-button>
-          </template>
-          <template v-slot="{ row }">
-            <formatted-amount
-              :font-weight-rate="FontWeightRate.MEDIUM"
-              :value="row.velocityFormatted"
-              class="explore-table-item-price explore-table-item-amount"
-            />
-          </template>
-        </s-table-column>
       </template>
     </s-table>
 
-    <history-pagination
+    <s-pagination
       class="explore-table-pagination"
-      :current-page="currentPage"
-      :page-amount="pageAmount"
-      :total="total"
-      :last-page="lastPage"
-      :loading="loadingState"
-      @pagination-click="handlePaginationClick"
+      :layout="'prev, total, next'"
+      :current-page.sync="currentPage"
+      :page-size="pageAmount"
+      :total="filteredItems.length"
+      @prev-click="handlePrevClick"
+      @next-click="handleNextClick"
     />
   </div>
 </template>
 
 <script lang="ts">
-import last from 'lodash/fp/last';
 import { gql } from '@urql/core';
 import { FPNumber } from '@sora-substrate/util';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -184,10 +170,10 @@ import ExplorePageMixin from '@/components/mixins/ExplorePageMixin';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 
 type AssetData = AssetEntity & {
-  hourSnapshots: {
+  daySnapshots: {
     nodes: AssetSnapshotEntity[];
   };
-  daySnapshots: {
+  weekSnapshot: {
     nodes: AssetSnapshotEntity[];
   };
 };
@@ -196,8 +182,7 @@ type TokenData = {
   reserves: FPNumber;
   startPriceDay: FPNumber;
   startPriceWeek: FPNumber;
-  volumeDay: FPNumber;
-  volumeWeek: FPNumber;
+  volume: FPNumber;
 };
 
 type TableItem = {
@@ -207,14 +192,10 @@ type TableItem = {
   priceChangeDayFP: FPNumber;
   priceChangeWeek: number;
   priceChangeWeekFP: FPNumber;
-  volumeDay: number;
-  volumeDayFormatted: AmountWithSuffix;
+  volumeWeek: number;
+  volumeWeekFormatted: AmountWithSuffix;
   tvl: number;
   tvlFormatted: AmountWithSuffix;
-  // mcap: number;
-  // mcapFormatted: AmountWithSuffix;
-  velocity: number;
-  velocityFormatted: string;
 } & Asset;
 
 const AssetsQuery = gql<EntitiesQueryResponse<AssetData>>`
@@ -227,20 +208,23 @@ const AssetsQuery = gql<EntitiesQueryResponse<AssetData>>`
       nodes {
         id
         liquidity
-        hourSnapshots: data(
+        daySnapshots: data(
           filter: { and: [{ timestamp: { greaterThanOrEqualTo: $dayTimestamp } }, { type: { equalTo: HOUR } }] }
-          orderBy: [TIMESTAMP_DESC]
+          orderBy: [TIMESTAMP_ASC]
         ) {
           nodes {
+            timestamp
             priceUSD
             volume
           }
         }
-        daySnapshots: data(
-          filter: { and: [{ timestamp: { greaterThanOrEqualTo: $weekTimestamp } }, { type: { equalTo: DAY } }] }
-          orderBy: [TIMESTAMP_DESC]
+        weekSnapshot: data(
+          filter: { timestamp: { greaterThanOrEqualTo: $weekTimestamp } }
+          orderBy: [TIMESTAMP_ASC]
+          first: 1
         ) {
           nodes {
+            timestamp
             priceUSD
             volume
           }
@@ -250,22 +234,19 @@ const AssetsQuery = gql<EntitiesQueryResponse<AssetData>>`
   }
 `;
 
-const calcVolume = (nodes: AssetSnapshotEntity[]): FPNumber => {
-  return nodes.reduce((buffer, snapshot) => {
-    const snapshotVolume = new FPNumber(snapshot.volume.amountUSD);
-
-    return buffer.add(snapshotVolume);
-  }, FPNumber.ZERO);
-};
-
 const parse = (item: AssetData): Record<string, TokenData> => {
+  const volume = item.daySnapshots.nodes.reduce((buffer, snapshot) => {
+    const hourVolume = new FPNumber(snapshot.volume.amountUSD);
+
+    return buffer.add(hourVolume);
+  }, FPNumber.ZERO);
+
   return {
     [item.id]: {
       reserves: FPNumber.fromCodecValue(item.liquidity ?? 0),
-      startPriceDay: new FPNumber(last(item.hourSnapshots.nodes)?.priceUSD?.open ?? 0),
-      startPriceWeek: new FPNumber(last(item.daySnapshots.nodes)?.priceUSD?.open ?? 0),
-      volumeDay: calcVolume(item.hourSnapshots.nodes),
-      volumeWeek: calcVolume(item.daySnapshots.nodes),
+      startPriceDay: new FPNumber(item.daySnapshots.nodes?.[0]?.priceUSD?.open ?? 0),
+      startPriceWeek: new FPNumber(item.weekSnapshot.nodes?.[0]?.priceUSD?.open ?? 0),
+      volume,
     },
   };
 };
@@ -277,7 +258,6 @@ const parse = (item: AssetData): Record<string, TokenData> => {
     TokenAddress: components.TokenAddress,
     TokenLogo: components.TokenLogo,
     FormattedAmount: components.FormattedAmount,
-    HistoryPagination: components.HistoryPagination,
   },
 })
 export default class Tokens extends Mixins(ExplorePageMixin, TranslationMixin) {
@@ -301,14 +281,12 @@ export default class Tokens extends Mixins(ExplorePageMixin, TranslationMixin) {
       const fpPrice = FPNumber.fromCodecValue(this.getAssetFiatPrice(asset) ?? 0);
       const fpPriceDay = tokenData?.startPriceDay ?? FPNumber.ZERO;
       const fpPriceWeek = tokenData?.startPriceWeek ?? FPNumber.ZERO;
-      const fpVolumeDay = tokenData?.volumeDay ?? FPNumber.ZERO;
-      const fpVolumeWeek = tokenData?.volumeWeek ?? FPNumber.ZERO;
+      const fpVolumeWeek = tokenData?.volume ?? FPNumber.ZERO;
       const fpPriceChangeDay = calcPriceChange(fpPrice, fpPriceDay);
       const fpPriceChangeWeek = calcPriceChange(fpPrice, fpPriceWeek);
 
       const reserves = tokenData?.reserves ?? FPNumber.ZERO;
       const tvl = reserves.mul(fpPrice);
-      const velocity = tvl.isZero() ? FPNumber.ZERO : fpVolumeWeek.div(tvl);
 
       buffer.push({
         ...asset,
@@ -318,12 +296,10 @@ export default class Tokens extends Mixins(ExplorePageMixin, TranslationMixin) {
         priceChangeDayFP: fpPriceChangeDay,
         priceChangeWeek: fpPriceChangeWeek.toNumber(),
         priceChangeWeekFP: fpPriceChangeWeek,
-        volumeDay: fpVolumeDay.toNumber(),
-        volumeDayFormatted: formatAmountWithSuffix(fpVolumeDay),
+        volumeWeek: fpVolumeWeek.toNumber(),
+        volumeWeekFormatted: formatAmountWithSuffix(fpVolumeWeek),
         tvl: tvl.toNumber(),
         tvlFormatted: formatAmountWithSuffix(tvl),
-        velocity: velocity.toNumber(),
-        velocityFormatted: String(velocity.toNumber(2)),
       });
 
       return buffer;
@@ -334,7 +310,7 @@ export default class Tokens extends Mixins(ExplorePageMixin, TranslationMixin) {
   async updateExploreData(): Promise<void> {
     await this.withLoading(async () => {
       await this.withParentLoading(async () => {
-        this.tokensData = Object.freeze(await this.fetchTokensData());
+        this.tokensData = await this.fetchTokensData();
       });
     });
   }

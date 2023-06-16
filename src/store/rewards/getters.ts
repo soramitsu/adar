@@ -12,10 +12,7 @@ const getters = defineGetters<RewardsState>()({
   claimableRewards(...args): Array<RewardInfo | RewardsInfo> {
     const { state } = rewardsGetterContext(args);
 
-    const buffer: Array<RewardInfo | RewardsInfo> = [
-      ...state.selectedExternal,
-      ...Object.values(state.selectedCrowdloan).flat(1),
-    ];
+    const buffer: Array<RewardInfo | RewardsInfo> = [...state.selectedExternal, ...state.selectedCrowdloan];
 
     if (state.selectedInternal) {
       buffer.push(state.selectedInternal);
@@ -43,18 +40,17 @@ const getters = defineGetters<RewardsState>()({
     const { state } = rewardsGetterContext(args);
     return state.externalRewards.length !== 0;
   },
-  crowdloanRewardsAvailable(...args): string[] {
+  crowdloanRewardsAvailable(...args): Array<RewardInfo> {
     const { state } = rewardsGetterContext(args);
-    return Object.entries(state.crowdloanRewards).reduce<string[]>((buffer, [tag, rewards]) => {
-      if (rewards.some((reward) => !asZeroValue(reward.amount))) {
-        buffer.push(tag);
-      }
-      return buffer;
-    }, []);
+    return state.crowdloanRewards.filter((item) => !asZeroValue(item.amount));
   },
   externalRewardsSelected(...args): boolean {
     const { state } = rewardsGetterContext(args);
     return state.selectedExternal.length !== 0;
+  },
+  transactionStepsCount(...args): number {
+    const { getters } = rewardsGetterContext(args);
+    return getters.externalRewardsSelected ? 2 : 1;
   },
   rewardsByAssetsList(...args): Array<RewardsAmountHeaderItem> {
     const { getters } = rewardsGetterContext(args);

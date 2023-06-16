@@ -61,7 +61,7 @@
         />
       </template>
       <template v-else>
-        <widget :src="detailsWidgetUrl" />
+        <moonpay-widget :src="detailsWidgetUrl" />
         <s-button
           v-if="isCompletedTransaction"
           :type="actionButtonType"
@@ -82,8 +82,8 @@ import { Component, Mixins } from 'vue-property-decorator';
 import { WALLET_CONSTS, components, mixins } from '@soramitsu/soraneo-wallet-web';
 import type { BridgeHistory } from '@sora-substrate/util';
 
-import MoonpayBridgeInitMixin from '@/components/pages/Moonpay/BridgeInitMixin';
-import MoonpayLogo from '@/components/shared/Logo/Moonpay.vue';
+import MoonpayBridgeInitMixin from '@/components/Moonpay/MoonpayBridgeInitMixin';
+import MoonpayLogo from '@/components/logo/Moonpay.vue';
 
 import ethersUtil from '@/utils/ethers-util';
 import { getCssVariableValue, toQueryString } from '@/utils';
@@ -93,7 +93,7 @@ import { MoonpayTransactionStatus } from '@/utils/moonpay';
 import { action, getter, state } from '@/store/decorators';
 
 import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-import type { MoonpayTransaction, MoonpayCurrency, MoonpayCurrenciesById } from '@/utils/moonpay';
+import type { MoonpayTransaction, MoonpayCurrenciesById } from '@/utils/moonpay';
 
 const HistoryView = 'history';
 const DetailsView = 'details';
@@ -103,17 +103,17 @@ const DetailsView = 'details';
     MoonpayLogo,
     FormattedAmount: components.FormattedAmount,
     GenericPageHeader: lazyComponent(Components.GenericPageHeader),
-    Widget: lazyComponent(Components.Widget),
+    MoonpayWidget: lazyComponent(Components.MoonpayWidget),
     HistoryPagination: components.HistoryPagination,
   },
 })
 export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin, MoonpayBridgeInitMixin) {
   readonly FontSizeRate = WALLET_CONSTS.FontSizeRate;
 
-  @state.moonpay.transactions private transactions!: Array<MoonpayTransaction>;
-  @state.moonpay.currencies private currencies!: MoonpayCurrency[];
+  @state.moonpay.transactions transactions!: Array<MoonpayTransaction>;
 
   @getter.web3.isValidNetworkType private isValidNetworkType!: boolean;
+  @getter.moonpay.currenciesById private currenciesById!: MoonpayCurrenciesById;
   @getter.libraryTheme libraryTheme!: Theme;
 
   @action.moonpay.getTransactions private getTransactions!: AsyncFnWithoutArgs;
@@ -154,16 +154,6 @@ export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin,
     if (typeof this.unwatchEthereum === 'function') {
       this.unwatchEthereum();
     }
-  }
-
-  get currenciesById(): MoonpayCurrenciesById {
-    return this.currencies.reduce(
-      (result, item) => ({
-        ...result,
-        [item.id]: item,
-      }),
-      {}
-    );
   }
 
   get emptyHistory(): boolean {
@@ -355,6 +345,7 @@ $separator-margin: calc(var(--s-basic-spacing) / 2);
     align-items: center;
     border-radius: var(--s-border-radius-small);
     flex-flow: row nowrap;
+    letter-spacing: var(--s-letter-spacing-small);
     line-height: var(--s-line-height-medium);
     font-size: var(--s-font-size-small);
     font-weight: 300;

@@ -6,7 +6,6 @@ import { Language } from '@/consts';
 import { settingsStorage } from '@/utils/storage';
 
 import en from './en.json';
-import enCard from './card/en.json';
 
 Vue.use(VueI18n);
 
@@ -14,7 +13,7 @@ const i18n = new VueI18n({
   locale: Language.EN,
   fallbackLocale: Language.EN,
   messages: {
-    [Language.EN]: { ...en, ...enCard },
+    [Language.EN]: en,
   },
   silentTranslationWarn: process.env.NODE_ENV === 'production',
 });
@@ -78,13 +77,7 @@ export async function setI18nLocale(lang: Language): Promise<void> {
       `@/lang/${filename}.json`
     );
 
-    const { default: messagesCard } = await import(
-      /* webpackChunkName: "lang-card-[request]" */
-      /* webpackMode: "lazy" */
-      `@/lang/card/${filename}.json`
-    );
-
-    i18n.setLocaleMessage(locale, { ...messages, ...messagesCard });
+    i18n.setLocaleMessage(locale, messages);
     loadedLanguages.push(locale);
   }
 

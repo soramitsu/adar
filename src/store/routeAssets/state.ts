@@ -8,15 +8,11 @@ function initialState(): RouteAssetsState {
     subscriptions: [],
     enabledAssetsSubscription: null,
     enabledAssets: {
-      tbc: [],
-      xst: {},
       lockedSources: [],
     },
     processingState: {
       currentStageIndex: 0,
       inputToken: XOR,
-      datetime: undefined,
-      txInfo: undefined,
     },
   };
 }

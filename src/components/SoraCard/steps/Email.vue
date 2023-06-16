@@ -1,25 +1,17 @@
 <template>
   <div class="sora-card">
-    <s-input
-      maxlength="320"
-      :placeholder="t('card.emailPlaceholder')"
-      v-model="email"
-      :disabled="loading"
-      type="email"
-    />
+    <s-input maxlength="320" placeholder="Email" v-model="email" :disabled="loading" type="email" />
     <p class="sora-card__email-input-description">{{ emailInputDescription }}</p>
     <s-icon v-if="emailSent" name="basic-check-mark-24" size="16px" />
-    <div v-if="showNameInputs">
-      <s-input
-        class="sora-card__input-name"
-        maxlength="50"
-        :placeholder="t('card.firstNamePlaceholder')"
-        v-model="firstName"
-        :disabled="loading"
-      />
-      <s-input maxlength="50" :placeholder="t('card.lastNamePlaceholder')" v-model="lastName" :disabled="loading" />
-      <p class="sora-card__name-input-description">{{ t('card.personalNameInputDesc') }}</p>
-    </div>
+    <s-input
+      class="sora-card__input-name"
+      maxlength="50"
+      placeholder="First Name"
+      v-model="firstName"
+      :disabled="loading"
+    />
+    <s-input maxlength="50" placeholder="Last Name" v-model="lastName" :disabled="loading" />
+    <p class="sora-card__name-input-description">Use your real name.</p>
     <s-button
       type="primary"
       :disabled="sendBtnDisabled"
@@ -36,7 +28,6 @@
 <script lang="ts">
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 import EmailValidator from 'email-validator';
-
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { state } from '@/store/decorators';
@@ -45,107 +36,60 @@ const RESEND_INTERVAL = 59;
 
 @Component
 export default class SmsCode extends Mixins(TranslationMixin, mixins.LoadingMixin) {
-  @state.soraCard.authLogin private authLogin!: any;
-
-  private emailCountDown = '';
-  private prefilledEmail = '';
-  private unconfirmedEmail = '';
-  private emailSentFirstTime = false;
-  private emailResendCount = RESEND_INTERVAL;
+  @state.soraCard.authLogin authLogin!: any;
 
   firstName = '';
   lastName = '';
   email = '';
   emailSent = false;
+  emailSentFirstTime = false;
+  emailResendText = '';
+  emailResendCount = RESEND_INTERVAL;
 
   @Watch('emailResendCount', { immediate: true })
   private handleSmsCountChange(value: number): void {
     const digit = value.toString().length > 1 ? '' : '0';
-    this.emailCountDown = `00:${digit}${value}`;
+    const countDown = `${digit}${value}`;
+    this.emailResendText = `RESEND AVAILABLE IN 00:${countDown}`;
   }
 
   handleSendEmail(): void {
     this.startEmailCountDown();
 
-    if (this.isPrefilledEmailValid || this.isEmailMismatch) {
-      // user wants to change unconfirmed email
-      if (this.prefilledEmail !== this.email) {
-        this.authLogin.ChangeUnconfirmedEmail({ Email: this.email }).catch((error) => {
-          console.error('[SoraCard]: Error while changing email', error);
-        });
-
-        this.unconfirmedEmail = this.email;
-        this.emailSent = true;
-
-        return;
-      }
-    }
-
-    // user signs on for the first time
-    if (!this.emailSentFirstTime && !this.isPrefilledEmailValid) {
+    if (!this.emailSentFirstTime) {
       this.authLogin
         .UserMinimalRegistration({ Email: this.email, FirstName: this.firstName, LastName: this.lastName })
         .catch((error) => {
-          console.error('[SoraCard]: Error while email setup', error);
+          console.error(error);
         });
 
-      this.unconfirmedEmail = this.email;
       this.emailSentFirstTime = true;
       return;
     }
 
-    // user tries to resend email several times
-    this.authLogin.SendVerificationEmail().catch((error) => {
-      console.error('[SoraCard]: Error while resending email', error);
+    this.authLogin.SendVerificationEmail().catch(function (error) {
+      console.error(error);
     });
 
     this.emailSent = true;
   }
 
   get emailInputDescription(): string {
-    if (this.emailSent) return this.t('card.emailInputAfterSendDesc');
-    return this.t('card.emailInputBeforeSendDesc');
+    if (this.emailSent) return 'We’ve sent you the magic link. Check your email!';
+    return 'We’ll send you a verification email.';
   }
 
   get buttonText() {
-    if (this.emailSent && this.emailCountDown) {
-      return this.t('card.resendInBtn', { value: this.emailCountDown });
-    }
-    return this.t('card.sendEmailLinkBtn');
+    if (this.emailSent) return this.emailResendText;
+    return 'SEND VERIFICATION EMAIL';
   }
 
   get sendBtnDisabled(): boolean {
     if (this.emailSent) return true;
-
-    if (this.isPrefilledEmailValid) {
-      if (EmailValidator.validate(this.email)) {
-        return false;
-      }
-
-      return true;
-    } else {
-      if (this.firstName && this.lastName) {
-        return !EmailValidator.validate(this.email);
-      }
-
-      return true;
+    if (this.firstName && this.lastName) {
+      return !EmailValidator.validate(this.email);
     }
-  }
-
-  get showNameInputs(): boolean {
-    return this.prefilledEmail === 'undefined' || !this.prefilledEmail;
-  }
-
-  get isPrefilledEmailValid(): boolean {
-    if (this.prefilledEmail !== 'undefined' || !!this.prefilledEmail) {
-      return EmailValidator.validate(this.prefilledEmail);
-    }
-    return false;
-  }
-
-  get isEmailMismatch(): boolean {
-    if (!this.unconfirmedEmail) return false;
-    return this.unconfirmedEmail !== this.email;
+    return true;
   }
 
   startEmailCountDown(): void {
@@ -161,23 +105,20 @@ export default class SmsCode extends Mixins(TranslationMixin, mixins.LoadingMixi
   }
 
   mounted(): void {
-    this.prefilledEmail = localStorage.getItem('PW-Email') || 'undefined';
-
-    if (this.prefilledEmail !== 'undefined') {
-      this.email = this.prefilledEmail;
-    }
-
     if (!this.authLogin) return;
 
     this.authLogin
       .on('Verification-Email-Sent-Success', () => {
         this.emailSent = true;
       })
+      .on('Otp-Verification-Success', () => {
+        // Tokens are stored in local storage localStorage.getItem('PW-token'); localStorage.getItem('PW-refresh-token');
+        /* Minimal registration is required */
+      })
       .on('Verification-Email-ReSent-Success', () => {
         this.emailSent = true;
       })
       .on('Email-verified', () => {
-        this.unconfirmedEmail = '';
         this.$emit('confirm');
       });
   }

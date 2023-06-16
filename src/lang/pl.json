@@ -87,12 +87,11 @@
         "noAccounts": "Wygląda na to, że w Twoim rozszerzeniu {extension} nie ma kont. Dodaj konto i spróbuj ponownie.",
         "noAccount": "Błąd konta {extension}. Sprawdź swoje konto w rozszerzeniu {extension}.",
         "noExtension": "Nie znaleziono {extension} . Zainstaluj go i ponownie załaduj tę stronę",
-        "noSigner": "Brak dostępu. Przejdź do ustawień {extension} i otwórz „Zarządzaj dostępem do witryny”, aby zezwolić.",
-        "connectionError": "Wystąpił błąd podczas łączenia portfela. Możesz spróbować ponownie połączyć portfel przez {extension}"
+        "noSigner": "Brak dostępu. Przejdź do ustawień {extension} i otwórz „Zarządzaj dostępem do witryny”, aby zezwolić."
     },
     "connection": {
         "title": "Konto sieci {Sora}",
-        "text": "Rozszerzenia i Google bezpiecznie przechowują Twoje konto w sieci {Sora} . Pozwalają podpisywać transakcje i zarządzać aktywami.",
+        "text": "Połącz lub utwórz konto sieciowe {Sora} z {extensions}. Te rozszerzenia umożliwiają bezpieczne podpisywanie transakcji i zarządzanie zasobami w sieci {Sora}.",
         "noAccounts": "W Twoim rozszerzeniu przeglądarki {extension} nie znaleziono konta. Dodaj konto i spróbuj ponownie.",
         "selectAccount": "Wybierz konto, na którym chcesz pracować",
         "action": {
@@ -106,19 +105,13 @@
             "install": "zainstalować",
             "connected": "Połączony",
             "notConnected": "Nie połączony"
-        },
-        "internalTitle": "Połącz przez {wallet}",
-        "internalText": "Możesz utworzyć lub połączyć istniejące konto za pośrednictwem {wallet} . Przechowuje konta przy użyciu szyfrowania.",
-        "list": {
-            "simplest": "Najprostsza opcja",
-            "extensions": "Rozszerzenia"
         }
     },
     "wallet": {
         "title": "Konto sieci {Sora}",
         "WalletAssets": "Waluty",
-        "createToken": "@:createTokenText",
-        "WalletHistory": "Aktywność"
+        "WalletActivity": "Aktywność",
+        "createToken": "@:createTokenText"
     },
     "walletSend": {
         "title": "Wyślij",
@@ -329,6 +322,7 @@
         "Bridge": "@:bridgeText",
         "About": "O giełdzie",
         "Stats": "Statystyki",
+        "Support": "Pomoc",
         "Wallet": "Portfel",
         "CreatePair": "Tworzenie pary",
         "AddLiquidity": "Dodawanie płynności",
@@ -350,6 +344,7 @@
         "Rewards": "Wynagrodzenie",
         "About": "O giełdzie",
         "Stats": "Statystyki",
+        "Support": "Pomoc",
         "CreatePair": "Utwórz parę",
         "StakingContainer": "Staking",
         "Explore\/Container": "Badać",
@@ -862,9 +857,7 @@
         "settings": "Ustawienia",
         "switchTheme": "Przełącz na tryb {theme}",
         "switchLanguage": "Wybierz język",
-        "selectNode": "@:selectNodeText",
-        "showDisclaimer": "Pokaż zastrzeżenie",
-        "hideDisclaimer": "Ukryj wyłączenie odpowiedzialności"
+        "selectNode": "@:selectNodeText"
     },
     "sentText": "Wysłano",
     "learnMoreText": "Dowiedz się więcej",
@@ -1110,13 +1103,7 @@
             "jsonFields": "Plik JSON nie zawiera wymaganych pól"
         },
         "assetsAtRiskText": "Aktywa zagrożone!",
-        "deleteAccountText": "Konta nie można odzyskać bez frazy początkowej, pliku .json lub jeśli jest on przechowywany w jakimś rozszerzeniu. Zostaniesz wylogowany.",
-        "importSteps": {
-            "selectWallet": "Przejdź do używanego portfela",
-            "selectAccount": "Wybierz konto, które chcesz wyeksportować",
-            "exportAccount": "Wyeksportuj plik {JSON}"
-        },
-        "exportTutorialsText": "Eksportuj samouczki"
+        "deleteAccountText": "Konta nie można odzyskać bez frazy początkowej, pliku .json lub jeśli jest on przechowywany w jakimś rozszerzeniu. Zostaniesz wylogowany."
     },
     "hashiBridgeText": "Most {Hashi}",
     "disclaimerTitle": "Zastrzeżenie:",
@@ -1125,70 +1112,12 @@
     },
     "tooltips": {
         "roi": "{ROI} oznacza zwrot z inwestycji. Oblicza się go, dzieląc zysk uzyskany z inwestycji przez koszt tej inwestycji w ekwiwalencie procentowym.",
-        "tvl": "{TVL} oznacza całkowitą zablokowaną wartość. Reprezentuje tokeny zamknięte w pulach w ekwiwalencie dolara.",
-        "volume": "Wolumen odnosi się do całkowitej kwoty aktywów, którymi handlowano lub wymieniano w sieci w określonym czasie. Wolumen jest ważnym miernikiem do pomiaru płynności i ogólnej aktywności sieci.",
-        "fees": "Opłaty na blockchainie {Sora} odnoszą się do opłat, które są naliczane za wykonywanie transakcji w sieci. Opłaty te są uiszczane w XOR, natywnej kryptowalucie sieci {Sora} . Wysokość opłaty uzależniona jest od złożoności i wielkości realizowanej transakcji",
-        "supply": "Podaż tokenów odnosi się do całkowitej liczby tokenów, które zostały utworzone i są w obiegu w sieci. Podaż tokenów może się zmieniać w zależności od liczby tokenów postawionych, spalonych lub przesłanych w sieci.",
-        "transactions": "Transakcje odnoszą się do procesu wysyłania lub odbierania zasobów cyfrowych w sieci, w tym operacji płynnościowych, a także swapów.",
-        "accounts": "Konta to adresy cyfrowe, które przechowują zasoby użytkownika w sieci. Każde konto jest powiązane z unikalnym adresem publicznym i kluczem prywatnym, który umożliwia użytkownikowi dostęp do zasobów i zarządzanie nimi.",
-        "bridgeTransactions": "Most {from} do {to} odnosi się do procesu przesyłania zasobów między sieciami {from} i {to} za pomocą mostu. Most umożliwia interoperacyjność obu sieci, umożliwiając użytkownikom płynne przenoszenie zasobów między nimi.",
-        "velocity": "Szybkość tokena to średnia liczba zmian tokena na kontach w okresie (miesiącu). Wskazuje poziom aktywności handlowej i płynności."
+        "tvl": "{TVL} oznacza całkowitą zablokowaną wartość. Reprezentuje tokeny zamknięte w pulach w ekwiwalencie dolara."
     },
     "createTokenText": "Utwórz token",
     "comingSoonText": "Już wkrótce...",
     "confirmText": "Potwierdź",
     "createTokenTextNFT": "Utwórz token NFT",
     "doNotShowText": "Nie pokazuj mi tego więcej",
-    "accountText": "konto | konta",
-    "networkStatisticsText": "Statystyki sieci",
-    "footer": {
-        "node": {
-            "title": {
-                "connected": "Węzeł podłączony",
-                "loading": "Ponowne łączenie węzła",
-                "disconnected": "Węzeł odłączony"
-            }
-        },
-        "internet": {
-            "title": {
-                "disabled": "Internet wyłączony",
-                "unstable": "Internet niestabilny",
-                "stable": "Stabilny internet"
-            },
-            "label": "Twoja prędkość internetu",
-            "desc": {
-                "disabled": "Bezładny",
-                "unstable": "Wolne połączenie",
-                "stable": "Optymalna prędkość"
-            },
-            "action": "Odśwież {Polkaswap}",
-            "dialogTitle": "Połącz się ze źródłem internetowym",
-            "dialogDesc": "{Polkaswap} wymaga połączenia internetowego do stabilnego działania"
-        },
-        "statistics": {
-            "title": {
-                "unavailable": "Statystyki niedostępne",
-                "loading": "Ładowanie statystyk",
-                "available": "Dostępne statystyki"
-            },
-            "label": "Usługi statystyczne",
-            "desc": {
-                "unavailable": "Wszystkie usługi są odłączone",
-                "loading": "Trwa ładowanie wszystkich usług",
-                "available": "Wszystkie usługi są stabilne"
-            },
-            "action": "Wybierz usługi",
-            "dialog": {
-                "title": "{Sora} Wybór usługi sieciowej",
-                "fiat": "wartości Fiata",
-                "chartsAndActivity": "Wykresy i aktywność"
-            }
-        }
-    },
-    "locationText": "Lokalizacja",
-    "acceptText": "Zaakceptuj i ukryj",
-    "newAccountsText": "Nowe konta",
-    "dragAndDropText": "Przeciągnij i upuść lub wybierz plik {extension}",
-    "copyPhraseText": "Skopiuj frazę",
-    "stepText": "Krok"
+    "accountText": "konto | konta"
 }

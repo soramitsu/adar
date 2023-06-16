@@ -1,7 +1,7 @@
 <template>
   <div class="rewards">
     <div class="rewards-content" v-loading="parentLoading || loading">
-      <rewards-gradient-box class="rewards-block" :symbol="gradientSymbol">
+      <gradient-box class="rewards-block" :symbol="gradientSymbol">
         <div :class="['rewards-box', libraryTheme]">
           <tokens-row :assets="rewardTokens" />
           <div v-if="claimingInProgressOrFinished" class="rewards-claiming-text">
@@ -14,33 +14,31 @@
                 class="rewards-table"
                 v-if="internalRewards"
                 v-model="selectedInternalRewardsModel"
-                :title="t('rewards.events.LiquidityProvision')"
-                :items="[internalRewards]"
+                :item="internalRewards"
                 :theme="libraryTheme"
+                :disabled="!internalRewardsAvailable"
                 is-codec-string
               />
               <rewards-amount-table
                 class="rewards-table"
                 v-model="selectedVestedRewardsModel"
-                :title="t('rewards.groups.strategic')"
-                :items="vestedRewadsGroupItems"
+                :item="vestedRewadsGroupItem"
                 :theme="libraryTheme"
+                :disabled="!vestedRewardsAvailable"
                 is-codec-string
               />
               <rewards-amount-table
-                v-if="Object.keys(crowdloanRewards).length"
                 class="rewards-table"
                 v-model="selectedCrowdloanRewardsModel"
-                :title="t('rewards.groups.crowdloan')"
-                :items="crowdloanRewardsGroupItems"
+                :item="crowdloanRewardsGroupItem"
                 :theme="libraryTheme"
+                complex-group
                 is-codec-string
               />
               <rewards-amount-table
                 class="rewards-table"
                 v-model="selectedExternalRewardsModel"
-                :title="t('rewards.groups.external')"
-                :items="externalRewardsGroupItems"
+                :item="externalRewardsGroupItem"
                 :show-table="!!externalRewards.length"
                 :theme="libraryTheme"
                 simple-group
@@ -75,7 +73,7 @@
             {{ transactionStatusMessage }}
           </div>
         </div>
-      </rewards-gradient-box>
+      </gradient-box>
       <div v-if="!claimingInProgressOrFinished && hintText" class="rewards-block rewards-hint">
         {{ hintText }}
       </div>
@@ -99,7 +97,6 @@ import { Component, Mixins } from 'vue-property-decorator';
 import { components, mixins, groupRewardsByAssetsList } from '@soramitsu/soraneo-wallet-web';
 import { CodecString, FPNumber } from '@sora-substrate/util';
 import { KnownAssets, KnownSymbols } from '@sora-substrate/util/build/assets/consts';
-import { RewardType } from '@sora-substrate/util/build/rewards/consts';
 import type { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import type { RewardInfo, RewardsInfo } from '@sora-substrate/util/build/rewards/types';
 import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
@@ -118,11 +115,11 @@ import type { ClaimRewardsParams } from '@/store/rewards/types';
 
 @Component({
   components: {
-    RewardsGradientBox: lazyComponent(Components.RewardsGradientBox),
+    GenericPageHeader: lazyComponent(Components.GenericPageHeader),
+    GradientBox: lazyComponent(Components.GradientBox),
+    TokensRow: lazyComponent(Components.TokensRow),
     RewardsAmountHeader: lazyComponent(Components.RewardsAmountHeader),
     RewardsAmountTable: lazyComponent(Components.RewardsAmountTable),
-    GenericPageHeader: lazyComponent(Components.GenericPageHeader),
-    TokensRow: lazyComponent(Components.TokensRow),
     InfoLine: components.InfoLine,
   },
 })
@@ -130,8 +127,7 @@ export default class Rewards extends Mixins(
   SubscriptionsMixin,
   mixins.FormattedAmountMixin,
   WalletConnectMixin,
-  mixins.TransactionMixin,
-  mixins.NotificationMixin
+  mixins.TransactionMixin
 ) {
   @state.rewards.feeFetching private feeFetching!: boolean;
   @state.rewards.rewardsFetching private rewardsFetching!: boolean;
@@ -142,22 +138,23 @@ export default class Rewards extends Mixins(
   @state.rewards.fee fee!: CodecString;
 
   @state.rewards.vestedRewards private vestedRewards!: RewardsInfo;
-  @state.rewards.crowdloanRewards private crowdloanRewards!: Record<string, RewardInfo[]>;
+  @state.rewards.crowdloanRewards private crowdloanRewards!: Array<RewardInfo>;
   @state.rewards.internalRewards internalRewards!: RewardInfo;
   @state.rewards.externalRewards externalRewards!: Array<RewardInfo>;
 
   @state.rewards.selectedVested private selectedVestedRewards!: Nullable<RewardsInfo>;
   @state.rewards.selectedInternal private selectedInternalRewards!: Nullable<RewardInfo>;
   @state.rewards.selectedExternal private selectedExternalRewards!: Array<RewardInfo>;
-  @state.rewards.selectedCrowdloan private selectedCrowdloanRewards!: Record<string, RewardInfo[]>;
+  @state.rewards.selectedCrowdloan private selectedCrowdloanRewards!: Array<RewardInfo>;
 
   @getter.assets.xor private xor!: AccountAsset;
+  @getter.rewards.transactionStepsCount private transactionStepsCount!: number;
   @getter.rewards.externalRewardsAvailable private externalRewardsAvailable!: boolean;
   @getter.rewards.rewardsAvailable rewardsAvailable!: boolean;
-  @getter.rewards.internalRewardsAvailable private internalRewardsAvailable!: boolean;
-  @getter.rewards.vestedRewardsAvailable private vestedRewardsAvailable!: boolean;
-  @getter.rewards.rewardsByAssetsList private rewardsByAssetsList!: Array<RewardsAmountHeaderItem>;
-  @getter.rewards.externalRewardsSelected private externalRewardsSelected!: boolean;
+  @getter.rewards.internalRewardsAvailable internalRewardsAvailable!: boolean;
+  @getter.rewards.vestedRewardsAvailable vestedRewardsAvailable!: boolean;
+  @getter.rewards.rewardsByAssetsList rewardsByAssetsList!: Array<RewardsAmountHeaderItem>;
+  @getter.rewards.externalRewardsSelected externalRewardsSelected!: boolean;
   @getter.libraryTheme libraryTheme!: Theme;
 
   @mutation.rewards.reset private reset!: FnWithoutArgs;
@@ -209,10 +206,6 @@ export default class Rewards extends Mixins(
     }
   }
 
-  get transactionStepsCount(): number {
-    return this.externalRewardsSelected ? 2 : 1;
-  }
-
   get rewardsReceived(): boolean {
     return this.receivedRewards.length !== 0;
   }
@@ -233,53 +226,43 @@ export default class Rewards extends Mixins(
     return this.rewardTokenSymbols.length === 1 ? this.rewardTokenSymbols[0] : '';
   }
 
-  get externalRewardsGroupItems(): RewardInfoGroup[] {
-    return [
-      {
-        type: [RewardType.External, this.t('rewards.groups.external')],
-        limit: groupRewardsByAssetsList(this.externalRewards),
-        rewards: this.externalRewards,
-      },
-    ];
+  get externalRewardsGroupItem(): RewardInfoGroup {
+    return {
+      type: this.t('rewards.groups.external'),
+      limit: groupRewardsByAssetsList(this.externalRewards),
+      rewards: this.externalRewards,
+    };
   }
 
-  get vestedRewadsGroupItems(): RewardInfoGroup[] {
+  get vestedRewadsGroupItem(): RewardInfoGroup {
     const rewards = this.vestedRewards?.rewards ?? [];
     const pswap = KnownAssets.get(KnownSymbols.PSWAP);
 
-    return [
-      {
-        type: [RewardType.Strategic, this.t('rewards.groups.strategic')],
-        title: this.t('rewards.claimableAmountDoneVesting'),
-        limit: [
-          {
-            amount: FPNumber.fromCodecValue(this.vestedRewards?.limit ?? 0, pswap.decimals).toCodecString(),
-            asset: pswap,
-          },
-        ],
-        total: {
-          amount: FPNumber.fromCodecValue(this.vestedRewards?.total ?? 0, pswap.decimals).toLocaleString(),
+    return {
+      type: this.t('rewards.groups.strategic'),
+      title: this.t('rewards.claimableAmountDoneVesting'),
+      limit: [
+        {
+          amount: FPNumber.fromCodecValue(this.vestedRewards?.limit ?? 0, pswap.decimals).toCodecString(),
           asset: pswap,
         },
-        rewards,
+      ],
+      total: {
+        amount: FPNumber.fromCodecValue(this.vestedRewards?.total ?? 0, pswap.decimals).toLocaleString(),
+        asset: pswap,
       },
-    ];
+      rewards,
+    };
   }
 
-  get crowdloanRewardsGroupItems(): RewardInfoGroup[] {
-    return Object.entries(this.crowdloanRewards).map(([tag, rewards]) => {
-      return {
-        type: [RewardType.Crowdloan, tag],
-        title: tag,
-        limit: rewards.map((item) => ({
-          ...item,
-          total: {
-            amount: FPNumber.fromCodecValue(item.total ?? 0, item.asset.decimals).toLocaleString(),
-            asset: item.asset,
-          },
-        })),
-      };
-    });
+  get crowdloanRewardsGroupItem(): RewardInfoGroup {
+    return {
+      type: this.t('rewards.groups.crowdloan'),
+      rewards: this.crowdloanRewards.map((item) => ({
+        ...item,
+        total: FPNumber.fromCodecValue(item.total ?? 0, item.asset.decimals).toLocaleString(),
+      })),
+    };
   }
 
   get selectedInternalRewardsModel(): boolean {
@@ -309,15 +292,17 @@ export default class Rewards extends Mixins(
     this.setSelectedRewards({ selectedVested });
   }
 
-  get selectedCrowdloanRewardsModel(): string[] {
-    return Object.keys(this.selectedCrowdloanRewards);
+  get selectedCrowdloanRewardsModel(): Array<string> {
+    return this.selectedCrowdloanRewards.map((item) => item.type);
   }
 
-  set selectedCrowdloanRewardsModel(value: string[]) {
-    const selectedCrowdloan = value.reduce((buffer, tag) => {
-      buffer[tag] = this.crowdloanRewards[tag];
+  set selectedCrowdloanRewardsModel(value: Array<string>) {
+    const selectedCrowdloan = this.crowdloanRewards.reduce<RewardInfo[]>((buffer, item) => {
+      if (value.includes(item.type)) {
+        buffer.push(item);
+      }
       return buffer;
-    }, {});
+    }, []);
 
     this.setSelectedRewards({ selectedCrowdloan });
   }
@@ -415,7 +400,10 @@ export default class Rewards extends Mixins(
     await this.getExternalRewards(this.evmAddress);
 
     if (!this.rewardsAvailable && showNotification) {
-      this.showAppNotification(this.t('rewards.notification.empty'));
+      this.$notify({
+        message: this.t('rewards.notification.empty'),
+        title: '',
+      });
     }
   }
 

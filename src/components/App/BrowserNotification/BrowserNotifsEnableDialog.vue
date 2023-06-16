@@ -1,13 +1,13 @@
 <template>
   <dialog-base class="browser-notification" :title="t('browserNotificationDialog.title')" :visible.sync="isVisible">
     <div class="browser-notification-dialog">
-      <s-image src="browser-notification/chrome.png" lazy fit="cover" draggable="false" class="unselectable" />
+      <img src="@/assets/img/browser-notification/chrome.png?inline" class="browser-notification-dialog__example" />
       <p class="browser-notification-dialog__info">
         {{ t('browserNotificationDialog.info') }}
       </p>
       <s-button
         type="primary"
-        class="browser-notification-dialog__btn s-typography-button--large"
+        class="s-typography-button--large browser-notification-dialog__btn"
         :loading="loading"
         @click="handleConfirm"
       >
@@ -29,28 +29,49 @@ import { state, mutation } from '@/store/decorators';
     DialogBase: components.DialogBase,
   },
 })
-export default class AppBrowserNotifsEnableDialog extends Mixins(
+export default class BrowserNotifsEnableDialog extends Mixins(
   TranslationMixin,
   mixins.LoadingMixin,
   mixins.DialogMixin
 ) {
-  @state.settings.isBrowserNotificationApiAvailable private isAvailable!: boolean;
-  @mutation.settings.setBrowserNotifsAgreement private setNotifsAgreement!: (value: NotificationPermission) => void;
-
+  @state.settings.isBrowserNotificationApiAvailable isBrowserNotificationApiAvailable!: boolean;
+  @mutation.settings.setBrowserNotifsAgreement setBrowserNotifsAgreement!: (value: NotificationPermission) => void;
   async handleConfirm(): Promise<void> {
-    if (this.isAvailable) {
+    if (this.isBrowserNotificationApiAvailable) {
       this.closeDialog();
       this.$emit('set-dark-page', true);
       const permission = await Notification.requestPermission();
-      this.setNotifsAgreement(permission);
+      this.setBrowserNotifsAgreement(permission);
       this.$emit('set-dark-page', false);
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.browser-notification {
+  .el-dialog__title {
+    margin: auto;
+    padding-left: var(--s-size-mini);
+  }
+
+  .el-dialog {
+    margin-top: 22vh !important;
+  }
+}
 .browser-notification-dialog {
-  @include browser-notification-dialog;
+  display: flex;
+  flex-direction: column;
+
+  &__info {
+    text-align: center;
+    margin: $basic-spacing $basic-spacing * 2;
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  &__btn {
+    margin-bottom: $basic-spacing;
+  }
 }
 </style>

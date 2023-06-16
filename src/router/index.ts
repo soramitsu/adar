@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
-import { Component } from 'vue-property-decorator';
 import { WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { api } from '@sora-substrate/util';
 
@@ -14,8 +13,6 @@ import { DemeterPageNames } from '@/modules/demeterFarming/consts';
 import { demeterLazyView } from '@/modules/demeterFarming/router';
 
 Vue.use(VueRouter);
-
-Component.registerHooks(['beforeRouteEnter', 'beforeRouteUpdate', 'beforeRouteLeave']);
 
 const WALLET_DEFAULT_ROUTE = WALLET_CONSTS.RouteNames.Wallet;
 
@@ -54,7 +51,7 @@ const routes: Array<RouteConfig> = [
     redirect: '/swap',
   },
   {
-    path: '/swap/:first?/:second?',
+    path: '/swap',
     name: PageNames.Swap,
     component: lazyView(PageNames.Swap),
   },

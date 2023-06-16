@@ -38,13 +38,13 @@ const mutations = defineMutations<PoolState>()({
     state.accountLockedLiquiditySubscription = null;
   },
   setPoolApyObject(state, object: PoolApyObject): void {
-    state.poolApyObject = Object.freeze({ ...object });
+    state.poolApyObject = object;
   },
   resetPoolApyObject(state): void {
     state.poolApyObject = {};
   },
   updatePoolApyObject(state, poolApyObject: PoolApyObject): void {
-    state.poolApyObject = Object.freeze({ ...state.poolApyObject, ...poolApyObject });
+    state.poolApyObject = { ...state.poolApyObject, ...poolApyObject };
   },
   setPoolApySubscription(state, subscription: VoidFunction): void {
     state.poolApySubscription = subscription;

@@ -12,9 +12,6 @@ function initialState(): SoraCardState {
     xorToDeposit: FPNumber.ZERO,
     totalXorBalanceUpdates: null,
     authLogin: null,
-    hasFreeAttempts: null,
-    wantsToPassKycAgain: false,
-    rejectReason: null,
   };
 }
 

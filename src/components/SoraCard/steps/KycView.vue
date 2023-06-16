@@ -14,16 +14,17 @@
 </template>
 
 <script lang="ts">
+import { loadScript, unloadScript } from 'vue-plugin-load-script';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 import { v4 as uuidv4 } from 'uuid';
-import { WALLET_CONSTS, mixins, ScriptLoader } from '@soramitsu/soraneo-wallet-web';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
+import { WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { state } from '@/store/decorators';
 import { soraCard } from '@/utils/card';
 
 @Component
-export default class KycView extends Mixins(TranslationMixin, mixins.NotificationMixin) {
+export default class KycView extends Mixins(TranslationMixin) {
   @state.wallet.settings.soraNetwork soraNetwork!: WALLET_CONSTS.SoraNetwork;
 
   @Prop({ default: '', type: String }) readonly accessToken!: string;
@@ -58,10 +59,12 @@ export default class KycView extends Mixins(TranslationMixin, mixins.Notificatio
     } catch (data) {
       console.error('[SoraCard]: Error while initiating KYC', data);
 
-      this.showAppNotification(this.t('card.infoMessageTryAgain'));
+      this.$notify({
+        message: 'Something went wrong. Please, start again',
+        title: '',
+      });
       this.$emit('confirm-kyc', false);
-
-      ScriptLoader.unload(kycService.sdkURL, false);
+      unloadScript(kycService.sdkURL);
     }
   }
 
@@ -70,9 +73,9 @@ export default class KycView extends Mixins(TranslationMixin, mixins.Notificatio
 
     const referenceNumber = await this.getReferenceNumber(soraProxy.referenceNumberEndpoint);
 
-    await ScriptLoader.unload(kycService.sdkURL, false);
+    await unloadScript(kycService.sdkURL).catch(() => {});
 
-    ScriptLoader.load(kycService.sdkURL)
+    loadScript(kycService.sdkURL)
       .then(() => {
         // @ts-expect-error no-undef
         Paywings.WebKyc.create({
@@ -118,10 +121,12 @@ export default class KycView extends Mixins(TranslationMixin, mixins.Notificatio
           .on('Error', (data) => {
             console.error('[SoraCard]: Error while initiating KYC', data);
 
-            this.showAppNotification(this.t('card.infoMessageTryAgain'));
+            this.$notify({
+              message: 'Something went wrong. Please, start again',
+              title: '',
+            });
             this.$emit('confirm-kyc', false);
-
-            ScriptLoader.unload(kycService.sdkURL);
+            unloadScript(kycService.sdkURL);
 
             // Integrator will be notified if user cancels KYC or something went wrong
             // alert('Something went wrong ' + data.StatusDescription);
@@ -131,7 +136,7 @@ export default class KycView extends Mixins(TranslationMixin, mixins.Notificatio
             // alert('Kyc was successfull, integrator takes control of flow from now on')
 
             this.$emit('confirm-kyc', true);
-            ScriptLoader.unload(kycService.sdkURL);
+            unloadScript(kycService.sdkURL);
 
             // document.getElementById('kyc')!.style.display = 'none';
             // document.getElementById('finish')!.style.display = 'block';
@@ -142,7 +147,7 @@ export default class KycView extends Mixins(TranslationMixin, mixins.Notificatio
       });
     setTimeout(() => {
       this.loadingKycView = false;
-    }, 5_000);
+    }, 5000);
   }
 }
 </script>

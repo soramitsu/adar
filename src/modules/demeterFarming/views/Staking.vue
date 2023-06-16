@@ -18,17 +18,13 @@
           <div>
             <h3 class="staking-info-title">{{ token.asset.symbol }}</h3>
             <div
-              v-show="!isActiveCollapseItem(token.asset.address, activeCollapseItems)"
+              v-show="getStatusBadgeVisibility(token.asset.address, activeCollapseItems)"
               class="s-flex staking-info-badges"
             >
               <status-badge
                 v-for="item in token.items"
                 :key="item.pool.rewardAsset"
-                :pool="item.pool"
-                :account-pool="item.accountPool"
-                :pool-asset="item.poolAsset"
-                :reward-asset="item.rewardAsset"
-                :apr="item.apr"
+                v-bind="item"
                 @add="changePoolStake($event, true)"
                 class="staking-info-badge"
               />
@@ -36,25 +32,17 @@
           </div>
         </template>
 
-        <template v-if="isActiveCollapseItem(token.asset.address, activeCollapseItems)">
-          <pool-card
-            v-for="item in token.items"
-            :key="item.pool.rewardAsset"
-            :pool="item.pool"
-            :account-pool="item.accountPool"
-            :base-asset="item.baseAsset"
-            :pool-asset="item.poolAsset"
-            :reward-asset="item.rewardAsset"
-            :apr="item.apr"
-            :tvl="item.tvl"
-            @add="changePoolStake($event, true)"
-            @remove="changePoolStake($event, false)"
-            @claim="claimPoolRewards"
-            @calculator="showPoolCalculator"
-            show-balance
-            class="staking-info-card"
-          />
-        </template>
+        <pool-card
+          v-for="item in token.items"
+          :key="item.pool.rewardAsset"
+          v-bind="item"
+          @add="changePoolStake($event, true)"
+          @remove="changePoolStake($event, false)"
+          @claim="claimPoolRewards"
+          @calculator="showPoolCalculator"
+          show-balance
+          class="staking-info-card"
+        />
       </s-collapse-item>
     </s-collapse>
 
@@ -164,6 +152,7 @@ export default class DemeterStaking extends Mixins(PageMixin, TranslationMixin) 
   line-height: var(--s-line-height-medium);
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: var(--s-letter-spacing-small);
   text-align: center;
 }
 </style>
@@ -177,12 +166,17 @@ $title-height: 42px;
 
 .staking-info-badges {
   flex-flow: wrap;
-  gap: $inner-spacing-mini / 2;
+  margin: -$inner-spacing-mini / 2;
+
+  & > * {
+    margin: $inner-spacing-mini / 2;
+  }
 }
 
 .staking-info {
   &-title {
     font-weight: 700;
+    letter-spacing: var(--s-letter-spacing-small);
     text-align: left;
     height: $title-height;
     line-height: $title-height;

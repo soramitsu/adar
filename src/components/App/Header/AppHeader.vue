@@ -24,13 +24,14 @@
       :class="{ 'app-controls--settings-panel--dark': themeIsDark }"
     >
       <!-- <market-maker-countdown /> -->
-      <!-- <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
+      <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
         <token-logo class="node-control__logo token-logo" v-bind="nodeLogo" />
-      </s-button> -->
-      <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
+      </s-button>
+      <account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
       <app-header-menu />
     </div>
 
+    <select-node-dialog />
     <select-language-dialog />
 
     <template v-if="moonpayEnabled">
@@ -48,11 +49,7 @@ import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 
 import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-
-import PolkaswapLogo from '@/components/shared/Logo/Polkaswap.vue';
-import AppAccountButton from './AppAccountButton.vue';
-import AppHeaderMenu from './AppHeaderMenu.vue';
-import AppLogoButton from './AppLogoButton.vue';
+import NodeErrorMixin from '@/components/mixins/NodeErrorMixin';
 
 import { lazyComponent, goTo } from '@/router';
 import { PageNames, Components } from '@/consts';
@@ -62,10 +59,11 @@ import { getter, mutation } from '@/store/decorators';
 
 @Component({
   components: {
-    PolkaswapLogo,
-    AppAccountButton,
-    AppHeaderMenu,
-    AppLogoButton,
+    WalletAvatar: components.WalletAvatar as any,
+    AccountButton: lazyComponent(Components.AccountButton),
+    AppLogoButton: lazyComponent(Components.AppLogoButton),
+    AppHeaderMenu: lazyComponent(Components.AppHeaderMenu),
+    SelectNodeDialog: lazyComponent(Components.SelectNodeDialog),
     SelectLanguageDialog: lazyComponent(Components.SelectLanguageDialog),
     Moonpay: lazyComponent(Components.Moonpay),
     MoonpayNotification: lazyComponent(Components.MoonpayNotification),
@@ -73,10 +71,9 @@ import { getter, mutation } from '@/store/decorators';
     MoonpayConfirmation: lazyComponent(Components.MoonpayConfirmation),
     RouteAssetsNavigation: adarLazyComponent(AdarComponents.RouteAssetsNavigation),
     TokenLogo: components.TokenLogo,
-    WalletAvatar: components.WalletAvatar,
   },
 })
-export default class AppHeader extends Mixins(WalletConnectMixin) {
+export default class AppHeader extends Mixins(WalletConnectMixin, NodeErrorMixin) {
   readonly PageNames = PageNames;
 
   @Prop({ type: Boolean, default: false }) readonly loading!: boolean;
@@ -88,6 +85,13 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
   @mutation.moonpay.setDialogVisibility private setMoonpayVisibility!: (flag: boolean) => void;
 
   goTo = goTo;
+
+  get nodeTooltip(): string {
+    if (this.nodeIsConnected) {
+      return this.t('selectNodeConnected', { chain: this.node.chain });
+    }
+    return this.t('selectNodeText');
+  }
 
   get nodeLogo() {
     return {
@@ -106,6 +110,10 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
 
   get areMoonpayButtonsVisible(): boolean {
     return this.moonpayEnabled && this.isLoggedIn;
+  }
+
+  openNodeSelectionDialog(): void {
+    this.setSelectNodeDialogVisibility(true);
   }
 
   async openMoonpayDialog(): Promise<void> {
@@ -148,6 +156,7 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
     display: none;
     white-space: normal;
     text-align: left;
+    letter-spacing: var(--s-letter-spacing-small);
 
     @include large-mobile {
       display: inline-block;

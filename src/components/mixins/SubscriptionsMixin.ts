@@ -1,6 +1,5 @@
 import { Component, Watch, Mixins } from 'vue-property-decorator';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import type { NavigationGuardNext, Route } from 'vue-router';
 
 import { getter } from '@/store/decorators';
 
@@ -26,17 +25,12 @@ export default class SubscriptionsMixin extends Mixins(mixins.LoadingMixin) {
     return this.parentLoading || this.loading;
   }
 
-  beforeMount(): void {
+  mounted(): void {
     this.updateSubscriptions();
   }
 
-  // [TODO]
-  // We need subscription management
-  // when every subscription have own unsubscribe call, which is not stored in vuex
-  // to change this hook to beforeDestroy
-  async beforeRouteLeave(to: Route, from: Route, next: NavigationGuardNext<Vue>): Promise<void> {
-    await this.resetSubscriptions();
-    next();
+  beforeDestroy(): void {
+    this.resetSubscriptions();
   }
 
   public setStartSubscriptions(list: AsyncFnWithoutArgs[]) {

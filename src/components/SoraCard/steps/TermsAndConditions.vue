@@ -1,9 +1,10 @@
 <template>
   <div class="tos" v-loading="parentLoading">
     <div class="tos__disclaimer">
-      <h4 class="tos__disclaimer-header">{{ t('disclaimerTitle') }}</h4>
+      <h4 class="tos__disclaimer-header">Disclaimer</h4>
       <p class="tos__disclaimer-paragraph">
-        {{ t('card.disclaimerCollectData') }}
+        To get an IBAN account needed for the SORA Card, users are required to undergo a KYC process with the card
+        issuer. This is required compliance. The SORA community does not and will not collect any of your personal data.
       </p>
       <div class="tos__disclaimer-warning icon">
         <s-icon name="notifications-alert-triangle-24" size="28px" />
@@ -11,39 +12,35 @@
     </div>
     <div class="tos__section">
       <div class="tos__section-block" @click="openDialog('t&c')">
-        <span class="tos__section-point">{{ t(termsAndConditionsTitle) }}</span>
+        <span class="tos__section-point">{{ termsAndConditionsTitle }}</span>
         <s-icon name="arrows-circle-chevron-right-24" size="18px" class="tos__section-icon" />
       </div>
       <div class="line" />
       <div class="tos__section-block" @click="openDialog('privacyPolicy')">
-        <span class="tos__section-point">{{ t(privacyPolicyTitle) }}</span>
+        <span class="tos__section-point">{{ privacyPolicyTitle }}</span>
         <s-icon name="arrows-circle-chevron-right-24" size="18px" class="tos__section-icon" />
       </div>
       <div class="line" />
       <div class="tos__section-block" @click="openDialog('unsupported')">
-        <span class="tos__section-point">{{ t(unsupportedCountriesTitle) }}</span>
+        <span class="tos__section-point">{{ unsupportedCountriesTitle }}</span>
         <s-icon name="arrows-circle-chevron-right-24" size="18px" class="tos__section-icon" />
       </div>
     </div>
     <s-button type="primary" class="sora-card__btn s-typography-button--large" @click="handleConfirmToS">
-      <span class="text">{{ t('card.acceptAndContinue') }}</span>
+      <span class="text">ACCEPT & CONTINUE</span>
     </s-button>
-    <tos-dialog :visible.sync="showDialog" :srcLink="link" :title="t(dialogTitle)" :key="link" />
+    <tos-dialog :visible.sync="showDialog" :srcLink="link" :title="dialogTitle" :key="link" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Mixins } from 'vue-property-decorator';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-
-import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components, TosExternalLinks } from '@/consts';
 import { lazyComponent } from '@/router';
+import TranslationMixin from '../../mixins/TranslationMixin';
 import { getter } from '@/store/decorators';
-import { delay } from '@/utils';
-
-type TermsAndConditionsType = 't&c' | 'privacyPolicy' | 'unsupported';
+import { Theme } from '@soramitsu/soramitsu-js-ui';
 
 @Component({
   components: {
@@ -51,15 +48,16 @@ type TermsAndConditionsType = 't&c' | 'privacyPolicy' | 'unsupported';
   },
 })
 export default class TermsAndConditions extends Mixins(TranslationMixin, mixins.LoadingMixin) {
-  readonly termsAndConditionsTitle = 'card.termsAndConditions';
-  readonly privacyPolicyTitle = 'card.privacyPolicy';
-  readonly unsupportedCountriesTitle = 'card.unsupportedCountries';
-
-  @getter.libraryTheme private libraryTheme!: Theme;
-
   showDialog = false;
-  dialogTitle = this.termsAndConditionsTitle;
+  nonSupportedCountriesDialog = false;
+  dialogTitle = '';
   link = '';
+
+  termsAndConditionsTitle = 'Terms & Conditions';
+  privacyPolicyTitle = 'Privacy Policy';
+  unsupportedCountriesTitle = 'Unsupported Сountries';
+
+  @getter.libraryTheme libraryTheme!: Theme;
 
   get termsLink(): string {
     return TosExternalLinks.getLinks(this.libraryTheme).Terms;
@@ -73,18 +71,19 @@ export default class TermsAndConditions extends Mixins(TranslationMixin, mixins.
     this.$emit('confirm');
   }
 
-  async openDialog(policy: TermsAndConditionsType): Promise<void> {
+  openDialog(policy: string): void {
     if (policy === 't&c') {
       this.link = this.termsLink;
       this.dialogTitle = this.termsAndConditionsTitle;
-    } else if (policy === 'privacyPolicy') {
+    }
+    if (policy === 'privacyPolicy') {
       this.link = this.privacyLink;
       this.dialogTitle = this.privacyPolicyTitle;
-    } else if (policy === 'unsupported') {
+    }
+    if (policy === 'unsupported') {
       this.link = '';
       this.dialogTitle = this.unsupportedCountriesTitle;
     }
-    await delay(); // small delay is required for dialog re-rendering
     this.showDialog = true;
   }
 }

@@ -191,8 +191,6 @@ export default class PoolCard extends Mixins(PoolCardMixin, TranslationMixin) {
     opacity: 0.75;
     color: var(--s-color-base-content-primary);
     text-decoration: none;
-
-    @include focus-outline;
   }
 }
 

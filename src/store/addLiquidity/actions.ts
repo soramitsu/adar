@@ -1,7 +1,6 @@
 import { defineActions } from 'direct-vuex';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { FPNumber } from '@sora-substrate/util';
-import { XOR, XSTUSD } from '@sora-substrate/util/build/assets/consts';
 import type { ActionContext } from 'vuex';
 import type { AccountBalance } from '@sora-substrate/util/build/assets/types';
 
@@ -153,13 +152,7 @@ const actions = defineActions({
       return asset?.address ?? '';
     };
 
-    let [first, second] = await Promise.all([findAssetAddress(firstAddress), findAssetAddress(secondAddress)]);
-
-    if (first === XSTUSD.address && second === XOR.address) {
-      // We should invert XSTUSD-XOR pair
-      first = XOR.address;
-      second = XSTUSD.address;
-    }
+    const [first, second] = await Promise.all([findAssetAddress(firstAddress), findAssetAddress(secondAddress)]);
 
     await dispatch.setFirstTokenAddress(first);
     await dispatch.setSecondTokenAddress(second);

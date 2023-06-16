@@ -87,12 +87,11 @@
         "noAccounts": "Zdá sa, že vo vašom rozšírení {extension} nie sú žiadne účty. Pridajte účet a skúste to znova.",
         "noAccount": "Chyba účtu {extension}. Skontrolujte váš účet v rozšírení {extension}",
         "noExtension": "Nenašlo sa žiadne {extension} . Nainštalujte si ho a znova načítajte túto stránku",
-        "noSigner": "Prístup zamietnutý. Prejdite do nastavení {extension} a otvorte položku Spravovať prístup k webovým stránkam.",
-        "connectionError": "Pri pripájaní peňaženky sa vyskytla chyba. Môžete skúsiť znova pripojiť peňaženku cez {extension}"
+        "noSigner": "Prístup zamietnutý. Prejdite do nastavení {extension} a otvorte položku Spravovať prístup k webovým stránkam."
     },
     "connection": {
         "title": "Sieťový účet {Sora}",
-        "text": "Rozšírenia a Google bezpečne ukladajú váš účet siete {Sora} . Umožňujú vám podpisovať transakcie a spravovať aktíva.",
+        "text": "Pripojte alebo vytvorte svoj účet siete {Sora} s {extensions}. Tieto rozšírenia vám umožňujú bezpečne podpisovať transakcie a spravovať aktíva v sieti {Sora}.",
         "noAccounts": "Vo vašom rozšírení prehliadača {extension} nebol nájdený žiadny účet. Pridajte účet a skúste to znova.",
         "selectAccount": "Vyberte účet, s ktorým chcete pracovať",
         "action": {
@@ -106,19 +105,13 @@
             "install": "Inštalácia",
             "connected": "Pripojené",
             "notConnected": "Nepripojený"
-        },
-        "internalTitle": "Pripojte sa cez {wallet}",
-        "internalText": "Existujúci účet môžete vytvoriť alebo prepojiť prostredníctvom služby {wallet} . Ukladá účty pomocou šifrovania.",
-        "list": {
-            "simplest": "Najjednoduchšia možnosť",
-            "extensions": "Rozšírenia"
         }
     },
     "wallet": {
         "title": "Sieťový účet {Sora}",
         "WalletAssets": "Aktíva",
-        "createToken": "@:createTokenText",
-        "WalletHistory": "Aktivita"
+        "WalletActivity": "Aktivita",
+        "createToken": "@:createTokenText"
     },
     "walletSend": {
         "title": "Odoslať",
@@ -329,6 +322,7 @@
         "Bridge": "@:bridgeText",
         "About": "O aplikácii",
         "Stats": "Štatistiky",
+        "Support": "Podpora",
         "Wallet": "Peňaženka",
         "CreatePair": "Vytvoriť pár",
         "AddLiquidity": "Pridať likviditu",
@@ -350,6 +344,7 @@
         "Rewards": "Odmeny",
         "About": "O aplikácii",
         "Stats": "Štatistiky",
+        "Support": "Podpora",
         "CreatePair": "Vytvoriť pár",
         "StakingContainer": "Stakovanie",
         "Explore\/Container": "Preskúmať",
@@ -862,9 +857,7 @@
         "settings": "Nastavenia",
         "switchTheme": "Prepnite do režimu {theme}",
         "switchLanguage": "Vyberte Jazyk",
-        "selectNode": "@:selectNodeText",
-        "showDisclaimer": "Zobraziť vylúčenie zodpovednosti",
-        "hideDisclaimer": "Skryť vylúčenie zodpovednosti"
+        "selectNode": "@:selectNodeText"
     },
     "sentText": "Odoslané",
     "learnMoreText": "Dozvedieť sa viac",
@@ -1110,13 +1103,7 @@
             "jsonFields": "Súbor JSON neobsahuje povinné polia"
         },
         "assetsAtRiskText": "Majetok v ohrození!",
-        "deleteAccountText": "Účet nie je možné obnoviť bez počiatočnej frázy, súboru .json alebo ak je uložený v nejakej prípone. Budete odhlásení.",
-        "importSteps": {
-            "selectWallet": "Prejdite do peňaženky, ktorú používate",
-            "selectAccount": "Vyberte účet, ktorý chcete exportovať",
-            "exportAccount": "Exportujte súbor {JSON}"
-        },
-        "exportTutorialsText": "Exportujte návody"
+        "deleteAccountText": "Účet nie je možné obnoviť bez počiatočnej frázy, súboru .json alebo ak je uložený v nejakej prípone. Budete odhlásení."
     },
     "hashiBridgeText": "Most {Hashi}",
     "disclaimerTitle": "Vylúčenie zodpovednosti:",
@@ -1125,70 +1112,12 @@
     },
     "tooltips": {
         "roi": "{ROI} znamená návratnosť investícií. Vypočítava sa vydelením zisku získaného z investície nákladmi na túto investíciu v percentuálnom ekvivalente.",
-        "tvl": "{TVL} znamená Total Value Locked. Predstavuje tokeny uzamknuté v bazénoch v ekvivalente dolára.",
-        "volume": "Objem sa vzťahuje na celkové množstvo aktív, ktoré boli zobchodované alebo vymenené v sieti počas určitého časového obdobia. Objem je dôležitou metrikou na meranie likvidity a celkovej aktivity siete.",
-        "fees": "Poplatky na blockchaine {Sora} sa vzťahujú na poplatky, ktoré vznikajú pri vykonávaní transakcií v sieti. Tieto poplatky sa platia v XOR, natívnej kryptomene siete {Sora} . Výška poplatku je určená zložitosťou a veľkosťou vykonávanej transakcie",
-        "supply": "Zásoba tokenov sa vzťahuje na celkový počet tokenov, ktoré boli vytvorené a sú v obehu v sieti. Zásoba tokenov môže kolísať v závislosti od množstva tokenov, ktoré sa vkladajú, pália alebo prenášajú v sieti.",
-        "transactions": "Transakcie sa týkajú procesu odosielania alebo prijímania digitálnych aktív v sieti, vrátane operácií s likviditou, ako aj swapov.",
-        "accounts": "Účty sú digitálne adresy, ktoré uchovávajú aktíva používateľov v sieti. Každý účet je spojený s jedinečnou verejnou adresou a súkromným kľúčom, ktorý používateľovi umožňuje pristupovať k jeho majetku a spravovať ho.",
-        "bridgeTransactions": "{from} do {to} sa vzťahuje na proces prenosu aktív medzi sieťami {from} a {to} pomocou mosta. Most umožňuje interoperabilitu týchto dvoch sietí, čo používateľom umožňuje bezproblémovo presúvať prostriedky medzi nimi.",
-        "velocity": "Rýchlosť tokenu je priemerný počet zmien účtov počas obdobia (mesiaca). Označuje úroveň obchodnej aktivity a likviditu."
+        "tvl": "{TVL} znamená Total Value Locked. Predstavuje tokeny uzamknuté v bazénoch v ekvivalente dolára."
     },
     "createTokenText": "Vytvoriť token",
     "comingSoonText": "Pripravujeme…",
     "confirmText": "Potvrdiť",
     "createTokenTextNFT": "Vytvorte NFT",
     "doNotShowText": "Už mi to neukazuj",
-    "accountText": "účet | účtov",
-    "networkStatisticsText": "Štatistiky siete",
-    "footer": {
-        "node": {
-            "title": {
-                "connected": "Uzol pripojený",
-                "loading": "Opätovné pripojenie uzla",
-                "disconnected": "Uzol je odpojený"
-            }
-        },
-        "internet": {
-            "title": {
-                "disabled": "Internet je zakázaný",
-                "unstable": "Internet je nestabilný",
-                "stable": "Internet stabilný"
-            },
-            "label": "Rýchlosť vášho internetu",
-            "desc": {
-                "disabled": "Odpojené",
-                "unstable": "Pomalé pripojenie",
-                "stable": "Optimálna rýchlosť"
-            },
-            "action": "Obnoviť {Polkaswap}",
-            "dialogTitle": "Pripojte sa k zdroju internetu",
-            "dialogDesc": "{Polkaswap} vyžaduje internetové pripojenie na stabilné používanie"
-        },
-        "statistics": {
-            "title": {
-                "unavailable": "Štatistika nie je k dispozícii",
-                "loading": "Načítavanie štatistík",
-                "available": "Dostupné štatistiky"
-            },
-            "label": "Štatistické služby",
-            "desc": {
-                "unavailable": "Všetky služby sú odpojené",
-                "loading": "Všetky služby sa načítavajú",
-                "available": "Všetky služby sú stabilné"
-            },
-            "action": "Vyberte služby",
-            "dialog": {
-                "title": "{Sora} Výber sieťovej služby",
-                "fiat": "Hodnoty Fiat",
-                "chartsAndActivity": "Grafy a aktivita"
-            }
-        }
-    },
-    "locationText": "Poloha",
-    "acceptText": "Prijať a skryť",
-    "newAccountsText": "Nové účty",
-    "dragAndDropText": "Presuňte myšou alebo vyberte súbor {extension}",
-    "copyPhraseText": "Kopírovať frázu",
-    "stepText": "Krok"
+    "accountText": "účet | účtov"
 }

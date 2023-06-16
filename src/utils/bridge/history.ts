@@ -179,12 +179,13 @@ export class EthBridgeHistory {
 
       if (!response) return history;
 
+      const elements = response.edges.map((edge) => edge.node) as HistoryElement[];
       hasNext = !!response.pageInfo?.hasNextPage;
       after = response.pageInfo?.endCursor ?? '';
-      history.push(...response.nodes);
+      history.push(...elements);
     } while (hasNext);
 
-    return history;
+    return history as HistoryElement[];
   }
 
   public async clearHistory(updateCallback?: FnWithoutArgs | AsyncFnWithoutArgs): Promise<void> {

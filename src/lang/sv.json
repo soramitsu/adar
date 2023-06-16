@@ -87,12 +87,11 @@
         "noAccounts": "Det verkar inte finnas några konton i ditt {extension} tillägg. Vänligen lägg till ett konto och försök igen.",
         "noAccount": "{extension} konto fel. Vänligen kontrollera ditt konto i {extension}-tillägget.",
         "noExtension": "Inget {extension} -tillägg hittades. Installera det och ladda om den här sidan",
-        "noSigner": "Tillträde beviljas ej. Gå till tilläggsinställningarna för {extension} och öppna \"Hantera webbplatsåtkomst\" för att tillåta.",
-        "connectionError": "Ett fel uppstod vid anslutning av plånboken. Du kan försöka ansluta plånboken via {extension} igen"
+        "noSigner": "Tillträde beviljas ej. Gå till tilläggsinställningarna för {extension} och öppna \"Hantera webbplatsåtkomst\" för att tillåta."
     },
     "connection": {
         "title": "{Sora}-Nätverkskonto",
-        "text": "Tillägg och Google lagrar ditt {Sora} Network-konto säkert. De låter dig signera transaktioner och hantera tillgångar.",
+        "text": "Anslut eller skapa ditt {Sora} Network-konto med {extensions} -tillägg. Med dessa tillägg kan du säkert signera transaktioner och hantera tillgångar i {Sora} -nätverket.",
         "noAccounts": "Inget konto hittades i ditt {extension} webbläsartillägg. Vänligen lägg till ett konto och försök igen.",
         "selectAccount": "Välj konto att arbeta med",
         "action": {
@@ -106,19 +105,13 @@
             "install": "Installera",
             "connected": "Ansluten",
             "notConnected": "Ej ansluten"
-        },
-        "internalTitle": "Anslut via {wallet}",
-        "internalText": "Du kan skapa eller länka ett befintligt konto via {wallet} . Den lagrar konton med kryptering.",
-        "list": {
-            "simplest": "Enklaste alternativet",
-            "extensions": "Tillägg"
         }
     },
     "wallet": {
         "title": "{Sora}-Nätverkskonto",
         "WalletAssets": "Tillgångar",
-        "createToken": "@:createTokenText",
-        "WalletHistory": "Aktivitet"
+        "WalletActivity": "Aktivitet",
+        "createToken": "@:createTokenText"
     },
     "walletSend": {
         "title": "Skicka",
@@ -329,6 +322,7 @@
         "Bridge": "@:bridgeText",
         "About": "Om",
         "Stats": "Statistik",
+        "Support": "Assistans",
         "Wallet": "Plånbok",
         "CreatePair": "Skapa Par",
         "AddLiquidity": "Lägg Till Likviditet",
@@ -350,6 +344,7 @@
         "Rewards": "Belöningar",
         "About": "Om",
         "Stats": "Statistik",
+        "Support": "Assistans",
         "CreatePair": "Skapa Par",
         "StakingContainer": "Utsättning",
         "Explore\/Container": "Utforska",
@@ -862,9 +857,7 @@
         "settings": "Inställningar",
         "switchTheme": "Byt till {theme} Läge",
         "switchLanguage": "Välj Språk",
-        "selectNode": "@:selectNodeText",
-        "showDisclaimer": "Visa ansvarsfriskrivning",
-        "hideDisclaimer": "Dölj ansvarsfriskrivning"
+        "selectNode": "@:selectNodeText"
     },
     "sentText": "Skickat",
     "learnMoreText": "Lär dig mer",
@@ -1110,13 +1103,7 @@
             "jsonFields": "JSON-fil har inte obligatoriska fält"
         },
         "assetsAtRiskText": "Tillgångar i riskzonen!",
-        "deleteAccountText": "Kontot kan inte återställas utan en fröfras, .json-fil eller om det är lagrat i något tillägg. Du kommer att loggas ut.",
-        "importSteps": {
-            "selectWallet": "Gå till plånboken för din användning",
-            "selectAccount": "Välj det konto du vill exportera",
-            "exportAccount": "Exportera {JSON} -filen"
-        },
-        "exportTutorialsText": "Exportera självstudier"
+        "deleteAccountText": "Kontot kan inte återställas utan en fröfras, .json-fil eller om det är lagrat i något tillägg. Du kommer att loggas ut."
     },
     "hashiBridgeText": "{Hashi} bro",
     "disclaimerTitle": "Ansvarsfriskrivning:",
@@ -1125,70 +1112,12 @@
     },
     "tooltips": {
         "roi": "{ROI} står för Return on Investment. Den beräknas genom att dividera den vinst som tjänats in på en investering med kostnaden för den investeringen i en motsvarande procentsats.",
-        "tvl": "{TVL} står för Total Value Locked. Det representerar tokens inlåsta i poolerna i motsvarande dollar.",
-        "volume": "Volym avser det totala beloppet av tillgångar som har handlats eller bytts ut i nätverket under en viss tidsperiod. Volymen är ett viktigt mått för att mäta nätverkets likviditet och övergripande aktivitet.",
-        "fees": "Avgifter på blockkedjan {Sora} avser de avgifter som uppstår för att utföra transaktioner på nätverket. Dessa avgifter betalas i XOR, den ursprungliga kryptovalutan i {Sora} -nätverket. Avgiftsbeloppet bestäms av komplexiteten och storleken på den transaktion som genomförs",
-        "supply": "Token-tillförsel avser det totala antalet tokens som har skapats och är i omlopp på nätverket. Tokentillgången kan fluktuera baserat på mängden tokens som satsas, bränns eller överförs på nätverket.",
-        "transactions": "Transaktioner avser processen att skicka eller ta emot digitala tillgångar på nätverket, inklusive likviditetsoperationer, såväl som swappar.",
-        "accounts": "Konton är digitala adresser som håller användarens tillgångar i nätverket. Varje konto är associerat med en unik offentlig adress och en privat nyckel som låter användaren komma åt och hantera sina tillgångar.",
-        "bridgeTransactions": "{from} till {to} -bryggan hänvisar till processen att överföra tillgångar mellan {from} och {to} -nätverken med hjälp av en brygga. Bryggan möjliggör interoperabilitet mellan de två nätverken, vilket gör det möjligt för användare att sömlöst flytta tillgångar mellan dem.",
-        "velocity": "Tokenhastighet är antalet gånger token byter konton under period (månad) i genomsnitt. Det indikerar nivån på handelsaktivitet och likviditet."
+        "tvl": "{TVL} står för Total Value Locked. Det representerar tokens inlåsta i poolerna i motsvarande dollar."
     },
     "createTokenText": "Skapa token",
     "comingSoonText": "Kommer Snart",
     "confirmText": "Bekräfta",
     "createTokenTextNFT": "Skapa NFT",
     "doNotShowText": "Visa mig inte det här igen",
-    "accountText": "konto | konton",
-    "networkStatisticsText": "Nätverksstatistik",
-    "footer": {
-        "node": {
-            "title": {
-                "connected": "Nod ansluten",
-                "loading": "Noden återansluter",
-                "disconnected": "Noden frånkopplad"
-            }
-        },
-        "internet": {
-            "title": {
-                "disabled": "Internet inaktiverat",
-                "unstable": "Internet instabilt",
-                "stable": "Internet stabil"
-            },
-            "label": "Din internethastighet",
-            "desc": {
-                "disabled": "Osammanhängande",
-                "unstable": "Långsam uppkoppling",
-                "stable": "Optimal hastighet"
-            },
-            "action": "Uppdatera {Polkaswap}",
-            "dialogTitle": "Anslut till internetkälla",
-            "dialogDesc": "{Polkaswap} kräver internetanslutning för en stabil upplevelse"
-        },
-        "statistics": {
-            "title": {
-                "unavailable": "Statistik inte tillgänglig",
-                "loading": "Statistik laddas",
-                "available": "Statistik tillgänglig"
-            },
-            "label": "Statistiktjänster",
-            "desc": {
-                "unavailable": "Alla tjänster är frånkopplade",
-                "loading": "Alla tjänster laddas",
-                "available": "Alla tjänster är stabila"
-            },
-            "action": "Välj tjänster",
-            "dialog": {
-                "title": "{Sora} Val av nätverkstjänst",
-                "fiat": "Fiat värden",
-                "chartsAndActivity": "Diagram och aktivitet"
-            }
-        }
-    },
-    "locationText": "Plats",
-    "acceptText": "Acceptera och dölj",
-    "newAccountsText": "Nya konton",
-    "dragAndDropText": "Dra och släpp eller välj filen {extension}",
-    "copyPhraseText": "Kopiera fras",
-    "stepText": "Steg"
+    "accountText": "konto | konton"
 }

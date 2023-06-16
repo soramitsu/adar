@@ -14,11 +14,9 @@ export type SettingsState = {
   slippageTolerance: string;
   marketAlgorithm: MarketAlgorithms;
   сhartsEnabled: boolean;
-  userDisclaimerApprove: boolean;
   transactionDeadline: number;
   node: Partial<Node>;
   language: string;
-  displayRegions: Nullable<Intl.DisplayNames>;
   defaultNodes: Array<Node>;
   customNodes: Array<Node>;
   nodeAddressConnecting: string;
@@ -27,15 +25,13 @@ export type SettingsState = {
   faucetUrl: string;
   selectNodeDialogVisibility: boolean;
   selectLanguageDialogVisibility: boolean;
-  disclaimerVisibility: boolean;
   browserNotifPopupVisibility: boolean;
   browserNotifPopupBlockedVisibility: boolean;
   isBrowserNotificationApiAvailable: boolean;
   browserNotifsPermission: NotificationPermission;
   blockNumber: number;
   blockNumberUpdates: Nullable<Subscription>;
-  internetConnection: Nullable<boolean>;
-  internetConnectionSpeed: Nullable<number>;
+  kycData: any;
 };
 
 export type NodesHashTable = {

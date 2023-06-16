@@ -514,6 +514,7 @@ export default class ReferralProgram extends Mixins(
     }
     font-size: var(--s-font-size-large);
     line-height: var(--s-line-height-reset);
+    letter-spacing: var(--s-letter-spacing-small);
     font-weight: 700;
   }
 }
@@ -645,6 +646,7 @@ export default class ReferralProgram extends Mixins(
     .formatted-amount--fiat-value {
       font-size: var(--s-font-size-medium);
       line-height: var(--s-line-height-medium);
+      letter-spacing: var(--s-letter-spacing-small);
       font-weight: 600;
     }
   }
@@ -658,6 +660,7 @@ export default class ReferralProgram extends Mixins(
   &-value {
     font-size: var(--s-font-size-large);
     line-height: var(--s-line-height-extra-small);
+    letter-spacing: var(--s-letter-spacing-small);
     font-weight: 800;
   }
 }
@@ -715,6 +718,7 @@ export default class ReferralProgram extends Mixins(
     &,
     &-label {
       line-height: var(--s-line-height-medium);
+      letter-spacing: var(--s-letter-spacing-small);
     }
     &-label {
       color: var(--s-color-base-content-secondary);
@@ -728,6 +732,7 @@ export default class ReferralProgram extends Mixins(
   text-align: center;
   font-size: var(--s-font-size-extra-small);
   line-height: var(--s-line-height-medium);
+  letter-spacing: var(--s-letter-spacing-small);
 }
 
 .referrer {
@@ -735,6 +740,7 @@ export default class ReferralProgram extends Mixins(
     &-container {
       margin-top: $inner-spacing-medium;
       h5 {
+        letter-spacing: var(--s-letter-spacing-small);
         + .referrer-description {
           margin-top: $inner-spacing-small;
         }
@@ -764,6 +770,7 @@ export default class ReferralProgram extends Mixins(
   &-description {
     margin-top: $inner-spacing-medium;
     line-height: var(--s-line-height-medium);
+    letter-spacing: var(--s-letter-spacing-small);
   }
 }
 </style>

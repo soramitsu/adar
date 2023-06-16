@@ -40,7 +40,5 @@ export default class CalculatorButton extends Vue {}
   & > span + &-icon {
     margin-left: $inner-spacing-tiny;
   }
-
-  @include focus-outline;
 }
 </style>

@@ -48,10 +48,6 @@ export default class ExplorePageMixin extends Mixins(
     return [];
   }
 
-  get total(): number {
-    return this.filteredItems.length;
-  }
-
   get filteredItems() {
     const search = this.exploreQuery.toLowerCase().trim();
 
@@ -110,26 +106,6 @@ export default class ExplorePageMixin extends Mixins(
 
   updateExploreData(): void {
     console.warn('[ExplorePageMixin]: "updateExploreData" method is not implemented');
-  }
-
-  handlePaginationClick(button: WALLET_CONSTS.PaginationButton): void {
-    let current = 1;
-
-    switch (button) {
-      case WALLET_CONSTS.PaginationButton.Prev:
-        current = this.currentPage - 1;
-        break;
-      case WALLET_CONSTS.PaginationButton.Next:
-        current = this.currentPage + 1;
-        break;
-      case WALLET_CONSTS.PaginationButton.First:
-        current = 1;
-        break;
-      case WALLET_CONSTS.PaginationButton.Last:
-        current = this.lastPage;
-    }
-
-    this.currentPage = current;
   }
 
   private initScrollbar(): void {

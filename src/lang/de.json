@@ -87,12 +87,11 @@
         "noAccounts": "Es scheint keine Konten in deiner {extension} Erweiterung zu geben. Bitte, füge ein Konto hinzu und versuche es erneut.",
         "noAccount": "{extension} Kontofehler. Bitte überprüfe dein Konto in der {extension} Erweiterung",
         "noExtension": "Es wurde keine {extension} gefunden. Bitte installiere es und lade diese Seite neu",
-        "noSigner": "Zugriff abgelehnt. Gehe zu den Erweiterungseinstellungen von {extension} und öffne \"Website-Zugriff verwalten\", um dies zuzulassen.",
-        "connectionError": "Beim Verbinden der Wallet ist ein Fehler aufgetreten. Sie können erneut versuchen, das Wallet über {extension} zu verbinden"
+        "noSigner": "Zugriff abgelehnt. Gehe zu den Erweiterungseinstellungen von {extension} und öffne \"Website-Zugriff verwalten\", um dies zuzulassen."
     },
     "connection": {
         "title": "{Sora}-Netzwerk-Konto",
-        "text": "Erweiterungen und Google speichern Ihr {Sora} Network-Konto sicher. Sie ermöglichen es Ihnen, Transaktionen zu unterzeichnen und Vermögenswerte zu verwalten.",
+        "text": "Verbinden oder erstellen Sie Ihr {Sora} -Netzwerkkonto mit {extensions} -Erweiterungen. Mit diesen Erweiterungen können Sie Transaktionen sicher signieren und Vermögenswerte im {Sora} -Netzwerk verwalten.",
         "noAccounts": "Es wurde kein Konto in deiner {extension} Browser-Erweiterung gefunden. Bitte, füge ein Konto hinzu und versuche es nochmal.",
         "selectAccount": "Wähle das Konto aus, das du verwenden möchtest",
         "action": {
@@ -106,19 +105,13 @@
             "install": "Installieren",
             "connected": "In Verbindung gebracht",
             "notConnected": "Nicht verbunden"
-        },
-        "internalTitle": "Über {wallet} verbinden",
-        "internalText": "Sie können ein bestehendes Konto über {wallet} erstellen oder verknüpfen. Es speichert Konten mit Verschlüsselung.",
-        "list": {
-            "simplest": "Einfachste Möglichkeit",
-            "extensions": "Erweiterungen"
         }
     },
     "wallet": {
         "title": "{Sora}-Netzwerk-Konto",
         "WalletAssets": "Assets",
-        "createToken": "@:createTokenText",
-        "WalletHistory": "Aktivität"
+        "WalletActivity": "Aktivität",
+        "createToken": "@:createTokenText"
     },
     "walletSend": {
         "title": "Senden",
@@ -329,6 +322,7 @@
         "Bridge": "@:bridgeText",
         "About": "Über",
         "Stats": "Statistiken",
+        "Support": "Support",
         "Wallet": "Wallet",
         "CreatePair": "Erstelle ein Paar",
         "AddLiquidity": "Liquidität hinzufügen",
@@ -350,6 +344,7 @@
         "Rewards": "Belohnungen",
         "About": "Über",
         "Stats": "Statistiken",
+        "Support": "Support",
         "CreatePair": "Erstelle ein Paar",
         "StakingContainer": "Staking",
         "Explore\/Container": "Entdecken",
@@ -862,9 +857,7 @@
         "settings": "Einstellungen",
         "switchTheme": "Wechseln Sie in den {theme}-Modus",
         "switchLanguage": "Sprache wählen",
-        "selectNode": "@:selectNodeText",
-        "showDisclaimer": "Haftungsausschluss anzeigen",
-        "hideDisclaimer": "Haftungsausschluss ausblenden"
+        "selectNode": "@:selectNodeText"
     },
     "sentText": "Gesendet",
     "learnMoreText": "Mehr erfahren",
@@ -1110,13 +1103,7 @@
             "jsonFields": "Die JSON-Datei enthält keine erforderlichen Felder"
         },
         "assetsAtRiskText": "Vermögen in Gefahr!",
-        "deleteAccountText": "Das Konto kann nicht ohne Seed-Phrase, .json Datei oder wenn es in einer Erweiterung gespeichert ist, wiederhergestellt werden. Sie werden abgemeldet.",
-        "importSteps": {
-            "selectWallet": "Gehen Sie zur Brieftasche Ihrer Verwendung",
-            "selectAccount": "Wählen Sie das Konto aus, das Sie exportieren möchten",
-            "exportAccount": "Exportieren Sie die {JSON} -Datei"
-        },
-        "exportTutorialsText": "Tutorials exportieren"
+        "deleteAccountText": "Das Konto kann nicht ohne Seed-Phrase, .json Datei oder wenn es in einer Erweiterung gespeichert ist, wiederhergestellt werden. Sie werden abgemeldet."
     },
     "hashiBridgeText": "{Hashi} Brücke",
     "disclaimerTitle": "Haftungsausschluss:",
@@ -1125,70 +1112,12 @@
     },
     "tooltips": {
         "roi": "{ROI} steht für Return on Investment. Es wird berechnet, indem der mit einer Investition erzielte Gewinn durch die Kosten dieser Investition in einem prozentualen Äquivalent dividiert wird.",
-        "tvl": "{TVL} steht für Total Value Locked. Es stellt Token dar, die in den Pools im Dollaräquivalent gesperrt sind.",
-        "volume": "Das Volumen bezieht sich auf die Gesamtmenge der Vermögenswerte, die über einen bestimmten Zeitraum im Netzwerk gehandelt oder ausgetauscht wurden. Das Volumen ist eine wichtige Kennzahl zur Messung der Liquidität und der Gesamtaktivität des Netzwerks.",
-        "fees": "Gebühren auf der {Sora} -Blockchain beziehen sich auf die Gebühren, die für die Ausführung von Transaktionen im Netzwerk anfallen. Diese Gebühren werden in XOR, der nativen Kryptowährung des {Sora} -Netzwerks, bezahlt. Die Höhe der Gebühr richtet sich nach der Komplexität und Größe der ausgeführten Transaktion",
-        "supply": "Die Token-Versorgung bezieht sich auf die Gesamtzahl der Token, die erstellt wurden und im Netzwerk im Umlauf sind. Die Token-Versorgung kann je nach Menge der Token, die im Netzwerk gestaket, verbrannt oder übertragen werden, schwanken.",
-        "transactions": "Transaktionen beziehen sich auf den Prozess des Sendens oder Empfangens digitaler Assets im Netzwerk, einschließlich Liquiditätsoperationen sowie Swaps.",
-        "accounts": "Konten sind digitale Adressen, die das Vermögen des Benutzers im Netzwerk enthalten. Jedes Konto ist mit einer eindeutigen öffentlichen Adresse und einem privaten Schlüssel verknüpft, der es dem Benutzer ermöglicht, auf sein Vermögen zuzugreifen und es zu verwalten.",
-        "bridgeTransactions": "{from} to {to} Bridge bezieht sich auf den Prozess der Übertragung von Assets zwischen den Netzwerken {from} und {to} mithilfe einer Bridge. Die Bridge ermöglicht die Interoperabilität der beiden Netzwerke, sodass Benutzer Assets nahtlos zwischen ihnen verschieben können.",
-        "velocity": "Die Token-Velocity ist die Anzahl der Token-Wechselkonten während eines Zeitraums (Monats) im Durchschnitt. Es zeigt das Niveau der Handelsaktivität und Liquidität an."
+        "tvl": "{TVL} steht für Total Value Locked. Es stellt Token dar, die in den Pools im Dollaräquivalent gesperrt sind."
     },
     "createTokenText": "Erstellen",
     "comingSoonText": "Demnächst verfügbar",
     "confirmText": "Bestätigen",
     "createTokenTextNFT": "NFT erstellen",
     "doNotShowText": "Zeig mir das nicht noch einmal",
-    "accountText": "Konto | Konten",
-    "networkStatisticsText": "Netzwerkstatistiken",
-    "footer": {
-        "node": {
-            "title": {
-                "connected": "Knoten verbunden",
-                "loading": "Knoten erneut verbinden",
-                "disconnected": "Knoten getrennt"
-            }
-        },
-        "internet": {
-            "title": {
-                "disabled": "Internet deaktiviert",
-                "unstable": "Internet instabil",
-                "stable": "Internet stabil"
-            },
-            "label": "Ihre Internetgeschwindigkeit",
-            "desc": {
-                "disabled": "Getrennt",
-                "unstable": "Langsame Verbindung",
-                "stable": "Optimale Geschwindigkeit"
-            },
-            "action": "{Polkaswap} aktualisieren",
-            "dialogTitle": "Verbinden Sie sich mit der Internetquelle",
-            "dialogDesc": "{Polkaswap} erfordert eine Internetverbindung für eine stabile Erfahrung"
-        },
-        "statistics": {
-            "title": {
-                "unavailable": "Statistiken nicht verfügbar",
-                "loading": "Statistiken werden geladen",
-                "available": "Statistiken verfügbar"
-            },
-            "label": "Statistikdienste",
-            "desc": {
-                "unavailable": "Alle Dienste sind getrennt",
-                "loading": "Alle Dienste werden geladen",
-                "available": "Alle Dienste sind stabil"
-            },
-            "action": "Dienste auswählen",
-            "dialog": {
-                "title": "{Sora} Netzwerkdienstauswahl",
-                "fiat": "Fiat-Werte",
-                "chartsAndActivity": "Diagramme & Aktivität"
-            }
-        }
-    },
-    "locationText": "Standort",
-    "acceptText": "Akzeptieren & ausblenden",
-    "newAccountsText": "Neue Konten",
-    "dragAndDropText": "Drag & Drop oder Datei {extension} auswählen",
-    "copyPhraseText": "Satz kopieren",
-    "stepText": "Schritt"
+    "accountText": "Konto | Konten"
 }

@@ -11,12 +11,12 @@ export type RewardsState = {
   externalRewards: Array<RewardInfo>;
   internalRewards: Nullable<RewardInfo>;
   vestedRewards: Nullable<RewardsInfo>;
-  crowdloanRewards: Record<string, RewardInfo[]>;
+  crowdloanRewards: Array<RewardInfo>;
   // selected
   selectedExternal: Array<RewardInfo>;
   selectedInternal: Nullable<RewardInfo>;
   selectedVested: Nullable<RewardsInfo>;
-  selectedCrowdloan: Record<string, RewardInfo[]>;
+  selectedCrowdloan: Array<RewardInfo>;
   // flags
   rewardsFetching: boolean;
   rewardsClaiming: boolean;

@@ -31,10 +31,11 @@
 
 <script lang="ts">
 import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { components, mixins, WALLET_CONSTS, ScriptLoader } from '@soramitsu/soraneo-wallet-web';
-
 import { X1Api, X1Widget } from '@/utils/x1';
 import { getter, state } from '@/store/decorators';
+
+import { components, mixins, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
+import { loadScript, unloadScript } from 'vue-plugin-load-script';
 
 @Component({
   components: {
@@ -72,15 +73,19 @@ export default class X1Dialog extends Mixins(mixins.DialogMixin, mixins.LoadingM
   }
 
   loadX1(): void {
-    ScriptLoader.load(this.X1Widget.sdkUrl).then(() => {
-      setTimeout(() => {
-        this.loadingX1 = false;
-      }, 1500);
-    });
+    loadScript(this.X1Widget.sdkUrl)
+      .then(() => {
+        setTimeout(() => {
+          this.loadingX1 = false;
+        }, 1500);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   unloadX1(): void {
-    ScriptLoader.unload(this.X1Widget.sdkUrl, false);
+    unloadScript(this.X1Widget.sdkUrl).catch(() => {});
   }
 
   mounted(): void {

@@ -11,7 +11,4 @@ export type SoraCardState = {
   xorToDeposit: FPNumber;
   totalXorBalanceUpdates: Nullable<Subscription>;
   authLogin: any;
-  hasFreeAttempts: Nullable<boolean>;
-  wantsToPassKycAgain: boolean;
-  rejectReason: Nullable<string>;
 };
