@@ -1,5 +1,6 @@
-import { KycStatus, VerificationStatus } from '@/types/card';
 import { defineMutations } from 'direct-vuex';
+
+import { KycStatus, VerificationStatus } from '@/types/card';
 
 import type { SoraCardState } from './types';
 
@@ -31,6 +32,15 @@ const mutations = defineMutations<SoraCardState>()({
   },
   setPayWingsAuthSdk(state, authLogin: any): void {
     state.authLogin = authLogin;
+  },
+  setHasKycAttempts(state, hasAttempt: boolean) {
+    state.hasFreeAttempts = hasAttempt;
+  },
+  setWillToPassKycAgain(state, will: boolean) {
+    state.wantsToPassKycAgain = will;
+  },
+  setRejectReason(state, rejectReason: string) {
+    state.rejectReason = rejectReason;
   },
 });
 

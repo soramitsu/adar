@@ -87,11 +87,12 @@
         "noAccounts": "Er lijken geen accounts te zijn in uw {extension} extensie. Voeg een account toe en probeer het opnieuw.",
         "noAccount": "{extension}-accountfout. Controleer uw account in de {extension}-extensie",
         "noExtension": "Er is geen {extension} -extensie gevonden. Installeer het en laad deze pagina opnieuw",
-        "noSigner": "Toegang geweigerd. Ga naar {extension} extensie-instellingen en open \"Websitetoegang beheren\" om toe te staan."
+        "noSigner": "Toegang geweigerd. Ga naar {extension} extensie-instellingen en open \"Websitetoegang beheren\" om toe te staan.",
+        "connectionError": "Er is een fout opgetreden tijdens het verbinden van de portemonnee. U kunt opnieuw proberen de portemonnee via {extension} te verbinden"
     },
     "connection": {
         "title": "{Sora} Netwerk account",
-        "text": "Verbind of maak je {Sora} Netwerkaccount aan met {extensions} extensies. Met deze extensies kun je veilig transacties ondertekenen en activa beheren in {Sora} Network.",
+        "text": "Extensies en Google slaan uw {Sora} Network-account veilig op. Hiermee kunt u transacties ondertekenen en activa beheren.",
         "noAccounts": "Geen account gevonden in uw {extension} browser extensie. Voeg een account toe en probeer het opnieuw.",
         "selectAccount": "Selecteer account om mee te werken",
         "action": {
@@ -105,13 +106,19 @@
             "install": "Installeren",
             "connected": "Verbonden",
             "notConnected": "Niet verbonden"
+        },
+        "internalTitle": "Maak verbinding via {wallet}",
+        "internalText": "U kunt een bestaand account aanmaken of koppelen via {wallet} . Het slaat accounts op met behulp van codering.",
+        "list": {
+            "simplest": "Eenvoudigste optie",
+            "extensions": "Extensies"
         }
     },
     "wallet": {
         "title": "{Sora} Netwerk account",
         "WalletAssets": "Assets",
-        "WalletActivity": "Activiteit",
-        "createToken": "@:createTokenText"
+        "createToken": "@:createTokenText",
+        "WalletHistory": "Activiteit"
     },
     "walletSend": {
         "title": "Verzenden",
@@ -322,7 +329,6 @@
         "Bridge": "@:bridgeText",
         "About": "Over ons",
         "Stats": "Stats",
-        "Support": "Support",
         "Wallet": "Wallet",
         "CreatePair": "Paar maken",
         "AddLiquidity": "Liquiditeit toevoegen",
@@ -344,7 +350,6 @@
         "Rewards": "Beloningen",
         "About": "Over",
         "Stats": "Stats",
-        "Support": "Support",
         "CreatePair": "Maak Paar",
         "StakingContainer": "Staking",
         "Explore\/Container": "Ontdekken",
@@ -518,13 +523,9 @@
         "strategicBonusApy": "Strategische Bonus APY"
     },
     "bridge": {
-        "title": "{Hashi} Bridge",
+        "title": "Bridge",
         "info": "Converteer tokens tussen de {Sora}-en {Ethereum}-netwerken.",
         "balance": "Saldo",
-        "connectWallet": "@:connectWalletText",
-        "connected": "@:connectedText",
-        "changeAccount": "@:changeAccountText",
-        "changeNetwork": "@:changeNetworkText",
         "next": "Volgende",
         "connectWallets": "Verbind wallets om hun respectievelijke transactiegeschiedenis te bekijken.",
         "soraNetworkFee": "{Sora} Netwerk Vergoeding",
@@ -538,8 +539,7 @@
         "networkInfo": "Bridge {Sora} Netwerk met:",
         "copy": "Netwerkadres kopiëren",
         "soraAddress": "{Sora} adres",
-        "ethereumAddress": "{Ethereum} adres",
-        "tooltipValue": "@:comingSoonText"
+        "ethereumAddress": "{Ethereum} adres"
     },
     "selectRegisteredAsset": {
         "title": "Kies een token",
@@ -561,11 +561,7 @@
         }
     },
     "confirmBridgeTransactionDialog": {
-        "confirmTransaction": "Bevestig transactie",
-        "insufficientBalance": "@:insufficientBalanceText",
-        "changeNetwork": "@:changeNetworkText",
-        "confirm": "@:confirmTransactionText",
-        "buttonConfirm": "@:confirmText"
+        "confirmTransaction": "Bevestig transactie"
     },
     "bridgeTransaction": {
         "details": "{from} voor {to}",
@@ -604,14 +600,10 @@
         "ethereum": "{Ethereum}",
         "sora": "{Sora}",
         "pending": "{network} transactie in behandeling...",
-        "retry": "@:retryText",
         "metamask": "{Metamask}",
         "confirm": "@:confirmTransactionText",
         "newTransaction": "Nieuwe transactie aanmaken",
-        "changeNetwork": "@:changeNetworkText",
-        "connectWallet": "@:connectWalletText",
         "changeAccount": "@:changeAccountText in {Metamask}",
-        "expectedAddress": "Verwacht adres in {Metamask}",
         "title": "Bridge-transactie",
         "expectedMetaMaskAddress": "Verwacht adres in {Metamask}:",
         "allowToken": "Sta {AppName} toe om je {tokenSymbol}",
@@ -857,7 +849,9 @@
         "settings": "Instellingen",
         "switchTheme": "Overschakelen naar {theme} -modus",
         "switchLanguage": "Kies een taal",
-        "selectNode": "@:selectNodeText"
+        "selectNode": "@:selectNodeText",
+        "showDisclaimer": "Disclaimer tonen",
+        "hideDisclaimer": "Disclaimer verbergen"
     },
     "sentText": "Verzonden",
     "learnMoreText": "Kom meer te weten",
@@ -1031,7 +1025,7 @@
     },
     "receivedText": "Ontvangen",
     "browserNotificationDialog": {
-        "title": "Browsermeldingen inschakelen",
+        "title": "Meldingen instellen",
         "info": "We sturen u alleen relevante updates over uw portemonnee, bijvoorbeeld: wijzigingen in activasaldo",
         "button": "Notificaties aanzetten",
         "agree": "Ja ik begrijp het",
@@ -1103,21 +1097,109 @@
             "jsonFields": "JSON-bestand heeft geen verplichte velden"
         },
         "assetsAtRiskText": "Activa in gevaar!",
-        "deleteAccountText": "Account kan niet worden hersteld zonder een seed-zin, een .json bestand of als het is opgeslagen in een extensie. U wordt uitgelogd."
+        "deleteAccountText": "Account kan niet worden hersteld zonder een seed-zin, een .json bestand of als het is opgeslagen in een extensie. U wordt uitgelogd.",
+        "importSteps": {
+            "selectWallet": "Ga naar de portemonnee van uw gebruik",
+            "selectAccount": "Selecteer het account dat u wilt exporteren",
+            "exportAccount": "Exporteer het {JSON} -bestand"
+        },
+        "exportTutorialsText": "Tutorials exporteren"
     },
     "hashiBridgeText": "{Hashi} brug",
-    "disclaimerTitle": "Disclaimer:",
+    "disclaimerTitle": "Disclaimer",
     "explore": {
         "showOnlyMyPositions": "Toon alleen mijn posities"
     },
     "tooltips": {
         "roi": "{ROI} staat voor Return on Investment. Het wordt berekend door de winst op een investering te delen door de kosten van die investering in een procentueel equivalent.",
-        "tvl": "{TVL} staat voor Total Value Locked. Het vertegenwoordigt tokens die in de pools zijn opgesloten in het equivalent van de dollar."
+        "tvl": "{TVL} staat voor Total Value Locked. Het vertegenwoordigt tokens die in de pools zijn opgesloten in het equivalent van de dollar.",
+        "volume": "Volume verwijst naar de totale hoeveelheid activa die gedurende een bepaalde periode op het netwerk is verhandeld of uitgewisseld. Het volume is een belangrijke maatstaf voor het meten van de liquiditeit en de algehele activiteit van het netwerk.",
+        "fees": "Kosten op de {Sora} -blockchain verwijzen naar de kosten die worden gemaakt voor het uitvoeren van transacties op het netwerk. Deze vergoedingen worden betaald in XOR, de native cryptocurrency van het {Sora} -netwerk. Het bedrag van de vergoeding wordt bepaald door de complexiteit en omvang van de transactie die wordt uitgevoerd",
+        "supply": "Tokenaanbod verwijst naar het totale aantal tokens dat is aangemaakt en in omloop is op het netwerk. Het tokenaanbod kan fluctueren op basis van het aantal tokens dat wordt ingezet, verbrand of overgedragen op het netwerk.",
+        "transactions": "Transacties verwijzen naar het proces van het verzenden of ontvangen van digitale activa op het netwerk, inclusief liquiditeitsoperaties, evenals swaps.",
+        "accounts": "Accounts zijn digitale adressen die de activa van de gebruiker op het netwerk bevatten. Elk account is gekoppeld aan een uniek openbaar adres en een privésleutel waarmee de gebruiker toegang heeft tot zijn activa en deze kan beheren.",
+        "bridgeTransactions": "{from} to {to} bridge verwijst naar het proces van het overbrengen van activa tussen de {from} en {to} netwerken met behulp van een bridge. De brug zorgt voor de interoperabiliteit van de twee netwerken, waardoor gebruikers naadloos activa tussen hen kunnen verplaatsen.",
+        "velocity": "Tokensnelheid is het aantal keren dat token gemiddeld van account wisselt gedurende een periode (maand). Het geeft het niveau van handelsactiviteit en liquiditeit aan."
     },
     "createTokenText": "Maak token",
     "comingSoonText": "Binnenkort beschikbaar",
     "confirmText": "Bevestigen",
     "createTokenTextNFT": "NFT maken",
     "doNotShowText": "Laat me dit niet nog een keer zien",
-    "accountText": "rekening | rekeningen"
+    "accountText": "rekening | rekeningen",
+    "networkStatisticsText": "Netwerkstatistieken",
+    "footer": {
+        "node": {
+            "title": {
+                "connected": "Knooppunt aangesloten",
+                "loading": "Knooppunt maakt opnieuw verbinding",
+                "disconnected": "Knooppunt losgekoppeld"
+            }
+        },
+        "internet": {
+            "title": {
+                "disabled": "Internet uitgeschakeld",
+                "unstable": "Internet onstabiel",
+                "stable": "Internet stabiel"
+            },
+            "label": "Je internetsnelheid",
+            "desc": {
+                "disabled": "Losgekoppeld",
+                "unstable": "Langzame verbinding",
+                "stable": "Optimale snelheid"
+            },
+            "action": "Vernieuw {Polkaswap}",
+            "dialogTitle": "Maak verbinding met internetbron",
+            "dialogDesc": "{Polkaswap} vereist een internetverbinding voor een stabiele ervaring"
+        },
+        "statistics": {
+            "title": {
+                "unavailable": "Statistieken niet beschikbaar",
+                "loading": "Statistieken laden",
+                "available": "Statistieken beschikbaar"
+            },
+            "label": "Statistische diensten",
+            "desc": {
+                "unavailable": "Alle diensten zijn losgekoppeld",
+                "loading": "Alle services worden geladen",
+                "available": "Alle diensten zijn stabiel"
+            },
+            "action": "Selecteer diensten",
+            "dialog": {
+                "title": "{Sora} Netwerkserviceselectie",
+                "fiat": "Fiat-waarden",
+                "chartsAndActivity": "Grafieken & Activiteit"
+            }
+        }
+    },
+    "locationText": "Plaats",
+    "acceptText": "Accepteren & verbergen",
+    "newAccountsText": "Nieuwe rekeningen",
+    "dragAndDropText": "Drag & drop of kies {extension} bestand",
+    "copyPhraseText": "Kopieer zin",
+    "stepText": "Stap",
+    "alerts": {
+        "drop": "Zakt onder",
+        "raise": "Stijgt boven",
+        "once": "Eenmaal",
+        "always": "Altijd",
+        "edit": "Melding bewerken",
+        "delete": "Melding verwijderen",
+        "onDropDesc": "{token} zakt onder {price}",
+        "onRaiseDesc": "{token} verhoogt boven {price}",
+        "alertsTitle": "Waarschuwingen",
+        "alertsCreateTitle": "Prijsalarm instellen",
+        "alertsTooltip": "Prijswaarschuwingen zijn meldingen die door u kunnen worden ingesteld om updates te ontvangen wanneer de prijs van een bepaald token een bepaald door u ingesteld punt bereikt",
+        "createBtn": "Nieuwe prijswaarschuwing maken",
+        "enableSwitch": "Meldingen van activastortingen inschakelen",
+        "currentPrice": "huidige prijs",
+        "alertTypeTitle": "Waarschuwingstype",
+        "typeTooltip": "Kies de optie 'drops below' of 'raises above' om een waarschuwingsconditie op te geven voor het volgen van belangrijke prijsbewegingen. Met deze opties ontvangt u tijdige meldingen wanneer de waarde van uw vermogen onder of boven de door u aangegeven drempelwaarde komt",
+        "alertFrequencyTitle": "Alert frequentie",
+        "frequencyTooltip": "Kies tussen 'eenmalig' en 'altijd' om te bepalen hoe vaak u meldingen ontvangt voor het gekozen waarschuwingstype. 'Eenmaal' stuurt een enkele melding wanneer aan de voorwaarde is voldaan, terwijl 'altijd' u op de hoogte blijft houden telkens wanneer de prijsdrempel wordt overschreden",
+        "noSupportMsg": "Meldingen worden niet ondersteund door je browser",
+        "finishBtn": "Vervolledigen"
+    },
+    "accountAddressText": "Accountadres",
+    "fiatDisclaimer": "Houd er rekening mee dat de fiat-waarden die zijn gekoppeld aan cryptocurrencies op onze website worden geleverd door externe services (Subquery, Subsquid, Ceres API) bij benadering zijn. Gezien de inherente complexiteit van deze berekeningen kan absolute nauwkeurigheid niet te allen tijde worden gegarandeerd."
 }

@@ -51,11 +51,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
 import { components, mixins, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
+
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 
 import PoolCardMixin from '../mixins/PoolCardMixin';
-import TranslationMixin from '@/components/mixins/TranslationMixin';
 
 @Component({
   components: {
@@ -83,6 +84,8 @@ export default class ClaimDialog extends Mixins(
 .claim-dialog {
   @include full-width-button('action-button');
 
+  padding-bottom: $inner-spacing-medium;
+
   & > *:not(:last-child) {
     margin-top: $inner-spacing-medium;
   }
@@ -101,7 +104,6 @@ export default class ClaimDialog extends Mixins(
     font-size: var(--s-font-size-large);
     font-weight: 700;
     line-height: var(--s-line-height-reset);
-    letter-spacing: var(--s-letter-spacing-small);
 
     &--fiat {
       font-size: var(--s-font-size-big);

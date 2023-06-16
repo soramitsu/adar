@@ -1,16 +1,17 @@
+import { mixins } from '@soramitsu/soraneo-wallet-web';
 import isNil from 'lodash/fp/isNil';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { mixins } from '@soramitsu/soraneo-wallet-web';
-import type { RegisteredAccountAsset } from '@sora-substrate/util';
-import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
-import type { WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 
 import AssetsSearchMixin from '@/components/mixins/AssetsSearchMixin';
+import { getter } from '@/store/decorators';
 
-import { asZeroValue, getAssetBalance } from '@/utils';
+import type { RegisteredAccountAsset } from '@sora-substrate/util';
+import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 @Component
 export default class SelectAsset extends Mixins(mixins.DialogMixin, AssetsSearchMixin) {
+  @getter.assets.assetDataByAddress private getAsset!: (addr?: string) => Nullable<RegisteredAccountAsset>;
+
   @Watch('visible')
   async handleVisibleChangeToFocusSearch(value: boolean): Promise<void> {
     await this.$nextTick();
@@ -47,36 +48,16 @@ export default class SelectAsset extends Mixins(mixins.DialogMixin, AssetsSearch
     };
   }
 
-  public getAssetsWithBalances({
-    assets,
-    accountAssetsAddressTable,
-    notNullBalanceOnly = false,
-    accountAssetsOnly = false,
-    excludeAsset,
-  }: {
-    assets: Array<Asset | RegisteredAccountAsset>;
-    accountAssetsAddressTable: WALLET_TYPES.AccountAssetsTable;
-    notNullBalanceOnly?: boolean;
-    accountAssetsOnly?: boolean;
-    excludeAsset?: Asset | AccountAsset;
-  }): Array<AccountAsset | RegisteredAccountAsset> {
-    return assets.reduce((result: Array<AccountAsset>, item) => {
-      if (!item || (excludeAsset && item.address === excludeAsset.address)) return result;
+  public getAssetsWithBalances(addresses: string[], excludeAddress = ''): Array<RegisteredAccountAsset> {
+    return addresses.reduce<RegisteredAccountAsset[]>((buffer, address) => {
+      if (address !== excludeAddress) {
+        const asset = this.getAsset(address);
 
-      const accountAsset = accountAssetsAddressTable[item.address];
-
-      if (accountAssetsOnly && !accountAsset) return result;
-
-      const balance = accountAsset?.balance;
-
-      if (notNullBalanceOnly && asZeroValue(getAssetBalance(accountAsset))) return result;
-
-      const prepared = {
-        ...item,
-        balance,
-      };
-
-      return [...result, prepared];
+        if (asset) {
+          buffer.push(asset);
+        }
+      }
+      return buffer;
     }, []);
   }
 

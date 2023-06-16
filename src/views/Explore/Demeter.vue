@@ -143,14 +143,14 @@
       </s-table-column>
     </s-table>
 
-    <s-pagination
+    <history-pagination
       class="explore-table-pagination"
-      :layout="'prev, total, next'"
-      :current-page.sync="currentPage"
-      :page-size="pageAmount"
-      :total="filteredItems.length"
-      @prev-click="handlePrevClick"
-      @next-click="handleNextClick"
+      :current-page="currentPage"
+      :page-amount="pageAmount"
+      :total="total"
+      :last-page="lastPage"
+      :loading="loadingState"
+      @pagination-click="handlePaginationClick"
     />
 
     <calculator-dialog :visible.sync="showCalculatorDialog" v-bind="selectedDerivedPool" :liquidity="liquidity" />
@@ -158,27 +158,25 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Watch } from 'vue-property-decorator';
 import { FPNumber } from '@sora-substrate/util';
-import { api, components } from '@soramitsu/soraneo-wallet-web';
 import { SortDirection } from '@soramitsu/soramitsu-js-ui/lib/components/Table/consts';
+import { api, components } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import ExplorePageMixin from '@/components/mixins/ExplorePageMixin';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import DemeterBasePageMixin from '@/modules/demeterFarming/mixins/BasePageMixin';
-
-import { demeterLazyComponent } from '@/modules/demeterFarming/router';
-import { DemeterComponents } from '@/modules/demeterFarming/consts';
-
-import { lazyComponent } from '@/router';
 import { Components } from '@/consts';
+import { DemeterComponents } from '@/modules/demeterFarming/consts';
+import DemeterBasePageMixin from '@/modules/demeterFarming/mixins/BasePageMixin';
+import { demeterLazyComponent } from '@/modules/demeterFarming/router';
+import type { DemeterPoolDerivedData } from '@/modules/demeterFarming/types';
+import { lazyComponent } from '@/router';
+import type { AmountWithSuffix } from '@/types/formats';
 import { formatAmountWithSuffix, formatDecimalPlaces } from '@/utils';
 
 import type { Asset } from '@sora-substrate/util/build/assets/types';
-import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
 import type { DemeterPool } from '@sora-substrate/util/build/demeterFarming/types';
-import type { AmountWithSuffix } from '@/types/formats';
-import type { DemeterPoolDerivedData } from '@/modules/demeterFarming/types';
+import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
 
 type PoolData = {
   price: FPNumber;
@@ -217,33 +215,13 @@ const lpKey = (baseAsset: string, poolAsset: string): string => {
     SortButton: lazyComponent(Components.SortButton),
     TokenLogo: components.TokenLogo,
     FormattedAmount: components.FormattedAmount,
+    HistoryPagination: components.HistoryPagination,
   },
 })
 export default class ExploreDemeter extends Mixins(TranslationMixin, DemeterBasePageMixin, ExplorePageMixin) {
   @Watch('pools', { deep: true })
   private async updatePoolsData() {
-    await this.withLoading(async () => {
-      await this.withParentLoading(async () => {
-        const buffer = {};
-        const isFarm = this.isFarmingPage;
-        const keys = this.list.map((item) => lpKey(item.baseAsset, item.poolAsset));
-        const poolKeys = [...new Set(keys)];
-
-        await Promise.allSettled(
-          poolKeys.map(async (key) => {
-            if (!buffer[key]) {
-              const poolData = await this.getPoolData(key, isFarm);
-
-              if (poolData) {
-                buffer[key] = poolData;
-              }
-            }
-          })
-        );
-
-        this.poolsData = buffer;
-      });
-    });
+    await this.updateExploreData();
   }
 
   // override ExplorePageMixin
@@ -353,6 +331,35 @@ export default class ExploreDemeter extends Mixins(TranslationMixin, DemeterBase
     if (!this.isAccountItems) return this.items;
 
     return this.items.filter((item) => item.isAccountItem);
+  }
+
+  // ExplorePageMixin method implementation
+  async updateExploreData(): Promise<void> {
+    // return if method is already called by "watch" or "mounted"
+    if (this.loading) return;
+
+    await this.withLoading(async () => {
+      await this.withParentLoading(async () => {
+        const buffer = {};
+        const isFarm = this.isFarmingPage;
+        const keys = this.list.map((item) => lpKey(item.baseAsset, item.poolAsset));
+        const poolKeys = [...new Set(keys)];
+
+        await Promise.allSettled(
+          poolKeys.map(async (key) => {
+            if (!buffer[key]) {
+              const poolData = await this.getPoolData(key, isFarm);
+
+              if (poolData) {
+                buffer[key] = poolData;
+              }
+            }
+          })
+        );
+
+        this.poolsData = Object.freeze(buffer);
+      });
+    });
   }
 
   private async getPoolData(key: string, isFarm: boolean): Promise<Nullable<PoolData>> {

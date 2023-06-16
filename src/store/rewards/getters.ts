@@ -1,18 +1,22 @@
-import { defineGetters } from 'direct-vuex';
 import { KnownAssets, KnownSymbols } from '@sora-substrate/util/build/assets/consts';
 import { groupRewardsByAssetsList } from '@soramitsu/soraneo-wallet-web';
-import type { RewardInfo, RewardsInfo } from '@sora-substrate/util/build/rewards/types';
+import { defineGetters } from 'direct-vuex';
 
 import { rewardsGetterContext } from '@/store/rewards';
-import { asZeroValue } from '@/utils';
 import { RewardsAmountHeaderItem } from '@/types/rewards';
+import { asZeroValue } from '@/utils';
+
 import type { RewardsState } from './types';
+import type { RewardInfo, RewardsInfo } from '@sora-substrate/util/build/rewards/types';
 
 const getters = defineGetters<RewardsState>()({
   claimableRewards(...args): Array<RewardInfo | RewardsInfo> {
     const { state } = rewardsGetterContext(args);
 
-    const buffer: Array<RewardInfo | RewardsInfo> = [...state.selectedExternal, ...state.selectedCrowdloan];
+    const buffer: Array<RewardInfo | RewardsInfo> = [
+      ...state.selectedExternal,
+      ...Object.values(state.selectedCrowdloan).flat(1),
+    ];
 
     if (state.selectedInternal) {
       buffer.push(state.selectedInternal);
@@ -40,17 +44,18 @@ const getters = defineGetters<RewardsState>()({
     const { state } = rewardsGetterContext(args);
     return state.externalRewards.length !== 0;
   },
-  crowdloanRewardsAvailable(...args): Array<RewardInfo> {
+  crowdloanRewardsAvailable(...args): string[] {
     const { state } = rewardsGetterContext(args);
-    return state.crowdloanRewards.filter((item) => !asZeroValue(item.amount));
+    return Object.entries(state.crowdloanRewards).reduce<string[]>((buffer, [tag, rewards]) => {
+      if (rewards.some((reward) => !asZeroValue(reward.amount))) {
+        buffer.push(tag);
+      }
+      return buffer;
+    }, []);
   },
   externalRewardsSelected(...args): boolean {
     const { state } = rewardsGetterContext(args);
     return state.selectedExternal.length !== 0;
-  },
-  transactionStepsCount(...args): number {
-    const { getters } = rewardsGetterContext(args);
-    return getters.externalRewardsSelected ? 2 : 1;
   },
   rewardsByAssetsList(...args): Array<RewardsAmountHeaderItem> {
     const { getters } = rewardsGetterContext(args);

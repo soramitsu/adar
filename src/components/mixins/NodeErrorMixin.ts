@@ -1,13 +1,15 @@
+import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
-import TranslationMixin from './TranslationMixin';
-import { AppHandledError } from '@/utils/error';
-import { delay } from '@/utils';
 import { state, getter, mutation } from '@/store/decorators';
 import type { Node } from '@/types/nodes';
+import { delay } from '@/utils';
+import { AppHandledError } from '@/utils/error';
+
+import TranslationMixin from './TranslationMixin';
 
 @Component
-export default class NodeErrorMixin extends Mixins(TranslationMixin) {
+export default class NodeErrorMixin extends Mixins(TranslationMixin, mixins.NotificationMixin) {
   @state.settings.node node!: Partial<Node>;
   @getter.settings.nodeIsConnected nodeIsConnected!: boolean;
   @mutation.settings.setSelectNodeDialogVisibility setSelectNodeDialogVisibility!: (flag: boolean) => void;
@@ -28,29 +30,17 @@ export default class NodeErrorMixin extends Mixins(TranslationMixin) {
     }
 
     if (this.nodeIsConnected && preferNotification) {
-      this.$notify({
-        message: resultMessage,
-        type: 'success',
-        title: '',
-      });
+      this.showAppNotification(resultMessage, 'success');
     } else {
-      this.$alert(errorMessage + resultMessage, { title: this.t('errorText') });
+      this.showAppAlert(errorMessage + resultMessage, this.t('errorText'));
     }
   }
 
   protected handleNodeDisconnect(node: Node): void {
-    this.$notify({
-      message: this.t('node.warnings.disconnect', { address: node.address }),
-      type: 'warning',
-      title: '',
-    });
+    this.showAppNotification(this.t('node.warnings.disconnect', { address: node.address }), 'warning');
   }
 
   protected handleNodeReconnect(node: Node): void {
-    this.$notify({
-      message: this.t('node.messages.connected', { address: node.address }),
-      type: 'success',
-      title: '',
-    });
+    this.showAppNotification(this.t('node.messages.connected', { address: node.address }), 'success');
   }
 }

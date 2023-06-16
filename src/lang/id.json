@@ -87,11 +87,12 @@
         "noAccounts": "Sepertinya tidak ada akun di ekstensi {extension} anda. Tambahkan akun dan coba lagi.",
         "noAccount": "{extension} akun error. Silakan periksa akun Anda di ekstensi {extension}",
         "noExtension": "Tidak ada {extension} yang ditemukan. Silakan instal dan muat ulang halaman ini",
-        "noSigner": "Akses ditolak. Buka setelan ekstensi {extension} dan buka \"Kelola Akses Situs Web\" untuk mengizinkan."
+        "noSigner": "Akses ditolak. Buka setelan ekstensi {extension} dan buka \"Kelola Akses Situs Web\" untuk mengizinkan.",
+        "connectionError": "Terjadi kesalahan saat menghubungkan dompet. Anda dapat mencoba menyambungkan dompet melalui {extension} lagi"
     },
     "connection": {
         "title": "Akun Jaringan {Sora}",
-        "text": "Hubungkan atau buat akun Jaringan {Sora} Anda dengan {extensions}. Ekstensi ini memungkinkan Anda menandatangani transaksi dan mengelola aset dengan aman di Jaringan {Sora}.",
+        "text": "Ekstensi & Google menyimpan akun Jaringan {Sora} Anda dengan aman. Mereka memungkinkan Anda untuk menandatangani transaksi & mengelola aset.",
         "noAccounts": "Tidak ada akun yang ditemukan di ekstensi browser {extension} anda. Silakan tambahkan akun, lalu coba kembali.",
         "selectAccount": "Pilih akun untuk dikerjakan",
         "action": {
@@ -105,13 +106,19 @@
             "install": "Install",
             "connected": "Terhubung",
             "notConnected": "Tidak terhubung"
+        },
+        "internalTitle": "Terhubung melalui {wallet}",
+        "internalText": "Anda dapat membuat atau menautkan akun yang sudah ada melalui {wallet} . Ini menyimpan akun menggunakan enkripsi.",
+        "list": {
+            "simplest": "Opsi paling sederhana",
+            "extensions": "Ekstensi"
         }
     },
     "wallet": {
         "title": "Akun Jaringan {Sora}",
         "WalletAssets": "Aset",
-        "WalletActivity": "Aktivitas",
-        "createToken": "@:createTokenText"
+        "createToken": "@:createTokenText",
+        "WalletHistory": "Aktivitas"
     },
     "walletSend": {
         "title": "Kirim",
@@ -322,7 +329,6 @@
         "Bridge": "@:bridgeText",
         "About": "Tentang",
         "Stats": "Statistik",
-        "Support": "Dukungan",
         "Wallet": "Dompet",
         "CreatePair": "Buat Pair",
         "AddLiquidity": "Tambah Likuiditas",
@@ -344,7 +350,6 @@
         "Rewards": "Hadiah",
         "About": "Tentang",
         "Stats": "Statistik",
-        "Support": "Dukungan",
         "CreatePair": "Buat Pair",
         "StakingContainer": "Staking",
         "Explore\/Container": "Menjelajahi",
@@ -518,13 +523,9 @@
         "strategicBonusApy": "Bonus Strategis APY"
     },
     "bridge": {
-        "title": "{Hashi} Bridge",
+        "title": "Bridge",
         "info": "Tukar token antara jaringan {Sora} dan {Ethereum}.",
         "balance": "Saldo",
-        "connectWallet": "@:connectWalletText",
-        "connected": "@:connectedText",
-        "changeAccount": "@:changeAccountText",
-        "changeNetwork": "@:changeNetworkText",
         "next": "Berikutnya",
         "connectWallets": "Hubungkan dompet untuk melihat riwayat masing-masing transaksi.",
         "soraNetworkFee": "Biaya Jaringan {Sora}",
@@ -538,8 +539,7 @@
         "networkInfo": "Bridge Jaringan {Sora} dengan:",
         "copy": "Salin alamat jaringan",
         "soraAddress": "{Sora} alamat",
-        "ethereumAddress": "{Ethereum} alamat",
-        "tooltipValue": "@:comingSoonText"
+        "ethereumAddress": "{Ethereum} alamat"
     },
     "selectRegisteredAsset": {
         "title": "Pilih token",
@@ -561,11 +561,7 @@
         }
     },
     "confirmBridgeTransactionDialog": {
-        "confirmTransaction": "Konfirmasi transaksi",
-        "insufficientBalance": "@:insufficientBalanceText",
-        "changeNetwork": "@:changeNetworkText",
-        "confirm": "@:confirmTransactionText",
-        "buttonConfirm": "@:confirmText"
+        "confirmTransaction": "Konfirmasi transaksi"
     },
     "bridgeTransaction": {
         "details": "{from} untuk {to}",
@@ -604,14 +600,10 @@
         "ethereum": "{Ethereum}",
         "sora": "{Sora}",
         "pending": "{network} transaksi tertunda...",
-        "retry": "@:retryText",
         "metamask": "{Metamask}",
         "confirm": "@:confirmTransactionText",
         "newTransaction": "Buat transaksi baru",
-        "changeNetwork": "@:changeNetworkText",
-        "connectWallet": "@:connectWalletText",
         "changeAccount": "@:changeAccountText di {Metamask}",
-        "expectedAddress": "Alamat yang diharapkan di {Metamask}",
         "title": "Jembatan Transaksi",
         "expectedMetaMaskAddress": "Alamat yang diharapkan di {Metamask}",
         "allowToken": "Izinkan {AppName} untuk menggunakan {tokenSymbol}",
@@ -857,7 +849,9 @@
         "settings": "Pengaturan",
         "switchTheme": "Beralih ke Mode {theme}",
         "switchLanguage": "Pilih bahasa",
-        "selectNode": "@:selectNodeText"
+        "selectNode": "@:selectNodeText",
+        "showDisclaimer": "Tampilkan Penafian",
+        "hideDisclaimer": "Sembunyikan Penafian"
     },
     "sentText": "Terkirim",
     "learnMoreText": "Pelajari lebih lanjut",
@@ -1031,7 +1025,7 @@
     },
     "receivedText": "Diterima",
     "browserNotificationDialog": {
-        "title": "Aktifkan pemberitahuan browser",
+        "title": "Setel Notifikasi",
         "info": "Kami hanya akan mengirimkan pembaruan yang relevan tentang dompet Anda, misalnya: perubahan saldo aset",
         "button": "Aktifkan notifikasi",
         "agree": "Ya saya mengerti",
@@ -1103,21 +1097,109 @@
             "jsonFields": "File JSON tidak memiliki bidang yang wajib diisi"
         },
         "assetsAtRiskText": "Aset berisiko!",
-        "deleteAccountText": "Akun tidak dapat dipulihkan tanpa seed frase, file .json atau jika disimpan dalam beberapa ekstensi. Anda akan keluar."
+        "deleteAccountText": "Akun tidak dapat dipulihkan tanpa seed frase, file .json atau jika disimpan dalam beberapa ekstensi. Anda akan keluar.",
+        "importSteps": {
+            "selectWallet": "Buka dompet yang Anda gunakan",
+            "selectAccount": "Pilih akun yang ingin Anda ekspor",
+            "exportAccount": "Ekspor file {JSON}"
+        },
+        "exportTutorialsText": "Ekspor tutorial"
     },
     "hashiBridgeText": "Jembatan {Hashi}",
-    "disclaimerTitle": "Penafian:",
+    "disclaimerTitle": "Penafian",
     "explore": {
         "showOnlyMyPositions": "Hanya tampilkan posisi saya"
     },
     "tooltips": {
         "roi": "{ROI} adalah singkatan dari Pengembalian Investasi. Ini dihitung dengan membagi laba yang diperoleh dari investasi dengan biaya investasi itu dalam persentase yang setara.",
-        "tvl": "{TVL} adalah singkatan dari Total Value Locked. Ini mewakili token yang dikunci di kumpulan dalam setara dolar."
+        "tvl": "{TVL} adalah singkatan dari Total Value Locked. Ini mewakili token yang dikunci di kumpulan dalam setara dolar.",
+        "volume": "Volume mengacu pada jumlah total aset yang telah diperdagangkan atau dipertukarkan di jaringan selama periode waktu tertentu. Volume adalah metrik penting untuk mengukur likuiditas dan keseluruhan aktivitas jaringan.",
+        "fees": "Biaya pada blockchain {Sora} mengacu pada biaya yang dikeluarkan untuk melakukan transaksi di jaringan. Biaya ini dibayarkan dalam XOR, mata uang kripto asli dari Jaringan {Sora} . Jumlah biaya ditentukan oleh kompleksitas dan ukuran transaksi yang dijalankan",
+        "supply": "Pasokan token mengacu pada jumlah total token yang telah dibuat dan beredar di jaringan. Pasokan token dapat berfluktuasi berdasarkan jumlah token yang dipertaruhkan, dibakar, atau ditransfer di jaringan.",
+        "transactions": "Transaksi mengacu pada proses pengiriman atau penerimaan aset digital di jaringan, termasuk operasi likuiditas, serta pertukaran.",
+        "accounts": "Akun adalah alamat digital yang menyimpan aset pengguna di jaringan. Setiap akun dikaitkan dengan alamat publik unik dan kunci pribadi yang memungkinkan pengguna mengakses dan mengelola aset mereka.",
+        "bridgeTransactions": "Jembatan {from} to {to} mengacu pada proses transfer aset antara jaringan {from} dan {to} menggunakan jembatan. Jembatan memungkinkan untuk interoperabilitas dari dua jaringan, memungkinkan pengguna untuk memindahkan aset dengan mulus di antara keduanya.",
+        "velocity": "Kecepatan token adalah rata-rata berapa kali token mengubah akun selama periode (bulan). Ini menunjukkan tingkat aktivitas perdagangan dan likuiditas."
     },
     "createTokenText": "Buat token",
     "comingSoonText": "Segera Hadir",
     "confirmText": "Konfirmasi",
     "createTokenTextNFT": "Buat NFT",
     "doNotShowText": "Jangan tunjukkan ini lagi",
-    "accountText": "akun | akun"
+    "accountText": "akun | akun",
+    "networkStatisticsText": "Statistik jaringan",
+    "footer": {
+        "node": {
+            "title": {
+                "connected": "Node terhubung",
+                "loading": "Node terhubung kembali",
+                "disconnected": "Node terputus"
+            }
+        },
+        "internet": {
+            "title": {
+                "disabled": "Internet dinonaktifkan",
+                "unstable": "Internet tidak stabil",
+                "stable": "Internet stabil"
+            },
+            "label": "Kecepatan internet Anda",
+            "desc": {
+                "disabled": "Terputus",
+                "unstable": "Koneksi lambat",
+                "stable": "Kecepatan optimal"
+            },
+            "action": "Segarkan {Polkaswap}",
+            "dialogTitle": "Hubungkan ke sumber internet",
+            "dialogDesc": "{Polkaswap} membutuhkan koneksi internet untuk pengalaman yang stabil"
+        },
+        "statistics": {
+            "title": {
+                "unavailable": "Statistik tidak tersedia",
+                "loading": "Pemuatan statistik",
+                "available": "Statistik tersedia"
+            },
+            "label": "Layanan statistik",
+            "desc": {
+                "unavailable": "Semua layanan terputus",
+                "loading": "Semua layanan sedang dimuat",
+                "available": "Semua layanan stabil"
+            },
+            "action": "Pilih layanan",
+            "dialog": {
+                "title": "{Sora} Pemilihan layanan jaringan",
+                "fiat": "Nilai Fiat",
+                "chartsAndActivity": "Bagan & Aktivitas"
+            }
+        }
+    },
+    "locationText": "Lokasi",
+    "acceptText": "Terima & Sembunyikan",
+    "newAccountsText": "Akun baru",
+    "dragAndDropText": "Seret & lepas atau pilih file {extension}",
+    "copyPhraseText": "Salin Frasa",
+    "stepText": "Melangkah",
+    "alerts": {
+        "drop": "Jatuh di bawah",
+        "raise": "Menaikkan di atas",
+        "once": "Sekali",
+        "always": "Selalu",
+        "edit": "Edit lansiran",
+        "delete": "Hapus lansiran",
+        "onDropDesc": "{token} turun di bawah {price}",
+        "onRaiseDesc": "{token} naik di atas {price}",
+        "alertsTitle": "Lansiran",
+        "alertsCreateTitle": "Siapkan peringatan harga",
+        "alertsTooltip": "Peringatan harga adalah pemberitahuan yang dapat Anda atur untuk menerima pembaruan saat harga token tertentu mencapai titik tertentu yang Anda tetapkan",
+        "createBtn": "Buat peringatan harga baru",
+        "enableSwitch": "Aktifkan notifikasi setoran aset",
+        "currentPrice": "harga sekarang",
+        "alertTypeTitle": "Jenis peringatan",
+        "typeTooltip": "Pilih opsi 'turun di bawah' atau 'naik di atas' untuk menentukan kondisi waspada untuk melacak pergerakan harga penting. Opsi ini memungkinkan Anda menerima pemberitahuan tepat waktu saat nilai aset Anda turun di bawah atau naik di atas ambang batas yang Anda tetapkan",
+        "alertFrequencyTitle": "Frekuensi peringatan",
+        "frequencyTooltip": "Pilih antara 'sekali' dan 'selalu' untuk menentukan seberapa sering Anda menerima pemberitahuan untuk jenis lansiran yang dipilih. 'Sekali' akan mengirimkan satu notifikasi saat kondisi terpenuhi, sementara 'selalu' akan terus memberi tahu Anda setiap kali ambang harga dilewati",
+        "noSupportMsg": "Notifikasi tidak didukung oleh browser Anda",
+        "finishBtn": "Untuk menyelesaikan"
+    },
+    "accountAddressText": "Alamat akun",
+    "fiatDisclaimer": "Harap perhatikan bahwa nilai fiat yang terkait dengan cryptocurrency di situs web kami disediakan oleh layanan eksternal (Subquery, Subsquid, Ceres API) adalah perkiraan. Mengingat kerumitan perhitungan ini, presisi mutlak setiap saat tidak dapat dijamin."
 }

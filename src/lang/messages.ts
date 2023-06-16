@@ -1,12 +1,13 @@
-import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-import { en as walletEn, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Operation, TransactionStatus } from '@sora-substrate/util';
 import { RewardingEvents } from '@sora-substrate/util/build/rewards/consts';
+import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
+import { en as walletEn } from '@soramitsu/soraneo-wallet-web';
 
-import { DemeterPageNames } from '../modules/demeterFarming/consts';
+import { AlertFrequencyTabs, AlertTypeTabs } from '@/types/tabs';
+
+import { MoonpayNotifications } from '../components/pages/Moonpay/consts';
 import { PageNames, RewardsTabsItems } from '../consts';
-import { EvmNetworkType } from '../utils/ethers-util';
-import { MoonpayNotifications } from '../components/Moonpay/consts';
+import { DemeterPageNames } from '../modules/demeterFarming/consts';
 
 export default {
   // Wallet project keys
@@ -16,6 +17,8 @@ export default {
   hashiBridgeText: '{Hashi} bridge',
   moonpayText: 'MoonPay',
   changeNetworkText: 'Change network in {Metamask}',
+  accountText: 'account | accounts',
+  newAccountsText: 'New accounts',
   transactionText: 'transaction | transactions',
   transactionSubmittedText: 'Transaction was submitted',
   unknownErrorText: 'ERROR Something went wrong...',
@@ -28,6 +31,7 @@ export default {
   connectWalletTextTooltip: 'Connect to {Sora} Network with {PolkadotJs}',
   selectNodeText: 'Select node',
   bridgeText: 'Bridge',
+  acceptText: 'Accept & Hide',
   comingSoonText: 'Coming Soon',
   releaseNotesText: 'Release notes',
   memorandum: '{AppName} Memorandum and Terms of Services',
@@ -35,6 +39,8 @@ export default {
   disclaimerTitle: 'Disclaimer:',
   disclaimer:
     '{disclaimerPrefix} This website is maintained by the {Sora} community. Before continuing to use this website, please review the {polkaswapFaqLink} and documentation, which includes a detailed explanation on how {AppName} works, as well as the {memorandumLink}, and {privacyLink}. These documents are crucial to a secure and positive user experience. By using {AppName}, you acknowledge that you have read and understand these documents. You also acknowledge the following: 1) your sole responsibility for compliance with all laws that may apply to your particular use of {AppName} in your legal jurisdiction; 2) your understanding that the current version of {AppName} is an alpha version: it has not been fully tested, and some functions may not perform as designed; and 3) your understanding and voluntary acceptance of the risks involved in using {AppName}, including, but not limited to, the risk of losing tokens. Please do not continue without reading the {polkaswapFaqLink}, {memorandumLink}, {privacyLink}!',
+  fiatDisclaimer:
+    'Please note that the fiat values associated with cryptocurrencies on our website are provided by external services (Subquery, Subsquid, Ceres API)  are approximate. Given the inherent complexity of these calculations, absolute precision at all times cannot be guaranteed.',
   poweredBy: 'Powered by',
   confirmText: 'Confirm',
   confirmTransactionText: 'Confirm transaction in {direction}',
@@ -64,8 +70,7 @@ export default {
     [PageNames.Pool]: 'Pool',
     [PageNames.Bridge]: '@:bridgeText',
     [PageNames.About]: 'About',
-    [PageNames.Stats]: 'Stats',
-    [PageNames.Support]: 'Support',
+    [PageNames.Stats]: 'Statistics',
     [PageNames.Wallet]: 'Wallet',
     [PageNames.Rewards]: 'Rewards',
     [PageNames.ExploreTokens]: 'Tokens',
@@ -84,10 +89,33 @@ export default {
     [PageNames.Wallet]: 'Account',
     [PageNames.Rewards]: 'Rewards',
     [PageNames.About]: 'About',
-    [PageNames.Stats]: 'Stats',
-    [PageNames.Support]: 'Support',
+    [PageNames.Stats]: 'Statistics',
     [PageNames.ExploreContainer]: 'Explore',
     [PageNames.StakingContainer]: 'Staking',
+  },
+  alerts: {
+    [AlertTypeTabs.Drop]: 'Drops below',
+    [AlertTypeTabs.Raise]: 'Raises above',
+    [AlertFrequencyTabs.Once]: 'Once',
+    [AlertFrequencyTabs.Always]: 'Always',
+    edit: 'Edit alert',
+    delete: 'Delete alert',
+    onDropDesc: '{token} drops below {price}',
+    onRaiseDesc: '{token} raises above {price}',
+    alertsTitle: 'Alerts',
+    alertsTooltip:
+      'Price alerts are notifications that can be set by you to receive updates when the price of a particular token reaches certain point you set',
+    createBtn: 'Create new price alert',
+    finishBtn: 'Finish alert setup',
+    enableSwitch: 'Enable asset deposit notifications',
+    currentPrice: 'current price',
+    alertTyptTitle: 'Alert type',
+    typeTooltip:
+      "Choose either 'drops below' or 'raises above' option to specify the alert condition for tracking important price movements. These options allow you receive timely notifications when the value of your asset either falls below or rises above your designated threshold.",
+    alertFrequencyTitle: 'Alert frequency',
+    frequencyTooltip:
+      "Select between 'once' and 'always' to determine how often you receive notifications for the chosen alert type. 'Once' will send a single notification when the condition is met, while 'always' will continue to notify you each time the price threshold is crossed.",
+    noSupportMsg: "Notifications aren't supported by your browser",
   },
   headerMenu: {
     showBalances: 'Show Balances',
@@ -96,6 +124,8 @@ export default {
     switchTheme: 'Switch to {theme} Mode',
     switchLanguage: 'Choose Language',
     selectNode: '@:selectNodeText',
+    showDisclaimer: 'Show Disclaimer',
+    hideDisclaimer: 'Hide Disclaimer',
   },
   social: {
     wiki: '{Sora} Wiki',
@@ -440,6 +470,7 @@ export default {
     allowToken: 'Allow {AppName} to use your {tokenSymbol}',
     approveToken:
       'Please note that it is only needed to approve the token once. If your extension has multiple token approval requests, make sure to only confirm the last one while rejecting the rest.',
+    accountAddress: '{network} @:accountAddressText',
   },
   bridgeHistory: {
     title: 'History',
@@ -787,8 +818,23 @@ export default {
   },
   assetDeposit: 'Asset balance has been deposited',
   ofText: '{first} of {second}',
+  accountAddressText: 'Account address',
   tooltips: {
     roi: '{ROI} stands for Return on Investment. It is calculated by dividing the profit earned on an investment by the cost of that investment in a percentage equivalent.',
     tvl: '{TVL} stands for Total Value Locked. It represents tokens locked in the pools in the dollar equivalent.',
+    volume:
+      'Volume refers to the total amount of assets that have been traded or exchanged on the network over a specific period of time. The volume is an important metric for measuring the liquidity and overall activity of the network.',
+    fees: 'Fees on the {Sora} blockchain refer to the charges that are incurred for executing transactions on the network. These fees are paid in XOR, the native cryptocurrency of the {Sora} Network. The fee amount is determined by the complexity and size of the transaction being executed',
+    supply:
+      'Token supply refers to the total number of tokens that have been created and are in circulation on the network. The token supply can fluctuate based on the amount of tokens being staked, burned, or transferred on the network.',
+    transactions:
+      'Transactions refer to the process of sending or receiving digital assets on the network, including liquidity operations, as well as swaps.',
+    accounts:
+      "Accounts are digital addresses that hold user's assets on the network. Each account is associated with a unique public address and a private key that allows the user to access and manage their assets.",
+    bridgeTransactions:
+      '{from} to {to} bridge refers to the process of transferring assets between the {from} and {to} networks using a bridge. The bridge allows for the interoperability of the two networks, enabling users to seamlessly move assets between them.',
+    velocity:
+      'Token velocity is the number of times token changes accounts during period (month) on average. It indicates the level of trading activity and liquidity.',
   },
+  networkStatisticsText: 'Network statistics',
 };

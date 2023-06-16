@@ -1,21 +1,19 @@
-import { Component, Mixins, Prop } from 'vue-property-decorator';
 import { FPNumber } from '@sora-substrate/math';
+import { Component, Mixins, Prop } from 'vue-property-decorator';
 
+import type { DemeterAsset, DemeterPoolDerived, DemeterPoolDerivedData } from '@/modules/demeterFarming/types';
 import { state, getter } from '@/store/decorators';
+import { formatDecimalPlaces } from '@/utils';
 
 import AprMixin from './AprMixin';
 
-import { formatDecimalPlaces } from '@/utils';
-
 import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
-import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
 import type {
   DemeterPool,
   DemeterAccountPool,
   DemeterRewardToken,
 } from '@sora-substrate/util/build/demeterFarming/types';
-
-import type { DemeterAsset, DemeterPoolDerived, DemeterPoolDerivedData } from '@/modules/demeterFarming/types';
+import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
 
 type Pool = DemeterPool | DemeterAccountPool;
 
@@ -36,10 +34,10 @@ const createPoolsDoubleMap = <T extends Pool>(pools: readonly T[], isFarm = true
 export default class BasePageMixin extends Mixins(AprMixin) {
   @Prop({ default: true, type: Boolean }) readonly isFarmingPage!: boolean;
 
+  @state.demeterFarming.tokens tokens!: DemeterRewardToken[];
   @state.demeterFarming.pools demeterPools!: DemeterPool[];
   @state.demeterFarming.accountPools demeterAccountPools!: DemeterAccountPool[];
 
-  @getter.demeterFarming.tokenInfos tokenInfos!: DataMap<DemeterRewardToken>;
   @getter.assets.assetDataByAddress getAsset!: (addr?: string) => Nullable<AccountAsset>;
 
   showCalculatorDialog = false;
@@ -48,6 +46,10 @@ export default class BasePageMixin extends Mixins(AprMixin) {
   poolAsset: Nullable<string> = null;
   rewardAsset: Nullable<string> = null;
   liquidity: Nullable<AccountLiquidity> = null;
+
+  get tokenInfos(): DataMap<DemeterRewardToken> {
+    return this.tokens.reduce((buffer, token) => ({ ...buffer, [token.assetId]: token }), {});
+  }
 
   get uniqueAssets(): string[] {
     const adresses = this.demeterPools.reduce<string[]>((buffer, pool) => {

@@ -1,14 +1,16 @@
-import { defineActions } from 'direct-vuex';
-import { api } from '@soramitsu/soraneo-wallet-web';
 import { FPNumber } from '@sora-substrate/util';
-import type { ActionContext } from 'vuex';
-import type { AccountBalance } from '@sora-substrate/util/build/assets/types';
+import { XOR, XSTUSD } from '@sora-substrate/util/build/assets/consts';
+import { api } from '@soramitsu/soraneo-wallet-web';
+import { defineActions } from 'direct-vuex';
 
+import { ZeroStringValue } from '@/consts';
 import { addLiquidityActionContext } from '@/store/addLiquidity';
 import { FocusedField } from '@/store/addLiquidity/types';
-import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
 import type { LiquidityParams } from '@/store/pool/types';
-import { ZeroStringValue } from '@/consts';
+import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
+
+import type { AccountBalance } from '@sora-substrate/util/build/assets/types';
+import type { ActionContext } from 'vuex';
 
 const balanceSubscriptions = new TokenBalanceSubscriptions();
 
@@ -152,7 +154,13 @@ const actions = defineActions({
       return asset?.address ?? '';
     };
 
-    const [first, second] = await Promise.all([findAssetAddress(firstAddress), findAssetAddress(secondAddress)]);
+    let [first, second] = await Promise.all([findAssetAddress(firstAddress), findAssetAddress(secondAddress)]);
+
+    if (first === XSTUSD.address && second === XOR.address) {
+      // We should invert XSTUSD-XOR pair
+      first = XOR.address;
+      second = XSTUSD.address;
+    }
 
     await dispatch.setFirstTokenAddress(first);
     await dispatch.setSecondTokenAddress(second);

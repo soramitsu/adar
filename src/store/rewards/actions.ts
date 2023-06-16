@@ -1,17 +1,18 @@
-import { defineActions } from 'direct-vuex';
 import { api } from '@soramitsu/soraneo-wallet-web';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { defineActions } from 'direct-vuex';
+import { ethers } from 'ethers';
+
+import { rewardsActionContext } from '@/store/rewards';
+import type { SelectedRewards } from '@/types/rewards';
+import { waitForAccountPair } from '@/utils';
+import ethersUtil from '@/utils/ethers-util';
+
+import state from './state';
+
+import type { ClaimRewardsParams } from './types';
 import type { RewardInfo, RewardsInfo } from '@sora-substrate/util/build/rewards/types';
 import type { Subscription } from 'rxjs';
 import type { ActionContext } from 'vuex';
-
-import { rewardsActionContext } from '@/store/rewards';
-import { waitForAccountPair } from '@/utils';
-import ethersUtil from '@/utils/ethers-util';
-import { ethers } from 'ethers';
-import type { ClaimRewardsParams } from './types';
-import type { SelectedRewards } from '@/types/rewards';
-import state from './state';
 
 async function getCrowdloanRewardsSubscription(context: ActionContext<any, any>): Promise<Subscription> {
   const { commit, dispatch, getters } = rewardsActionContext(context);
@@ -21,21 +22,28 @@ async function getCrowdloanRewardsSubscription(context: ActionContext<any, any>)
   let subscription!: Subscription;
 
   await new Promise<void>((resolve) => {
-    subscription = observable.subscribe((rewards) => {
-      // XOR is not claimable
-      const crowdloanRewards = rewards.filter((item) => item.asset.address !== XOR.address);
-
+    subscription = observable.subscribe((crowdloanRewards) => {
       commit.setRewards({ crowdloanRewards });
-      const crowdloanRewardsAreAvailable = getters.crowdloanRewardsAvailable.length;
 
       // select available rewards for first time
-      if (!state.crowdloanRewardsSubscription && crowdloanRewardsAreAvailable) {
-        dispatch.setSelectedRewards({ selectedCrowdloan: [...getters.crowdloanRewardsAvailable] });
+      if (!state.crowdloanRewardsSubscription && getters.crowdloanRewardsAvailable.length) {
+        const selectedCrowdloan = getters.crowdloanRewardsAvailable.reduce((buffer, tag) => {
+          buffer[tag] = state.crowdloanRewards[tag];
+          return buffer;
+        }, {});
+        dispatch.setSelectedRewards({ selectedCrowdloan });
       }
       // deselect if no rewards after update
-      if (state.selectedCrowdloan.length && !crowdloanRewardsAreAvailable) {
-        dispatch.setSelectedRewards({ selectedCrowdloan: [] });
+      if (Object.keys(state.selectedCrowdloan)) {
+        const selectedCrowdloan = Object.entries(state.selectedCrowdloan).reduce((buffer, [tag, rewards]) => {
+          if (getters.crowdloanRewardsAvailable.includes(tag)) {
+            buffer[tag] = rewards;
+          }
+          return buffer;
+        }, {});
+        dispatch.setSelectedRewards({ selectedCrowdloan });
       }
+
       resolve();
     });
   });

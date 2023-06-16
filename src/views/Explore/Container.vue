@@ -36,14 +36,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import storage from '@/utils/storage';
-import router, { lazyComponent } from '@/router';
 import { PageNames, Components } from '@/consts';
+import router, { lazyComponent } from '@/router';
 import { getter } from '@/store/decorators';
+import storage from '@/utils/storage';
 
 const storageKey = 'exploreAccountItems';
 
@@ -102,11 +102,6 @@ export default class ExploreContainer extends Mixins(mixins.LoadingMixin, Transl
 
 <style lang="scss">
 .explore-tabs {
-  &-container {
-    margin-top: $inner-spacing-big;
-    min-height: var(--s-size-small);
-  }
-
   .el-tabs__header {
     margin: 0 auto;
   }
@@ -118,11 +113,10 @@ $container-max-width: 75vw;
 $search-input-width: 290px;
 
 .container--explore {
+  display: flex;
+  flex-flow: column nowrap;
+  gap: $inner-spacing-medium;
   margin: $inner-spacing-big $inner-spacing-big 0;
-
-  & > *:not(:last-child) {
-    margin-bottom: $inner-spacing-medium;
-  }
 
   @include tablet {
     max-width: $container-max-width;

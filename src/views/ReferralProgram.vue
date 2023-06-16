@@ -172,21 +172,21 @@
 </template>
 
 <script lang="ts">
+import { FPNumber } from '@sora-substrate/util';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { components, mixins, api, WALLET_TYPES, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import last from 'lodash/fp/last';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { components, mixins, api, WALLET_TYPES, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { FPNumber } from '@sora-substrate/util';
-import type { CodecString } from '@sora-substrate/util';
-import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
-import router, { lazyView } from '@/router';
-import { PageNames, ZeroStringValue } from '@/consts';
 import { detectBaseUrl } from '@/api';
+import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
+import { PageNames, ZeroStringValue } from '@/consts';
+import router, { lazyView } from '@/router';
+import { action, getter, mutation, state } from '@/store/decorators';
 import { formatAddress } from '@/utils';
 
-import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-import { action, getter, mutation, state } from '@/store/decorators';
+import type { CodecString } from '@sora-substrate/util';
+import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 @Component({
   components: {
@@ -514,7 +514,6 @@ export default class ReferralProgram extends Mixins(
     }
     font-size: var(--s-font-size-large);
     line-height: var(--s-line-height-reset);
-    letter-spacing: var(--s-letter-spacing-small);
     font-weight: 700;
   }
 }
@@ -646,7 +645,6 @@ export default class ReferralProgram extends Mixins(
     .formatted-amount--fiat-value {
       font-size: var(--s-font-size-medium);
       line-height: var(--s-line-height-medium);
-      letter-spacing: var(--s-letter-spacing-small);
       font-weight: 600;
     }
   }
@@ -660,7 +658,6 @@ export default class ReferralProgram extends Mixins(
   &-value {
     font-size: var(--s-font-size-large);
     line-height: var(--s-line-height-extra-small);
-    letter-spacing: var(--s-letter-spacing-small);
     font-weight: 800;
   }
 }
@@ -718,7 +715,6 @@ export default class ReferralProgram extends Mixins(
     &,
     &-label {
       line-height: var(--s-line-height-medium);
-      letter-spacing: var(--s-letter-spacing-small);
     }
     &-label {
       color: var(--s-color-base-content-secondary);
@@ -732,7 +728,6 @@ export default class ReferralProgram extends Mixins(
   text-align: center;
   font-size: var(--s-font-size-extra-small);
   line-height: var(--s-line-height-medium);
-  letter-spacing: var(--s-letter-spacing-small);
 }
 
 .referrer {
@@ -740,7 +735,6 @@ export default class ReferralProgram extends Mixins(
     &-container {
       margin-top: $inner-spacing-medium;
       h5 {
-        letter-spacing: var(--s-letter-spacing-small);
         + .referrer-description {
           margin-top: $inner-spacing-small;
         }
@@ -770,7 +764,6 @@ export default class ReferralProgram extends Mixins(
   &-description {
     margin-top: $inner-spacing-medium;
     line-height: var(--s-line-height-medium);
-    letter-spacing: var(--s-letter-spacing-small);
   }
 }
 </style>
