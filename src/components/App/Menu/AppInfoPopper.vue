@@ -39,12 +39,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
 import { api, mixins } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-
 import { app, SocialNetworkLinks, Links } from '@/consts';
+import { Links as AdarLinks } from '@/modules/ADAR/consts';
 
 @Component
 export default class AppInfoPopper extends Mixins(TranslationMixin, mixins.LoadingMixin) {
@@ -64,7 +64,7 @@ export default class AppInfoPopper extends Mixins(TranslationMixin, mixins.Loadi
     return [
       // {
       //   title: this.t('helpDialog.privacyPolicy'),
-      //   href: Links.privacy,
+      //   href: AdarLinks.privacy,
       // },
       {
         title: this.t('releaseNotesText'),
@@ -72,7 +72,7 @@ export default class AppInfoPopper extends Mixins(TranslationMixin, mixins.Loadi
       },
       // {
       //   title: this.t('helpDialog.termsOfService'),
-      //   href: Links.terms,
+      //   href: AdarLinks.terms,
       // },
     ];
   }
@@ -122,6 +122,7 @@ $social-link-min-height: 34px;
 
 .app-info {
   line-height: var(--s-line-height-medium);
+  letter-spacing: var(--s-letter-spacing-small);
 
   & > *:not(:last-child) {
     margin-bottom: $inner-spacing-small;

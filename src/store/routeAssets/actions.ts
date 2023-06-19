@@ -1,24 +1,27 @@
 /* eslint-disable no-console */
-import { defineActions } from 'direct-vuex';
-import { routeAssetsActionContext } from '@/store/routeAssets';
-import Papa from 'papaparse';
-import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
-import { api } from '@soramitsu/soraneo-wallet-web';
-import { getPathsAndPairLiquiditySources } from '@sora-substrate/liquidity-proxy';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { RouteAssetsSubscription, RecipientStatus } from './types';
-import { FPNumber, Operation } from '@sora-substrate/util/build';
-import { formatAddress, getAssetBalance, delay } from '@/utils';
-import type { DexQuoteData } from '@/store/swap/types';
-import { DexId } from '@sora-substrate/util/build/dex/consts';
-import type { QuotePayload, SwapResult } from '@sora-substrate/liquidity-proxy/build/types';
-import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
-import { findLast, groupBy, sumBy } from 'lodash';
-import { NumberLike } from '@sora-substrate/math';
-import { Messages } from '@sora-substrate/util/build/logger';
 import { assert } from '@polkadot/util';
+import { getPathsAndPairLiquiditySources } from '@sora-substrate/liquidity-proxy';
+import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
+import { NumberLike } from '@sora-substrate/math';
+import { FPNumber, Operation } from '@sora-substrate/util/build';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { DexId } from '@sora-substrate/util/build/dex/consts';
+import { Messages } from '@sora-substrate/util/build/logger';
+import { api } from '@soramitsu/soraneo-wallet-web';
+import { defineActions } from 'direct-vuex';
+import { findLast, groupBy, sumBy } from 'lodash';
+import Papa from 'papaparse';
+
 import { slippageMultiplier } from '@/modules/ADAR/consts';
+import { routeAssetsActionContext } from '@/store/routeAssets';
+import type { DexQuoteData } from '@/store/swap/types';
+import { formatAddress, getAssetBalance, delay } from '@/utils';
+
+import { RouteAssetsSubscription, RecipientStatus } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
+
+import type { QuotePayload, SwapResult } from '@sora-substrate/liquidity-proxy/build/types';
+import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const actions = defineActions({
   processingNextStage(context) {
@@ -113,6 +116,7 @@ const actions = defineActions({
       .map((item: Asset) => item?.address)
       .filter((item) => item !== sourceToken.address);
     if (!tokens || tokens.length < 1) return;
+    // const currentsPulls = [] as Array<RouteAssetsSubscription>;
 
     dispatch.cleanSwapReservesSubscription();
     const enabledAssets = await api.swap.getPrimaryMarketsEnabledAssets();
@@ -250,7 +254,8 @@ const actions = defineActions({
   },
 
   async getBlockNumber(context, blockId): Promise<string> {
-    return (await api.system.getBlockNumber(blockId)).toString();
+    const apiInstanceAtBlock = await api.api.at(blockId);
+    return (await apiInstanceAtBlock.query.system.number()).toString();
   },
 });
 
@@ -497,7 +502,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
       [rootGetters.swap.swapLiquiditySource].filter(Boolean) as Array<LiquiditySourceTypes>,
       enabledAssets,
       (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].paths,
-      (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].payload,
+      (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].payload as QuotePayload,
       dexId as DexId
     );
 

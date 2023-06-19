@@ -1,36 +1,34 @@
 <template>
   <transaction-details :info-only="infoOnly">
     <div class="swap-info-container">
-      <template v-if="isSwapInfoVisible">
-        <info-line v-for="{ id, label, value } in priceValues" :key="id" :label="label" :value="value" />
-        <info-line
-          :label="t(`swap.${isExchangeB ? 'maxSold' : 'minReceived'}`)"
-          :label-tooltip="t('swap.minReceivedTooltip')"
-          :value="formattedMinMaxReceived"
-          :asset-symbol="getAssetSymbolText"
-          :fiat-value="getFiatAmountByCodecString(minMaxReceived, isExchangeB ? tokenFrom : tokenTo)"
-          is-formatted
-        />
-        <info-line v-for="(reward, index) in rewardsValues" :key="index" v-bind="reward" />
-        <info-line :label="t('swap.priceImpact')" :label-tooltip="t('swap.priceImpactTooltip')">
-          <value-status-wrapper :value="priceImpact">
-            <formatted-amount class="swap-value" :value="priceImpactFormatted">%</formatted-amount>
-          </value-status-wrapper>
-        </info-line>
-        <info-line :label="t('swap.route')">
-          <div v-for="token in swapRoute" class="liquidity-route swap-value" :key="token">
-            <span>{{ token }}</span>
-            <s-icon name="el-icon el-icon-arrow-right route-icon" />
-          </div>
-        </info-line>
-        <info-line
-          :label="t('swap.liquidityProviderFee')"
-          :label-tooltip="liquidityProviderFeeTooltipText"
-          :value="formattedLiquidityProviderFee"
-          :asset-symbol="xorSymbol"
-          is-formatted
-        />
-      </template>
+      <info-line v-for="{ id, label, value } in priceValues" :key="id" :label="label" :value="value" />
+      <info-line
+        :label="t(`swap.${isExchangeB ? 'maxSold' : 'minReceived'}`)"
+        :label-tooltip="t('swap.minReceivedTooltip')"
+        :value="formattedMinMaxReceived"
+        :asset-symbol="getAssetSymbolText"
+        :fiat-value="getFiatAmountByCodecString(minMaxReceived, isExchangeB ? tokenFrom : tokenTo)"
+        is-formatted
+      />
+      <info-line v-for="(reward, index) in rewardsValues" :key="index" v-bind="reward" />
+      <info-line :label="t('swap.priceImpact')" :label-tooltip="t('swap.priceImpactTooltip')">
+        <value-status-wrapper :value="priceImpact">
+          <formatted-amount class="swap-value" :value="priceImpactFormatted">%</formatted-amount>
+        </value-status-wrapper>
+      </info-line>
+      <info-line :label="t('swap.route')">
+        <div v-for="token in swapRoute" class="liquidity-route swap-value" :key="token">
+          <span>{{ token }}</span>
+          <s-icon name="el-icon el-icon-arrow-right route-icon" />
+        </div>
+      </info-line>
+      <info-line
+        :label="t('swap.liquidityProviderFee')"
+        :label-tooltip="liquidityProviderFeeTooltipText"
+        :value="formattedLiquidityProviderFee"
+        :asset-symbol="xorSymbol"
+        is-formatted
+      />
       <info-line
         v-if="isLoggedIn"
         :label="t('swap.networkFee')"
@@ -45,17 +43,18 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator';
-import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { CodecString, Operation, NetworkFeesObject } from '@sora-substrate/util';
 import { XOR, KnownAssets } from '@sora-substrate/util/build/assets/consts';
-import type { LPRewardsInfo } from '@sora-substrate/liquidity-proxy/build/types';
-import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
+import { components, mixins } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { lazyComponent } from '@/router';
 import { Components } from '@/consts';
+import { lazyComponent } from '@/router';
 import { getter, state } from '@/store/decorators';
+
+import type { LPRewardsInfo } from '@sora-substrate/liquidity-proxy/build/types';
+import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 type PriceValue = {
   id: 'from' | 'to';
@@ -97,11 +96,6 @@ export default class SwapTransactionDetails extends Mixins(mixins.FormattedAmoun
   @getter.assets.assetDataByAddress private getAsset!: (addr?: string) => Nullable<AccountAsset>;
 
   @Prop({ default: true, type: Boolean }) readonly infoOnly!: boolean;
-  @Prop({ default: '', type: String }) readonly operation!: Operation;
-
-  get isSwapInfoVisible(): boolean {
-    return this.operation !== Operation.Transfer;
-  }
 
   get liquidityProviderFeeTooltipText(): string {
     return this.t('swap.liquidityProviderFeeTooltip', { liquidityProviderFee: this.liquidityProviderFeeValue });
@@ -148,7 +142,7 @@ export default class SwapTransactionDetails extends Mixins(mixins.FormattedAmoun
   }
 
   get networkFee(): CodecString {
-    return this.networkFees[this.operation || Operation.Swap];
+    return this.networkFees[Operation.Swap];
   }
 
   get formattedNetworkFee(): string {

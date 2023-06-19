@@ -1,10 +1,12 @@
-import invert from 'lodash/fp/invert';
 import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
+import invert from 'lodash/fp/invert';
 
+import { AdarPageNames } from '@/modules/ADAR/consts';
 import { DemeterPageNames } from '@/modules/demeterFarming/consts';
 
 import pkg from '../../package.json';
-import { AdarPageNames } from '@/modules/ADAR/consts';
+
+import type { Alert } from '@soramitsu/soraneo-wallet-web/lib/types/common';
 
 export const app = {
   version: pkg.version,
@@ -12,6 +14,8 @@ export const app = {
   email: 'jihoon@tutanota.de',
   title: 'ADAR — Pay employees anywhere, instantly',
 };
+
+export const MAX_ALERTS_NUMBER = 5;
 
 export const WalletPermissions = {
   sendAssets: true, // enable 'send' button in assets list
@@ -127,8 +131,6 @@ export enum PageNames {
   BridgeTransactionsHistory = 'BridgeTransactionsHistory',
   Tokens = 'Tokens',
   MoonpayHistory = 'MoonpayHistory',
-  Send = 'Send',
-  KYC = 'KYC',
   StakingContainer = 'StakingContainer',
   // just for router name & different titles
   ExploreContainer = 'Explore/Container',
@@ -146,6 +148,10 @@ export enum Components {
   AppMobilePopup = 'App/MobilePopup',
   AppBrowserNotifsEnableDialog = 'App/BrowserNotification/BrowserNotifsEnableDialog',
   AppBrowserNotifsBlockedDialog = 'App/BrowserNotification/BrowserNotifsBlockedDialog',
+  Alerts = 'App/Alerts/Alerts',
+  AlertList = 'App/Alerts/AlertList',
+  CreateAlert = 'App/Alerts/CreateAlert',
+  AlertsSelectAsset = 'pages/Alerts/SelectAsset',
   SelectLanguageDialog = 'App/Settings/Language/SelectLanguageDialog',
   AppFooter = 'App/Footer/AppFooter',
   AppDisclaimer = 'App/Header/AppDisclaimer',
@@ -236,6 +242,15 @@ export enum RewardsTabsItems {
   ReferralProgram = PageNames.ReferralProgram,
 }
 
+export interface EditableAlertObject {
+  alert: Alert;
+  position: number;
+}
+
+export interface NumberedAlert extends Alert {
+  position: number;
+}
+
 export interface SidebarMenuItem {
   icon?: string;
   title: string;
@@ -297,25 +312,21 @@ const AccountMenu: Array<SidebarMenuItemLink> = [
   // },
 ];
 
-const OtherPagesMenu: Array<SidebarMenuItemLink> = [
+const OtherPagesMenu: Array<SidebarMenuItem> = [
+  // {
+  //   icon: 'various-bone-24',
+  //   title: PageNames.Tokens,
+  // },
   // {
   //   icon: 'various-items-24',
   //   title: PageNames.ExploreContainer,
-  //   href: '/#/explore',
-  //   index: PageNames.ExploreFarming,
-  // },
-  // {
-  //   icon: 'various-planet-24',
-  //   title: PageNames.Stats,
-  //   href: '/#/stats',
   // },
   // {
   //   icon: 'sora-card',
   //   title: PageNames.SoraCard,
-  //   href: '/#/card',
   // },
   {
-    icon: 'file-file-text-24',
+    icon: 'adar-about',
     title: AdarPageNames.About,
   },
 ];
@@ -413,11 +424,6 @@ export const AboutTopics = [
   { title: Topics.AddLiquidity, icon: 'basic-drop-24' },
   { title: Topics.PriceFeeds, icon: 'software-terminal-24' },
 ];
-
-export enum EvmSymbol {
-  ETH = 'ETH',
-  VT = 'VT',
-}
 
 export const MaxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 export const EthAddress = '0x0000000000000000000000000000000000000000';
