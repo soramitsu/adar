@@ -11,6 +11,9 @@ import { demeterLazyView } from '@/modules/demeterFarming/router';
 import store from '@/store';
 import { updateDocumentTitle } from '@/utils';
 
+import * as Sentry from '@sentry/vue';
+import { BrowserTracing } from '@sentry/tracing';
+
 Vue.use(VueRouter);
 
 Component.registerHooks(['beforeRouteEnter', 'beforeRouteUpdate', 'beforeRouteLeave']);
@@ -294,6 +297,25 @@ router.beforeEach((to, from, next) => {
     }
   }
   setRoute(current, false);
+});
+
+Sentry.init({
+  Vue,
+  dsn: 'https://9aa0954e211541a5a36eaf27016f3d3e@sentry.soramitsu.co.jp/12',
+  integrations: [
+    new BrowserTracing({
+      routingInstrumentation: Sentry.vueRouterInstrumentation(router),
+
+      // As the documentation mention:
+      // If your frontend is making requests to a different domain, you'll need to add it there to propagate
+      // the sentry-trace and baggage headers to the backend services, which is required to link transactions
+      // together as part of a single trace.
+      tracingOrigins: ['adar.com', 'localhost', /^\//, 'api.subquery.network', 'whitelist.polkaswap2.io'],
+    }),
+  ],
+  // tracesSampleRate == 1.0 is to capture 100%
+  // of transactions for performance monitoring.
+  tracesSampleRate: 1.0,
 });
 
 export { lazyComponent, lazyView, goTo };
