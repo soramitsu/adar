@@ -1,9 +1,9 @@
 <template>
   <div class="swap-container">
-    <s-form v-loading="parentLoading" class="container el-form--actions" :show-message="false">
+    <s-form v-loading="parentLoading" class="container container--swap el-form--actions" :show-message="false">
       <generic-page-header class="page-header--swap" :title="t('exchange.Swap')">
         <div class="swap-settings-buttons">
-          <status-action-badge>
+          <swap-status-action-badge>
             <template #label>{{ t('marketText') }}:</template>
             <template #value>{{ swapMarketAlgorithm }}</template>
             <template #action>
@@ -14,7 +14,7 @@
                 @click="openSettingsDialog"
               />
             </template>
-          </status-action-badge>
+          </swap-status-action-badge>
 
           <svg-icon-button
             v-if="chartsFlagEnabled"
@@ -132,33 +132,33 @@
         :isInsufficientBalance="isInsufficientBalance"
         @confirm="confirmSwap"
       />
-      <settings-dialog :visible.sync="showSettings" />
+      <swap-settings :visible.sync="showSettings" />
     </s-form>
-    <swap-chart v-if="chartsEnabled" :token-from="tokenFrom" :token-to="tokenTo" :is-available="isAvailable" />
+    <swap-chart
+      v-if="chartsEnabled"
+      :token-from="tokenFrom"
+      :token-to="tokenTo"
+      :is-available="isAvailable"
+      class="swap-chart"
+    />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { api, components, mixins } from '@soramitsu/soraneo-wallet-web';
+import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
 import { FPNumber, Operation } from '@sora-substrate/util';
 import { KnownSymbols, XOR } from '@sora-substrate/util/build/assets/consts';
 import { DexId } from '@sora-substrate/util/build/dex/consts';
-import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
-import type { Subscription } from 'rxjs';
-import type { CodecString, NetworkFeesObject } from '@sora-substrate/util';
-import type { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
-import type {
-  QuotePayload,
-  PrimaryMarketsEnabledAssets,
-  LPRewardsInfo,
-  SwapResult,
-} from '@sora-substrate/liquidity-proxy/build/types';
-import type { DexQuoteData } from '@/store/swap/types';
+import { api, components, mixins } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
 
-import TranslationMixin from '@/components/mixins/TranslationMixin';
+import SelectedTokenRouteMixin from '@/components/mixins/SelectedTokensRouteMixin';
 import TokenSelectMixin from '@/components/mixins/TokenSelectMixin';
-
+import TranslationMixin from '@/components/mixins/TranslationMixin';
+import { Components, MarketAlgorithms, PageNames, ZeroStringValue } from '@/consts';
+import router, { lazyComponent } from '@/router';
+import { action, getter, mutation, state } from '@/store/decorators';
+import type { DexQuoteData } from '@/store/swap/types';
 import {
   isMaxButtonAvailable,
   getMaxValue,
@@ -168,22 +168,29 @@ import {
   getAssetBalance,
   debouncedInputHandler,
 } from '@/utils';
-import router, { lazyComponent } from '@/router';
-import { Components, MarketAlgorithms, PageNames, ZeroStringValue } from '@/consts';
-import { action, getter, mutation, state } from '@/store/decorators';
+
+import type {
+  QuotePayload,
+  PrimaryMarketsEnabledAssets,
+  LPRewardsInfo,
+  SwapResult,
+} from '@sora-substrate/liquidity-proxy/build/types';
+import type { CodecString, NetworkFeesObject } from '@sora-substrate/util';
+import type { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import type { Subscription } from 'rxjs';
 
 @Component({
   components: {
-    GenericPageHeader: lazyComponent(Components.GenericPageHeader),
-    SettingsDialog: lazyComponent(Components.SettingsDialog),
-    SlippageTolerance: lazyComponent(Components.SlippageTolerance),
-    SelectToken: lazyComponent(Components.SelectToken),
+    SwapSettings: lazyComponent(Components.SwapSettings),
     SwapConfirm: lazyComponent(Components.SwapConfirm),
-    StatusActionBadge: lazyComponent(Components.StatusActionBadge),
-    TokenInput: lazyComponent(Components.TokenInput),
-    ValueStatusWrapper: lazyComponent(Components.ValueStatusWrapper),
+    SwapStatusActionBadge: lazyComponent(Components.SwapStatusActionBadge),
     SwapTransactionDetails: lazyComponent(Components.SwapTransactionDetails),
     SwapChart: lazyComponent(Components.SwapChart),
+    GenericPageHeader: lazyComponent(Components.GenericPageHeader),
+    SlippageTolerance: lazyComponent(Components.SlippageTolerance),
+    SelectToken: lazyComponent(Components.SelectToken),
+    TokenInput: lazyComponent(Components.TokenInput),
+    ValueStatusWrapper: lazyComponent(Components.ValueStatusWrapper),
     SvgIconButton: lazyComponent(Components.SvgIconButton),
     FormattedAmount: components.FormattedAmount,
   },
@@ -192,7 +199,8 @@ export default class Swap extends Mixins(
   mixins.FormattedAmountMixin,
   mixins.LoadingMixin,
   TranslationMixin,
-  TokenSelectMixin
+  TokenSelectMixin,
+  SelectedTokenRouteMixin
 ) {
   @state.settings.сhartsEnabled сhartsEnabled!: boolean;
   @state.wallet.settings.networkFees private networkFees!: NetworkFeesObject;
@@ -221,7 +229,7 @@ export default class Swap extends Mixins(
   @mutation.swap.setLiquidityProviderFee private setLiquidityProviderFee!: (value: CodecString) => void;
   @mutation.swap.setPrimaryMarketsEnabledAssets private setEnabledAssets!: (args: PrimaryMarketsEnabledAssets) => void;
   @mutation.swap.setRewards private setRewards!: (rewards: Array<LPRewardsInfo>) => void;
-  @mutation.swap.setPath private setPath!: (path: Array<string>) => void;
+  @mutation.swap.setRoute private setRoute!: (route: Array<string>) => void;
   @mutation.swap.selectDexId private selectDexId!: (dexId: DexId) => void;
 
   @action.swap.setTokenFromAddress private setTokenFromAddress!: (address?: string) => Promise<void>;
@@ -257,7 +265,6 @@ export default class Swap extends Mixins(
   showSelectTokenDialog = false;
   showConfirmSwapDialog = false;
   liquidityReservesSubscription: Nullable<Subscription> = null;
-  enabledAssetsSubscription: Nullable<Subscription> = null;
   recountSwapValues = debouncedInputHandler(this.runRecountSwapValues, 100);
 
   get tokenFromSymbol(): string {
@@ -381,7 +388,13 @@ export default class Swap extends Mixins(
 
   created() {
     this.withApi(async () => {
-      if (!this.tokenFrom) {
+      this.parseCurrentRoute();
+      if (this.tokenFrom && this.tokenTo) {
+        this.updateRouteAfterSelectTokens(this.tokenFrom, this.tokenTo);
+      } else if (this.isValidRoute && this.firstRouteAddress && this.secondRouteAddress) {
+        await this.setTokenFromAddress(this.firstRouteAddress);
+        await this.setTokenToAddress(this.secondRouteAddress);
+      } else if (!this.tokenFrom) {
         await this.setTokenFromAddress(XOR.address);
         await this.setTokenToAddress();
       }
@@ -443,6 +456,7 @@ export default class Swap extends Mixins(
           value,
           this.isExchangeB,
           [this.liquiditySource].filter(Boolean) as Array<LiquiditySourceTypes>,
+          this.enabledAssets,
           this.dexQuoteData[dexId].paths,
           this.dexQuoteData[dexId].payload as QuotePayload,
           dexId as DexId
@@ -467,13 +481,13 @@ export default class Swap extends Mixins(
         }
       }
 
-      const { amount, amountWithoutImpact, fee, rewards, path } = results[bestDexId];
+      const { amount, amountWithoutImpact, fee, rewards, route } = results[bestDexId];
 
       setOppositeValue(this.getStringFromCodec(amount, oppositeToken.decimals));
       this.setAmountWithoutImpact(amountWithoutImpact as string);
       this.setLiquidityProviderFee(fee);
       this.setRewards(rewards);
-      this.setPath(path as string[]);
+      this.setRoute(route as string[]);
       this.selectDexId(bestDexId);
     } catch (error: any) {
       console.error(error);
@@ -481,17 +495,10 @@ export default class Swap extends Mixins(
     }
   }
 
-  private cleanEnabledAssetsSubscription(): void {
-    this.enabledAssetsSubscription?.unsubscribe();
-    this.enabledAssetsSubscription = null;
-  }
-
-  private subscribeOnEnabledAssetsAndSwapReserves(): void {
-    this.cleanEnabledAssetsSubscription();
-    this.enabledAssetsSubscription = api.swap.subscribeOnPrimaryMarketsEnabledAssets().subscribe((enabledAssets) => {
-      this.setEnabledAssets(enabledAssets);
-      this.subscribeOnSwapReserves();
-    });
+  private async subscribeOnEnabledAssetsAndSwapReserves(): Promise<void> {
+    const enabledAssets = await api.swap.getPrimaryMarketsEnabledAssets();
+    this.setEnabledAssets(enabledAssets);
+    this.subscribeOnSwapReserves();
   }
 
   private cleanSwapReservesSubscription(): void {
@@ -541,7 +548,8 @@ export default class Swap extends Mixins(
 
     await this.switchTokens();
 
-    this.subscribeOnSwapReserves();
+    this.updateRouteAfterSelectTokens(this.tokenFrom, this.tokenTo);
+    this.runRecountSwapValues();
   }
 
   handleMaxValue(): void {
@@ -563,6 +571,13 @@ export default class Swap extends Mixins(
     this.showSelectTokenDialog = true;
   }
 
+  /** Overrides SelectedTokenRouteMixin */
+  async setData(params: { firstAddress: string; secondAddress: string }): Promise<void> {
+    await this.setTokenFromAddress(params.firstAddress);
+    await this.setTokenToAddress(params.secondAddress);
+    this.subscribeOnSwapReserves();
+  }
+
   async handleSelectToken(token: AccountAsset): Promise<void> {
     if (token) {
       await this.withSelectAssetLoading(async () => {
@@ -574,6 +589,7 @@ export default class Swap extends Mixins(
         this.subscribeOnSwapReserves();
       });
     }
+    this.updateRouteAfterSelectTokens(this.tokenFrom, this.tokenTo);
   }
 
   handleConfirmSwap(): void {
@@ -603,7 +619,6 @@ export default class Swap extends Mixins(
 
   private resetSwapSubscriptions(): void {
     this.resetBalanceSubscriptions();
-    this.cleanEnabledAssetsSubscription();
     this.cleanSwapReservesSubscription();
   }
 
@@ -619,37 +634,12 @@ export default class Swap extends Mixins(
 
 <style lang="scss">
 .app-main--has-charts {
-  .container--charts {
-    min-width: calc(#{$bridge-width} * 0.75);
-  }
-}
-@include desktop {
-  .app-main--has-charts {
-    .swap-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: $inner-spacing-medium;
-      .el-form {
-        flex-shrink: 0;
-      }
-      .el-form,
-      .container--charts {
-        margin-right: $basic-spacing-small;
-        margin-left: $basic-spacing-small;
-      }
-    }
-    .el-form--actions {
-      flex-shrink: 0;
-    }
-  }
-}
+  .swap-chart {
+    flex-grow: 1;
+    max-width: $inner-window-width;
 
-@include large-desktop {
-  .app-main--has-charts {
-    .container--charts {
-      max-width: calc(#{$bridge-width} * 2);
-      flex-grow: 1;
+    @include desktop {
+      max-width: calc(#{$inner-window-width} * 2);
     }
   }
 }
@@ -672,8 +662,20 @@ export default class Swap extends Mixins(
   }
 }
 
-.el-button--switch-tokens {
-  border-radius: 100%;
+.swap-container {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: $inner-spacing-medium;
+
+  @include desktop {
+    flex-flow: row nowrap;
+  }
+}
+
+.container--swap {
+  margin: 0;
 }
 
 .page-header--swap {

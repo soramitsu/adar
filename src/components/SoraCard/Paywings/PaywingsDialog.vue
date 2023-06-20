@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts">
+import { components, mixins, ScriptLoader } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
+
 import { getter, state } from '@/store/decorators';
-import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { loadScript, unloadScript } from 'vue-plugin-load-script';
 
 // TODO: Set up widget for payment
 @Component({
@@ -30,11 +30,11 @@ export default class PaywingsDialog extends Mixins(mixins.DialogMixin, mixins.Lo
   }
 
   private loadPaywings(): void {
-    loadScript('https://checkout.paywings.io/HostedFields/custom/js/client.min.js').then(() => {});
+    ScriptLoader.load('https://checkout.paywings.io/HostedFields/custom/js/client.min.js', false);
   }
 
   private unloadPaywings(): void {
-    unloadScript('https://checkout.paywings.io/HostedFields/custom/js/client.min.js').catch(() => {});
+    ScriptLoader.unload('https://checkout.paywings.io/HostedFields/custom/js/client.min.js', false);
   }
 }
 </script>

@@ -7,7 +7,7 @@
           icon="arrows-swap-90-24"
           :disabled="historyLoading"
           :tooltip="t('bridgeHistory.restoreHistory')"
-          @click="updateHistory(true)"
+          @click="updateExternalHistory(true)"
         />
       </generic-page-header>
       <s-form class="history-form" :show-message="false">
@@ -32,20 +32,12 @@
               <div class="history-item-info">
                 <div class="history-item-title p4">
                   <formatted-amount value-can-be-hidden :value="formatAmount(item)" :asset-symbol="item.symbol" />
-                  <i
-                    :class="`s-icon--network s-icon-${
-                      isOutgoingType(item.type) ? 'sora' : getEvmIcon(item.externalNetwork)
-                    }`"
-                  />
+                  <i :class="`network-icon network-icon--${getEvmIcon(isOutgoingType(item.type) ? 0 : evmNetwork)}`" />
                   <span class="history-item-title-separator"> {{ t('bridgeTransaction.for') }} </span>
                   <formatted-amount value-can-be-hidden :value="formatAmount(item)" :asset-symbol="item.symbol" />
-                  <i
-                    :class="`s-icon--network s-icon-${
-                      !isOutgoingType(item.type) ? 'sora' : getEvmIcon(item.externalNetwork)
-                    }`"
-                  />
+                  <i :class="`network-icon network-icon--${getEvmIcon(!isOutgoingType(item.type) ? 0 : evmNetwork)}`" />
                 </div>
-                <div class="history-item-date">{{ formatHistoryDate(item) }}</div>
+                <div class="history-item-date">{{ formatDatetime(item) }}</div>
               </div>
               <div :class="historyStatusClasses(item)">
                 <div class="history-item-status-text">{{ historyStatusText(item) }}</div>
@@ -66,54 +58,57 @@
         </div>
       </s-form>
     </s-card>
+
+    <bridge-select-network :selected-evm-network="selectedEvmNetwork" @change="changeEvmNetwork" />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
 import { components, mixins, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import { BridgeTxStatus } from '@sora-substrate/util';
-import type { BridgeHistory, RegisteredAccountAsset } from '@sora-substrate/util';
+import { Component, Mixins } from 'vue-property-decorator';
 
-import TranslationMixin from '@/components/mixins/TranslationMixin';
-import BridgeMixin from '@/components/mixins/BridgeMixin';
 import BridgeHistoryMixin from '@/components/mixins/BridgeHistoryMixin';
+import BridgeMixin from '@/components/mixins/BridgeMixin';
+import BridgeTransactionMixin from '@/components/mixins/BridgeTransactionMixin';
 import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
-
-import router, { lazyComponent } from '@/router';
 import { Components, PageNames } from '@/consts';
-import { state, action, getter } from '@/store/decorators';
-import { isUnsignedToPart } from '@/utils/bridge';
+import router, { lazyComponent } from '@/router';
+import type { EvmAccountAsset } from '@/store/assets/types';
+import { state } from '@/store/decorators';
+
+import type { IBridgeTransaction } from '@sora-substrate/util';
+import type { EvmNetwork } from '@sora-substrate/util/build/evm/types';
 
 @Component({
   components: {
     GenericPageHeader: lazyComponent(Components.GenericPageHeader),
+    SwapStatusActionBadge: lazyComponent(Components.SwapStatusActionBadge),
+    BridgeSelectNetwork: lazyComponent(Components.BridgeSelectNetwork),
     SearchInput: components.SearchInput,
     FormattedAmount: components.FormattedAmount,
     HistoryPagination: components.HistoryPagination,
   },
 })
 export default class BridgeTransactionsHistory extends Mixins(
-  TranslationMixin,
   BridgeMixin,
+  BridgeTransactionMixin,
   BridgeHistoryMixin,
   NetworkFormatterMixin,
   mixins.PaginationSearchMixin,
   mixins.NumberFormatterMixin
 ) {
-  @state.assets.registeredAssets private registeredAssets!: Array<RegisteredAccountAsset>;
-  @state.bridge.historyLoading historyLoading!: boolean;
-  @action.bridge.updateHistory private updateHistory!: (clearHistory?: boolean) => Promise<void>;
-
-  @getter.bridge.historyPage historyPage!: number;
+  @state.assets.registeredAssets private registeredAssets!: Record<string, EvmAccountAsset>;
+  @state.bridge.historyPage historyPage!: number;
 
   pageAmount = 8; // override PaginationSearchMixin
   loading = true;
 
-  get filteredHistory(): Array<BridgeHistory> {
-    if (!this.history?.length) return [];
+  get historyList(): Array<IBridgeTransaction> {
+    return Object.values(this.history);
+  }
 
-    return this.getFilteredHistory(this.sortTransactions([...this.history], this.isLtrDirection));
+  get filteredHistory(): Array<IBridgeTransaction> {
+    return this.getFilteredHistory(this.sortTransactions(this.historyList, this.isLtrDirection));
   }
 
   get total(): number {
@@ -124,7 +119,7 @@ export default class BridgeTransactionsHistory extends Mixins(
     return this.filteredHistoryItems && this.total > 0;
   }
 
-  get filteredHistoryItems(): Array<BridgeHistory> {
+  get filteredHistoryItems(): Array<IBridgeTransaction> {
     const end = this.isLtrDirection
       ? Math.min(this.currentPage * this.pageAmount, this.filteredHistory.length)
       : Math.max((this.lastPage - this.currentPage + 1) * this.pageAmount - this.directionShift, 0);
@@ -138,8 +133,9 @@ export default class BridgeTransactionsHistory extends Mixins(
 
   created(): void {
     this.withParentLoading(async () => {
-      this.setHistory();
-      await this.updateHistory();
+      this.updateInternalHistory();
+      this.updateExternalHistory();
+
       if (this.historyPage !== 1) {
         this.currentPage = this.historyPage;
         if (this.currentPage !== 1 && this.currentPage === this.lastPage) {
@@ -151,15 +147,17 @@ export default class BridgeTransactionsHistory extends Mixins(
     });
   }
 
-  getFilteredHistory(history: Array<BridgeHistory>): Array<BridgeHistory> {
+  changeEvmNetwork(evmNetwork: EvmNetwork): void {
+    this.setSelectedEvmNetwork(evmNetwork);
+  }
+
+  getFilteredHistory(history: Array<IBridgeTransaction>): Array<IBridgeTransaction> {
     if (this.query) {
       const query = this.query.toLowerCase().trim();
       return history.filter(
         (item) =>
           `${item.assetAddress}`.toLowerCase().includes(query) ||
-          `${this.registeredAssets.find((asset) => asset.address === item.assetAddress)?.externalAddress}`
-            .toLowerCase()
-            .includes(query) ||
+          `${this.registeredAssets[item.assetAddress as string]?.address}`.toLowerCase().includes(query) ||
           `${item.symbol}`.toLowerCase().includes(query)
       );
     }
@@ -167,32 +165,23 @@ export default class BridgeTransactionsHistory extends Mixins(
     return history;
   }
 
-  formatAmount(historyItem: any): string {
-    if (!historyItem.amount) return '';
+  formatAmount(historyItem: IBridgeTransaction): string {
+    if (!(historyItem.amount && historyItem.assetAddress)) return '';
 
-    const decimals = this.registeredAssets?.find((asset) => asset.address === historyItem.address)?.decimals;
+    const decimals = this.registeredAssets?.[historyItem.assetAddress]?.decimals;
 
     return this.formatStringValue(historyItem.amount, decimals);
   }
 
-  formatHistoryDate(response: any): string {
-    // We use current date if request is failed
-    return this.formatDate(response?.startTime ?? Date.now());
-  }
-
-  isWaitingForAction(tx: BridgeHistory): boolean {
-    return tx.status === BridgeTxStatus.Failed && isUnsignedToPart(tx);
-  }
-
-  historyStatusClasses(item: BridgeHistory): string {
+  historyStatusClasses(item: IBridgeTransaction): string {
     const iconClass = 'history-item-status';
     const classes = [iconClass];
 
     if (this.isWaitingForAction(item)) {
-      classes.push(`${iconClass}--warning`);
-    } else if (item.status === BridgeTxStatus.Failed) {
+      classes.push(`${iconClass}--info`);
+    } else if (this.isFailedState(item)) {
       classes.push(`${iconClass}--error`);
-    } else if (item.status === BridgeTxStatus.Done) {
+    } else if (this.isSuccessState(item)) {
       classes.push(`${iconClass}--success`);
     } else {
       classes.push(`${iconClass}--pending`);
@@ -201,19 +190,19 @@ export default class BridgeTransactionsHistory extends Mixins(
     return classes.join(' ');
   }
 
-  historyStatusIconName(item: BridgeHistory): string {
+  historyStatusIconName(item: IBridgeTransaction): string {
     if (this.isWaitingForAction(item)) {
       return 'notifications-alert-triangle-24';
-    } else if (item.status === BridgeTxStatus.Failed) {
+    } else if (this.isFailedState(item)) {
       return 'basic-clear-X-24';
-    } else if (item.status === BridgeTxStatus.Done) {
+    } else if (this.isSuccessState(item)) {
       return 'basic-check-marks-24';
     } else {
       return 'time-time-24';
     }
   }
 
-  historyStatusText(item: BridgeHistory): string {
+  historyStatusText(item: IBridgeTransaction): string {
     if (this.isWaitingForAction(item)) {
       return this.t('bridgeHistory.statusAction');
     } else {
@@ -242,7 +231,6 @@ export default class BridgeTransactionsHistory extends Mixins(
         this.isLtrDirection = false;
     }
 
-    await this.updateHistory();
     this.currentPage = current;
     this.setHistoryPage(this.currentPage);
   }
@@ -266,12 +254,18 @@ export default class BridgeTransactionsHistory extends Mixins(
     .el-card .el-card__body .history-form {
       padding: 0 $inner-spacing-mini;
     }
+
+    .s-card.status-action-badge.status-action-badge--history {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translate(0, -50%);
+    }
   }
   &-item-title {
     display: flex;
     align-items: baseline;
     font-weight: 600;
-    letter-spacing: var(--s-letter-spacing-small);
   }
   &--search {
     .el-input__inner {
@@ -359,15 +353,10 @@ $separator-margin: calc(var(--s-basic-spacing) / 2);
     line-height: var(--s-line-height-big);
     white-space: nowrap;
 
-    .s-icon {
-      &--network {
-        margin-left: $separator-margin;
-      }
-      &-sora,
-      &-eth {
-        position: relative;
-        top: 1px;
-      }
+    .network-icon {
+      margin-left: $separator-margin;
+      width: calc(var(--s-size-small) / 2);
+      height: calc(var(--s-size-small) / 2);
     }
     &-separator {
       font-weight: normal;
@@ -391,8 +380,8 @@ $separator-margin: calc(var(--s-basic-spacing) / 2);
     &--error {
       color: var(--s-color-status-error);
     }
-    &--warning {
-      color: var(--s-color-status-warning);
+    &--info {
+      color: var(--s-color-status-info);
     }
     &--pending {
       color: var(--s-color-base-content-secondary);

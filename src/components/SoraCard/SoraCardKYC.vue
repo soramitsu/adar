@@ -1,5 +1,12 @@
 <template>
-  <wallet-base v-loading="loading" :title="title" :show-back="true" @back="handleBack" class="sora-card">
+  <wallet-base
+    v-loading="loading"
+    :title="title"
+    :show-back="showBackBtn"
+    :title-center="true"
+    @back="handleBack"
+    class="sora-card"
+  >
     <terms-and-conditions v-if="step === KycProcess.TermsAndConditions" @confirm="confirmToS" />
     <road-map v-else-if="step === KycProcess.RoadMap" @confirm="confirmSignIn" :userApplied="userApplied" />
     <phone v-else-if="step === KycProcess.Phone" @confirm="confirmPhone" :userApplied="userApplied" />
@@ -9,11 +16,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { lazyComponent } from '@/router';
+import { Component, Mixins, Prop } from 'vue-property-decorator';
+
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components } from '@/consts';
-import TranslationMixin from '../mixins/TranslationMixin';
+import { lazyComponent } from '@/router';
 
 enum KycProcess {
   TermsAndConditions,
@@ -35,6 +43,7 @@ enum KycProcess {
 })
 export default class SoraCardKYC extends Mixins(TranslationMixin, mixins.LoadingMixin) {
   @Prop({ default: false, type: Boolean }) readonly userApplied!: boolean;
+  @Prop({ default: false, type: Boolean }) readonly openKycForm!: boolean;
 
   step: KycProcess = KycProcess.TermsAndConditions;
 
@@ -74,18 +83,22 @@ export default class SoraCardKYC extends Mixins(TranslationMixin, mixins.Loading
   get title(): string {
     switch (this.step) {
       case KycProcess.TermsAndConditions:
-        return 'Terms & Conditions';
+        return this.t('card.termsAndConditions');
       case KycProcess.RoadMap:
-        return 'Complete KYC';
+        return this.t('card.completeKYC');
       case KycProcess.Phone:
-        return 'Phone Confirmation';
+        return this.t('card.phoneConfirmation');
       case KycProcess.Email:
-        return 'Email Confirmation';
+        return this.t('card.emailConfirmation');
       case KycProcess.KycView:
-        return 'Complete KYC';
+        return this.t('card.completeKYC');
       default:
         return '';
     }
+  }
+
+  get showBackBtn(): boolean {
+    return !(this.step === KycProcess.KycView);
   }
 
   confirmToS(): void {
@@ -108,9 +121,7 @@ export default class SoraCardKYC extends Mixins(TranslationMixin, mixins.Loading
     }
 
     if (state.showBanner) {
-      // user has KYC finished, show info banner
-      const withoutCheck = true;
-      this.$emit('go-to-start', withoutCheck);
+      this.$emit('go-to-start');
     }
   }
 
@@ -125,6 +136,11 @@ export default class SoraCardKYC extends Mixins(TranslationMixin, mixins.Loading
   mounted(): void {
     if (this.userApplied) {
       this.step = KycProcess.RoadMap;
+      return;
+    }
+
+    if (this.openKycForm) {
+      this.step = KycProcess.KycView;
     }
   }
 }

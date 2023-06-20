@@ -1,11 +1,12 @@
-import { defineGetters } from 'direct-vuex';
 import { connection } from '@soramitsu/soraneo-wallet-web';
-import type { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
+import { defineGetters } from 'direct-vuex';
 
-import { settingsGetterContext } from '@/store/settings';
 import { LiquiditySourceForMarketAlgorithm } from '@/consts';
-import type { NodesHashTable, SettingsState } from './types';
+import { settingsGetterContext } from '@/store/settings';
 import type { Node } from '@/types/nodes';
+
+import type { NodesHashTable, SettingsState } from './types';
+import type { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
 
 const getters = defineGetters<SettingsState>()({
   defaultNodesHashTable(...args): NodesHashTable {
@@ -19,6 +20,10 @@ const getters = defineGetters<SettingsState>()({
   nodeList(...args): Array<Node> {
     const { state, getters } = settingsGetterContext(args);
     return [...state.defaultNodes, ...getters.customNodes];
+  },
+  nodeIsConnecting(...args): boolean {
+    const { state } = settingsGetterContext(args);
+    return !!state.nodeAddressConnecting;
   },
   nodeIsConnected(...args): boolean {
     const { state } = settingsGetterContext(args);
@@ -51,6 +56,20 @@ const getters = defineGetters<SettingsState>()({
   notificationActivated(...args): boolean {
     const { state } = settingsGetterContext(args);
     return state.browserNotifsPermission === 'granted';
+  },
+  isInternetConnectionEnabled(...args): boolean {
+    const { state } = settingsGetterContext(args);
+    return state.internetConnection ?? navigator.onLine;
+  },
+  internetConnectionSpeedMb(...args): number {
+    const { state } = settingsGetterContext(args);
+    return state.internetConnectionSpeed ?? ((navigator as any)?.connection?.downlink as number) ?? 0;
+  },
+  /** Stable Connection - more or equal **1 Mb/s** */
+  isInternetConnectionStable(...args): boolean {
+    const { getters } = settingsGetterContext(args);
+    // `!getters.internetConnectionSpeedMb` for the case when `navigator.connection` isn't supported
+    return getters.internetConnectionSpeedMb >= 1 || !getters.internetConnectionSpeedMb;
   },
 });
 

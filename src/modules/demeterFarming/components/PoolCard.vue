@@ -97,18 +97,17 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator';
 import { components } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins, Prop } from 'vue-property-decorator';
 
-import PoolCardMixin from '../mixins/PoolCardMixin';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-
+import { Components, PageNames, Links } from '@/consts';
+import router, { lazyComponent } from '@/router';
 import { getter } from '@/store/decorators';
 
-import { demeterLazyComponent } from '../router';
 import { DemeterComponents } from '../consts';
-import router, { lazyComponent } from '@/router';
-import { Components, PageNames, Links } from '@/consts';
+import PoolCardMixin from '../mixins/PoolCardMixin';
+import { demeterLazyComponent } from '../router';
 
 import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
@@ -191,6 +190,8 @@ export default class PoolCard extends Mixins(PoolCardMixin, TranslationMixin) {
     opacity: 0.75;
     color: var(--s-color-base-content-primary);
     text-decoration: none;
+
+    @include focus-outline;
   }
 }
 

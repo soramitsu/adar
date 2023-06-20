@@ -1,17 +1,21 @@
-import { defineGetters } from 'direct-vuex';
 import { FPNumber } from '@sora-substrate/util';
 import { api } from '@soramitsu/soraneo-wallet-web';
-import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
+import { defineGetters } from 'direct-vuex';
 
-import { removeLiquidityGetterContext } from '@/store/removeLiquidity';
 import { ZeroStringValue } from '@/consts';
+import { removeLiquidityGetterContext } from '@/store/removeLiquidity';
+
 import type { RemoveLiquidityState } from './types';
-import type { RegisteredAccountAssetWithDecimals } from '../assets/types';
+import type { RegisteredAccountAsset } from '@sora-substrate/util';
+import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
 
 const getters = defineGetters<RemoveLiquidityState>()({
   liquidity(...args): Nullable<AccountLiquidity> {
     const { state, rootState } = removeLiquidityGetterContext(args);
     const { firstTokenAddress, secondTokenAddress } = state;
+
+    if (!(firstTokenAddress && secondTokenAddress)) return undefined;
+
     return rootState.pool.accountLiquidity.find(
       (liquidity) => liquidity.firstAddress === firstTokenAddress && liquidity.secondAddress === secondTokenAddress
     );
@@ -80,7 +84,7 @@ const getters = defineGetters<RemoveLiquidityState>()({
 
     return balance.sub(maxLocked);
   },
-  firstToken(...args): Nullable<RegisteredAccountAssetWithDecimals> {
+  firstToken(...args): Nullable<RegisteredAccountAsset> {
     const { getters, rootGetters } = removeLiquidityGetterContext(args);
     const firstAddress = getters.liquidity?.firstAddress;
     if (!firstAddress) {
@@ -88,7 +92,7 @@ const getters = defineGetters<RemoveLiquidityState>()({
     }
     return rootGetters.assets.assetDataByAddress(firstAddress);
   },
-  secondToken(...args): Nullable<RegisteredAccountAssetWithDecimals> {
+  secondToken(...args): Nullable<RegisteredAccountAsset> {
     const { getters, rootGetters } = removeLiquidityGetterContext(args);
     const secondAddress = getters.liquidity?.secondAddress;
     if (!secondAddress) {

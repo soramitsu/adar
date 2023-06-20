@@ -95,36 +95,35 @@
       </s-table-column>
     </s-table>
 
-    <s-pagination
+    <history-pagination
       class="explore-table-pagination"
-      :layout="'prev, total, next'"
-      :current-page.sync="currentPage"
-      :page-size="pageAmount"
-      :total="filteredItems.length"
-      @prev-click="handlePrevClick"
-      @next-click="handleNextClick"
+      :current-page="currentPage"
+      :page-amount="pageAmount"
+      :total="total"
+      :last-page="lastPage"
+      :loading="loadingState"
+      @pagination-click="handlePaginationClick"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
-import { api, components } from '@soramitsu/soraneo-wallet-web';
 import { FPNumber } from '@sora-substrate/util';
 import { SortDirection } from '@soramitsu/soramitsu-js-ui/lib/components/Table/consts';
+import { api, components } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
 
 import ExplorePageMixin from '@/components/mixins/ExplorePageMixin';
-import TranslationMixin from '@/components/mixins/TranslationMixin';
 import PoolApyMixin from '@/components/mixins/PoolApyMixin';
-
-import { state, getter } from '@/store/decorators';
-import { lazyComponent } from '@/router';
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components } from '@/consts';
+import { lazyComponent } from '@/router';
+import { state, getter } from '@/store/decorators';
+import type { AmountWithSuffix } from '@/types/formats';
 import { formatAmountWithSuffix, formatDecimalPlaces, asZeroValue } from '@/utils';
 
 import type { Asset, Whitelist } from '@sora-substrate/util/build/assets/types';
 import type { AccountLiquidity } from '@sora-substrate/util/build/poolXyk/types';
-import type { AmountWithSuffix } from '@/types/formats';
 
 type TableItem = {
   baseAsset: Asset;
@@ -143,6 +142,7 @@ type TableItem = {
     SortButton: lazyComponent(Components.SortButton),
     TokenLogo: components.TokenLogo,
     FormattedAmount: components.FormattedAmount,
+    HistoryPagination: components.HistoryPagination,
   },
 })
 export default class ExplorePools extends Mixins(ExplorePageMixin, TranslationMixin, PoolApyMixin) {
@@ -226,7 +226,7 @@ export default class ExplorePools extends Mixins(ExplorePageMixin, TranslationMi
   async updateExploreData(): Promise<void> {
     await this.withLoading(async () => {
       await this.withParentLoading(async () => {
-        this.poolReserves = await api.poolXyk.getAllReserves();
+        this.poolReserves = Object.freeze(await api.poolXyk.getAllReserves());
       });
     });
   }

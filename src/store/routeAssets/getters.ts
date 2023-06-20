@@ -1,12 +1,12 @@
-import { defineGetters } from 'direct-vuex';
-
-import { routeAssetsGetterContext } from '@/store/routeAssets';
-import type { Recipient, RouteAssetsState, RouteAssetsSubscription, TransactionInfo } from './types';
 import { api } from '@soramitsu/soraneo-wallet-web';
-import state from './state';
-import { Stages } from '@/modules/ADAR/consts';
-import type { Asset } from '@sora-substrate/util/build/assets/types';
+import { defineGetters } from 'direct-vuex';
 import { Subscription } from 'rxjs';
+
+import { Stages } from '@/modules/ADAR/consts';
+import { routeAssetsGetterContext } from '@/store/routeAssets';
+
+import type { Recipient, RouteAssetsState, RouteAssetsSubscription, TransactionInfo } from './types';
+import type { Asset } from '@sora-substrate/util/build/assets/types';
 
 const getters = defineGetters<RouteAssetsState>()({
   recipients(...args): Array<Recipient> {
@@ -33,32 +33,31 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.enabledAssetsSubscription;
   },
-  isDataExisting(): boolean {
-    return state.recipients.length > 0;
-  },
-  currentStageIndex(): number {
+  currentStageIndex(...args): number {
+    const { state } = routeAssetsGetterContext(args);
     return state.processingState.currentStageIndex;
   },
-  currentStageComponentName(): string {
+  currentStageComponentName(...args): string {
+    const { state } = routeAssetsGetterContext(args);
     return Stages[state.processingState.currentStageIndex].component;
   },
-  currentStageComponentTitle(): string {
+  currentStageComponentTitle(...args): string {
+    const { state } = routeAssetsGetterContext(args);
     return Stages[state.processingState.currentStageIndex].title;
   },
-  file(): Nullable<File> {
-    return state.file;
-  },
-  inputToken(): any {
+  inputToken(...args): Asset {
+    const { state } = routeAssetsGetterContext(args);
     return state.processingState.inputToken;
+  },
+  file(...args): Nullable<File> {
+    const { state } = routeAssetsGetterContext(args);
+    return state.file;
   },
   recipientsTokens(...args): Asset[] {
     const { getters, rootGetters } = routeAssetsGetterContext(args);
     const assetsTable = rootGetters.assets.assetsDataTable;
     const addressSet = [...new Set<string>(getters.recipients.map((item) => item.asset.address))];
     return addressSet.map((item) => assetsTable[item]);
-  },
-  isProcessed(...args) {
-    return false;
   },
   batchTxInfo(...args): Nullable<TransactionInfo> {
     const { state } = routeAssetsGetterContext(args);

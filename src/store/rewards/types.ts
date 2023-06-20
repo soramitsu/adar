@@ -1,7 +1,8 @@
-import type { Subscription } from 'rxjs';
+import type { RewardsAmountHeaderItem } from '@/types/rewards';
+
 import type { CodecString } from '@sora-substrate/util';
 import type { RewardInfo, RewardsInfo } from '@sora-substrate/util/build/rewards/types';
-import type { RewardsAmountHeaderItem } from '@/types/rewards';
+import type { Subscription } from 'rxjs';
 
 export type RewardsState = {
   // fee
@@ -11,12 +12,12 @@ export type RewardsState = {
   externalRewards: Array<RewardInfo>;
   internalRewards: Nullable<RewardInfo>;
   vestedRewards: Nullable<RewardsInfo>;
-  crowdloanRewards: Array<RewardInfo>;
+  crowdloanRewards: Record<string, RewardInfo[]>;
   // selected
   selectedExternal: Array<RewardInfo>;
   selectedInternal: Nullable<RewardInfo>;
   selectedVested: Nullable<RewardsInfo>;
-  selectedCrowdloan: Array<RewardInfo>;
+  selectedCrowdloan: Record<string, RewardInfo[]>;
   // flags
   rewardsFetching: boolean;
   rewardsClaiming: boolean;

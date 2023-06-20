@@ -1,6 +1,8 @@
-import { ZeroStringValue } from '@/consts';
-import type { SoraCardState } from './types';
 import { FPNumber } from '@sora-substrate/util';
+
+import { ZeroStringValue } from '@/consts';
+
+import type { SoraCardState } from './types';
 
 function initialState(): SoraCardState {
   return {
@@ -12,6 +14,9 @@ function initialState(): SoraCardState {
     xorToDeposit: FPNumber.ZERO,
     totalXorBalanceUpdates: null,
     authLogin: null,
+    hasFreeAttempts: null,
+    wantsToPassKycAgain: false,
+    rejectReason: null,
   };
 }
 
