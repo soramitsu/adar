@@ -29,7 +29,7 @@
     <p class="route-assets-upload-template__label">
       Don’t have a template? <a href="/adar/template.csv" download class="route-assets__ref">Download</a>
     </p>
-    <input type="file" @change="uploadFile" ref="file" hidden accept=".csv" />
+    <input type="file" @change="onInputChanged" ref="file" hidden accept=".csv" />
   </div>
   <div v-else class="container route-assets-upload-template">
     <div class="route-assets__page-header-title">The .csv file couldn’t be parsed.</div>
@@ -86,6 +86,10 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
     this.cancelProcessing();
     this.parsingError = false;
     (this as any).$refs.file = null;
+  }
+
+  onInputChanged(event) {
+    this.uploadFile(event.target.files[0]);
   }
 
   async uploadFile(file: File) {
