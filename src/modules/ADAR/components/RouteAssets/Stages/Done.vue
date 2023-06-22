@@ -217,11 +217,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         `${idx + 1}`,
         recipient.name.toString(),
         recipient.wallet.toString(),
-        recipient.usd.toString(),
+        recipient.usd.toFixed(2),
         this.inputToken.symbol,
         recipient.asset.symbol,
-        (recipient.amount?.toFixed(5) || '').toString(),
-        recipient.exchangeRate || '',
+        (recipient.amount?.toFixed(4) || '').toString(),
+        recipient.amountInTokens ? '-' : recipient.exchangeRate || '',
         recipient.status.toString(),
       ];
     });
@@ -283,10 +283,26 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
       },
       columnStyles: {
         1: {
-          cellWidth: 35,
+          minCellWidth: 30,
+        },
+        3: {
+          minCellWidth: 25,
+        },
+        4: {
+          cellWidth: 25,
+        },
+        5: {
+          cellWidth: 25,
+        },
+        6: {
+          minCellWidth: 25,
+        },
+        7: {
+          minCellWidth: 25,
         },
         8: {
           fontStyle: 'bold',
+          cellWidth: 25,
         },
       },
       didParseCell: function (data) {
