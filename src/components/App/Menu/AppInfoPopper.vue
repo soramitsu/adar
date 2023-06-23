@@ -62,18 +62,18 @@ export default class AppInfoPopper extends Mixins(TranslationMixin, mixins.Loadi
 
   get textLinks(): Array<{ title: string; href: string }> {
     return [
-      // {
-      //   title: this.t('helpDialog.privacyPolicy'),
-      //   href: AdarLinks.privacy,
-      // },
+      {
+        title: this.t('helpDialog.privacyPolicy'),
+        href: AdarLinks.privacy,
+      },
       {
         title: this.t('releaseNotesText'),
         href: Links.releaseNotes,
       },
-      // {
-      //   title: this.t('helpDialog.termsOfService'),
-      //   href: AdarLinks.terms,
-      // },
+      {
+        title: this.t('helpDialog.termsOfService'),
+        href: AdarLinks.terms,
+      },
     ];
   }
 

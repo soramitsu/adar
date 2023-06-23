@@ -47,6 +47,6 @@ export function getTokenEquivalent(
 }
 
 export function getAssetUSDPrice(asset, fiatPriceObject) {
-  if (!asset) return null;
+  if (!asset) return FPNumber.ZERO;
   return FPNumber.fromCodecValue(fiatPriceObject[asset.address], asset.decimals);
 }

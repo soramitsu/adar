@@ -21,6 +21,7 @@ export type Recipient = {
   isCompleted?: boolean;
   txId?: string;
   exchangeRate?: string;
+  amountInTokens: boolean;
 };
 
 export type RouteAssetsSubscription = {
