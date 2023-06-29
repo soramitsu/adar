@@ -76,7 +76,6 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   max-width: 988px;
   margin: 0 auto $inner-spacing-medium;
   .container {
-    max-width: none;
     margin: $inner-spacing-medium auto;
     max-width: 464px;
   }
