@@ -17,13 +17,21 @@
       <p class="dropping-area__description">Drop your completed process routing template or click to upload</p>
       <p>Supported file types: CSV</p>
       <div>
-        <s-button
-          type="primary"
-          class="s-typography-button--big route-assets-upload-template__button"
-          @click.stop="onBrowseButtonClick"
+        <label
+          class="
+            file-upload
+            s-typography-button--big
+            route-assets-upload-template__button
+            el-button el-tooltip
+            button
+            el-button--primary el-button--medium
+            neumorphic
+            s-medium s-border-radius-small s-primary
+          "
         >
-          {{ 'Upload' }}
-        </s-button>
+          <input type="file" @change="onInputChanged" ref="file" aria-label="false" accept=".csv" />
+          Upload
+        </label>
       </div>
     </div>
     <p class="route-assets-upload-template__label">
@@ -103,20 +111,11 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
         this.parsingError = true;
       });
   }
-
-  onBrowseButtonClick() {
-    this.fileElement.click();
-  }
-
-  get fileElement() {
-    return (this as any).$refs.file;
-  }
 }
 </script>
 
 <style lang="scss">
 .route-assets-upload-template {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -148,10 +147,6 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .dropping-area {
   border: 1px dashed var(--s-color-base-content-tertiary);
   border-radius: var(--s-border-radius-small);
@@ -179,5 +174,12 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
   margin-bottom: 16px;
   margin-left: 0;
   margin-right: 0;
+}
+
+.file-upload {
+  input {
+    overflow: hidden;
+    width: 0;
+  }
 }
 </style>
