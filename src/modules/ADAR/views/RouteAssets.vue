@@ -21,9 +21,8 @@
 </template>
 
 <script lang="ts">
-import { LiquiditySourceTypes, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy';
-import { api, mixins } from '@soramitsu/soraneo-wallet-web';
-import { Component, Mixins, Watch } from 'vue-property-decorator';
+import { mixins } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents } from '@/modules/ADAR/consts';
@@ -77,8 +76,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   max-width: 988px;
   margin: 0 auto $inner-spacing-medium;
   .container {
-    max-width: none;
     margin: $inner-spacing-medium auto;
+    max-width: 464px;
   }
 
   &__page-header-title {

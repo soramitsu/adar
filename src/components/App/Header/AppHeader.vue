@@ -18,7 +18,7 @@
       </s-button>
       <moonpay-history-button v-if="isLoggedIn" class="moonpay-button moonpay-button--history" /> -->
     <!-- </div> -->
-    <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex" />
+    <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex route-assets-navigation" />
     <div
       class="app-controls app-controls--settings-panel s-flex"
       :class="{ 'without-moonpay': !areMoonpayButtonsVisible }"
@@ -47,7 +47,6 @@ import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-import PolkaswapLogo from '@/components/shared/Logo/Polkaswap.vue';
 import { PageNames, Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
@@ -192,6 +191,12 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 }
 
 .app-controls {
+  &.route-assets-navigation {
+    @include tablet(true) {
+      display: none;
+    }
+  }
+
   &:not(:last-child) {
     margin-right: $inner-spacing-mini;
   }

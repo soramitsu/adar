@@ -400,6 +400,12 @@ export default class FailedTransactionsDialog extends Mixins(
   &__asset {
     @include flex-start;
     gap: 8px;
+    white-space: nowrap;
+  }
+  @include large-mobile(true) {
+    &__asset {
+      font-size: 10px;
+    }
   }
 }
 
