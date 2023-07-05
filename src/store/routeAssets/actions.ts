@@ -64,9 +64,15 @@ const actions = defineActions({
         step: (row, parser) => {
           // console.log((row.meta.cursor / file.size) * 100);
           try {
-            const usd = row.data[2]?.replace(/,/g, '');
+            const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
+            const csvAmount = row.data[2]?.replace(/,/g, '');
             const asset = findAsset(row.data[3]);
-            const amount = Number(usd) / Number(getAssetUSDPrice(asset, priceObject));
+            const amount = amountInTokens
+              ? Number(csvAmount)
+              : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject)).toNumber();
+            const usd = amountInTokens
+              ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject)).toNumber()
+              : Number(csvAmount);
             data.push({
               name: row.data[0],
               wallet: row.data[1],
@@ -78,6 +84,7 @@ const actions = defineActions({
                 : RecipientStatus.ADDRESS_INVALID,
               id: (crypto as any).randomUUID(),
               isCompleted: false,
+              amountInTokens,
             });
           } catch (error) {
             parser.abort();
@@ -96,10 +103,8 @@ const actions = defineActions({
     });
   },
 
-  editRecipient(context, { id, name, wallet, usd, asset }): void {
-    const { commit, rootState } = routeAssetsActionContext(context);
-    const priceObject = rootState.wallet.account.fiatPriceObject;
-    const amount = Number(usd) / Number(getAssetUSDPrice(asset, priceObject));
+  editRecipient(context, { id, name, wallet, usd, asset, amount }): void {
+    const { commit } = routeAssetsActionContext(context);
     commit.editRecipient({ id, name, wallet, usd, amount, asset });
   },
 
@@ -182,8 +187,10 @@ const actions = defineActions({
     const priceObject = rootState.wallet.account.fiatPriceObject;
     const recipients = getters.recipients;
     recipients.forEach((recipient) => {
-      const amount = Number(recipient.usd) / Number(getAssetUSDPrice(recipient.asset, priceObject));
-      commit.setRecipientTokenAmount({ id: recipient.id, amount });
+      if (!recipient.amountInTokens) {
+        const amount = new FPNumber(recipient.usd).div(getAssetUSDPrice(recipient.asset, priceObject)).toNumber();
+        commit.setRecipientTokenAmount({ id: recipient.id, amount });
+      }
     });
   },
 
@@ -263,7 +270,9 @@ function getTransferParams(context, inputAsset, recipient) {
   const { rootState, commit } = routeAssetsActionContext(context);
   if (recipient.asset.address === inputAsset.address) {
     const priceObject = rootState.wallet.account.fiatPriceObject;
-    const amount = getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
+    const amount = recipient.amountInTokens
+      ? new FPNumber(recipient.amount)
+      : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
     const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
     commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
     return {

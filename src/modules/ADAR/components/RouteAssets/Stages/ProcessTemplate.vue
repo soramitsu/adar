@@ -218,7 +218,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
 <style lang="scss">
 .route-assets-processing-template {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -269,10 +268,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .dropping-area {
   border: 1px dashed #d5cdd0;
   border-radius: 24px;

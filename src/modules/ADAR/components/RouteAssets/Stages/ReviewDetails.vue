@@ -1,6 +1,6 @@
 <template>
   <div class="route-assets-review-details">
-    <div class="container route-assets-upload-template">
+    <div class="container review-details-section">
       <div class="route-assets__page-header-title">Review Routing Details</div>
       <div class="route-assets__page-header-description">
         {{ `Review the details of your routing transaction` }}
@@ -367,7 +367,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
 <style lang="scss">
 .route-assets-review-details {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -382,6 +381,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     > span {
       width: 16px;
       height: 16px;
+    }
+  }
+  .review-details-section {
+    & > * {
+      margin-bottom: $inner-spacing-medium;
     }
   }
 
@@ -419,10 +423,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .fields-container {
   .el-divider {
     margin-bottom: $inner-spacing-medium;

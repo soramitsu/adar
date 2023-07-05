@@ -27,6 +27,14 @@
       color: var(--s-color-brand-day);
       white-space: nowrap;
     }
+    
+    @include tablet(true) {
+      th.el-table__cell .cell span,
+      td.el-table__cell .cell,
+      td.el-table__cell .cell .wallet-address button span {
+      font-size: var(--s-font-size-mini);
+      }
+    }
   
     th.el-table__cell .cell {
       white-space: nowrap;

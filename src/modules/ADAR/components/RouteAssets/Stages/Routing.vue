@@ -75,7 +75,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 
 <style lang="scss">
 .route-assets-routing-process {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -94,10 +93,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .fields-container {
   .field {
     &__label {
