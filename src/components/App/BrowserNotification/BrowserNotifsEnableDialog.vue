@@ -1,7 +1,7 @@
 <template>
   <dialog-base class="browser-notification" :title="t('browserNotificationDialog.title')" :visible.sync="isVisible">
     <div class="browser-notification-dialog">
-      <s-image src="browser-notification/chrome.png" lazy fit="cover" draggable="false" class="unselectable" />
+      <!-- <s-image src="browser-notification/chrome.png" lazy fit="cover" draggable="false" class="unselectable" /> -->
       <p class="browser-notification-dialog__info">
         {{ t('browserNotificationDialog.info') }}
       </p>

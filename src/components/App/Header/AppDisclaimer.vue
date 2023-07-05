@@ -19,6 +19,8 @@
               polkaswapFaqLink,
               memorandumLink,
               privacyLink,
+              adarTS,
+              adarPrivacy,
             })
           "
         />
@@ -43,6 +45,7 @@ import { Component, Mixins, Ref } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Links } from '@/consts';
+import { Links as AdarLinks } from '@/modules/ADAR/consts';
 import { mutation, state } from '@/store/decorators';
 import { delay } from '@/utils';
 
@@ -87,6 +90,14 @@ export default class AppDisclaimer extends Mixins(TranslationMixin) {
 
   get polkaswapFaqLink(): string {
     return this.generateDisclaimerLink(Links.faq, this.$t('FAQ', { AppName: 'Polkaswap' }).toString());
+  }
+
+  get adarTS(): string {
+    return this.generateDisclaimerLink(AdarLinks.terms, 'ADAR - Terms of Service');
+  }
+
+  get adarPrivacy(): string {
+    return this.generateDisclaimerLink(AdarLinks.privacy, 'ADAR - Privacy Policy');
   }
 
   generateDisclaimerLink(href: string, content: string): string {

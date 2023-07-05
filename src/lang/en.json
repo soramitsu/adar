@@ -312,7 +312,7 @@
     "connectWalletTextTooltip": "Connect to {Sora} Network with {PolkadotJs}",
     "selectNodeText": "Select Network Node",
     "bridgeText": "Bridge",
-    "disclaimer": "The token swap functionality on ADAR Technologies Inc’s website is powered by  the Polkaswap website (www.polkaswap.io) which is not maintained by us and is maintained by the SORA community. Therefore, in addition to our terms, the terms of Polkaswap apply mutatis mutandis.  The terms of Polkaswap are available at {polkaswapFaqLink}, {memorandumLink}, and {privacyLink} ",
+    "disclaimer": "The token swap functionality on ADAR Technologies Inc’s website is powered by  the Polkaswap website (www.polkaswap.io) which is not maintained by us and is maintained by the SORA community. Therefore, in addition to our terms {adarTS} {adarPrivacy}, the terms of Polkaswap apply mutatis mutandis.  The terms of Polkaswap are available at {polkaswapFaqLink}, {memorandumLink}, and {privacyLink} ",
     "poweredBy": "Powered by",
     "confirmTransactionText": "Confirm transaction in {direction}",
     "retryText": "Retry",
