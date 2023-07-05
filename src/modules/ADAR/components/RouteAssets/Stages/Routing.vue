@@ -1,8 +1,10 @@
 <template>
   <div class="container route-assets-routing-process">
-    <div class="route-assets__page-header-title">Routing assets...</div>
-    <div class="fields-container">
-      <div v-for="(token, idx) in recipientsTokens" :key="idx">
+    <!-- <div class="route-assets__page-header-title">Routing assets...</div> -->
+    <div>
+      <div v-loading="spinner" class="route-assets-routing-process__spinner"></div>
+      <div class="route-assets-routing-process__status-text">{{ statusText }}</div>
+      <!-- <div v-for="(token, idx) in recipientsTokens" :key="idx">
         <div class="field">
           <div class="field__value pointer">
             <div>{{ token.symbol }}</div>
@@ -13,7 +15,7 @@
           <div class="field__label" :class="`field__label_${getStatus(token)}`">{{ getStatus(token) }}</div>
         </div>
         <s-divider />
-      </div>
+      </div> -->
     </div>
     <div class="buttons-container">
       <s-button
@@ -56,8 +58,22 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     this.nextStage();
   }
 
-  getStatus(asset) {
-    const transactions = this.recipients.filter((recipient) => recipient.asset.address === asset.address);
+  get statusText() {
+    return this.status === 'routed'
+      ? 'Completed'
+      : this.status === 'waiting'
+      ? 'Processing the routing transactions...'
+      : this.status === 'passed'
+      ? 'Transactions are passed'
+      : 'Failed';
+  }
+
+  get spinner() {
+    return ['waiting', 'passed'].includes(this.status);
+  }
+
+  get status() {
+    const transactions = this.recipients;
     if (transactions.some((recipient) => recipient.status === RecipientStatus.FAILED)) return 'failed';
     if (transactions.some((recipient) => recipient.status === RecipientStatus.PASSED)) return 'passed';
     return transactions.find((recipient) => recipient.status === RecipientStatus.PENDING) ? 'waiting' : 'routed';
@@ -88,6 +104,18 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
       width: 24px;
       height: 24px;
     }
+  }
+
+  &__spinner {
+    height: 80px;
+  }
+
+  &__status-text {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 36px;
+    letter-spacing: -0.02em;
+    text-align: center;
   }
 }
 </style>
