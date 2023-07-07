@@ -72,7 +72,7 @@ const actions = defineActions({
               : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject)).toNumber();
             const usd = amountInTokens
               ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject)).toNumber()
-              : csvAmount;
+              : Number(csvAmount);
             data.push({
               name: row.data[0],
               wallet: row.data[1],

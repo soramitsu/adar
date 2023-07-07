@@ -2,22 +2,47 @@
   <div class="container route-assets-routing-process">
     <!-- <div class="route-assets__page-header-title">Routing assets...</div> -->
     <div>
-      <div v-loading="spinner" class="route-assets-routing-process__spinner"></div>
-      <div class="route-assets-routing-process__status-text">{{ statusText }}</div>
-      <!-- <div v-for="(token, idx) in recipientsTokens" :key="idx">
-        <div class="field">
-          <div class="field__value pointer">
-            <div>{{ token.symbol }}</div>
-            <div>
-              <token-logo class="token-logo" :token="token" />
-            </div>
-          </div>
-          <div class="field__label" :class="`field__label_${getStatus(token)}`">{{ getStatus(token) }}</div>
+      <div v-loading="spinner" class="route-assets-routing-process__spinner">
+        <div class="status">
+          <s-icon :name="iconName" size="30px" />
         </div>
-        <s-divider />
+      </div>
+      <div class="route-assets-routing-process__status-text">{{ statusText }}</div>
+    </div>
+    <div class="fields-container">
+      <div class="field">
+        <div class="field__label">INPUT ASSET</div>
+        <div class="field__value">
+          <div>{{ inputToken.symbol }}</div>
+          <div>
+            <token-logo class="token-logo" :token="inputToken" />
+          </div>
+        </div>
+      </div>
+      <s-divider />
+      <div class="field">
+        <div class="field__label">Total tokens required</div>
+        <div class="field__value">{{ tokensEstimate }} <token-logo class="token-logo" :token="inputToken" /></div>
+      </div>
+      <s-divider />
+      <div class="field">
+        <div class="field__label">total usd to be routed</div>
+        <div class="field__value usd">{{ overallUSDNumber }}</div>
+      </div>
+      <!-- <s-divider />
+      <div class="field">
+        <div class="field__label">total usd to be routed</div>
+        <div class="field__value usd">{{ usdToBeRouted }}</div>
+      </div>
+      <s-divider />
+      <div class="field">
+        <div class="field__label">Total tokens required</div>
+        <div class="field__value">
+          {{ formatNumber(estimatedAmountWithFees) }} <token-logo class="token-logo" :token="inputToken" />
+        </div>
       </div> -->
     </div>
-    <div class="buttons-container">
+    <div v-if="!continueButtonDisabled" class="buttons-container">
       <s-button
         type="primary"
         class="s-typography-button--big"
@@ -31,7 +56,8 @@
 </template>
 
 <script lang="ts">
-import { Asset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/util/build';
+import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
@@ -47,6 +73,9 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @action.routeAssets.processingNextStage nextStage!: any;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @getter.routeAssets.recipientsTokens recipientsTokens!: Asset[];
+  @getter.routeAssets.inputToken inputToken!: Asset;
+  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: number;
 
   get continueButtonDisabled() {
     return !!this.recipients.find(
@@ -56,6 +85,14 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 
   onContinueClick() {
     this.nextStage();
+  }
+
+  get tokensEstimate() {
+    return this.overallEstimatedTokens()?.toFixed();
+  }
+
+  get iconName() {
+    return this.status === 'routed' ? 'basic-check-marks-24' : 'basic-close-24';
   }
 
   get statusText() {
@@ -107,7 +144,27 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   &__spinner {
-    height: 80px;
+    height: 75px;
+    width: 75px;
+    margin: 0 auto;
+    border-radius: 999px;
+    overflow: hidden;
+    .status {
+      background: color-mix(in srgb, var(--s-color-theme-accent) 20%, transparent);
+      height: 100%;
+      position: relative;
+      // opacity: 0.3;
+      i {
+        // font-size: 16px !important;
+        // display: block;
+        color: var(--s-color-theme-accent);
+        opacity: 1;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
   }
 
   &__status-text {
@@ -163,12 +220,20 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 }
 
 .buttons-container {
-  margin-top: 150px;
+  // margin-top: 150px;
 
   button {
     width: 100%;
     display: block;
     margin: 0;
+  }
+}
+
+.usd {
+  color: var(--s-color-fiat-value);
+  &::before {
+    content: '~ $';
+    display: inline;
   }
 }
 </style>

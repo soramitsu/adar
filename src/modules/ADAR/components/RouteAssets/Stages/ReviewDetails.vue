@@ -426,7 +426,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 }
 
 .usd {
-  color: var(--s-color-status-warning);
+  color: var(--s-color-fiat-value);
   &::before {
     content: '~ $';
     display: inline;

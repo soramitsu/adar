@@ -381,7 +381,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 
 <style scoped lang="scss">
 .usd {
-  color: var(--s-color-status-warning);
+  color: var(--s-color-fiat-value);
   &::before {
     content: '~ $';
     display: inline;
