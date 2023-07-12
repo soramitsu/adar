@@ -1,6 +1,5 @@
 <template>
   <div class="container route-assets-routing-process">
-    <!-- <div class="route-assets__page-header-title">Routing assets...</div> -->
     <div>
       <div v-loading="spinner" class="route-assets-routing-process__spinner">
         <div class="status">
@@ -85,13 +84,10 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get statusText() {
-    return this.status === SwapTransferBatchStatus.SUCCESS
-      ? 'Completed'
-      : this.status === SwapTransferBatchStatus.PENDING
-      ? 'Processing the routing transactions...'
-      : this.status === SwapTransferBatchStatus.PASSED
-      ? 'Transactions are passed'
-      : 'Failed';
+    if (this.status === SwapTransferBatchStatus.SUCCESS) return 'Completed';
+    if (this.status === SwapTransferBatchStatus.PENDING) return 'Processing the routing transactions...';
+    if (this.status === SwapTransferBatchStatus.PASSED) return 'Transactions are passed';
+    return 'Failed';
   }
 
   get spinner() {

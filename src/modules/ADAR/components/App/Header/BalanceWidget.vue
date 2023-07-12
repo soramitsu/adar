@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
+import { CodecString, FPNumber } from '@sora-substrate/util/build';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
-import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { components } from '@soramitsu/soraneo-wallet-web';
+import { Component, Vue } from 'vue-property-decorator';
 
 import { getter, state } from '@/store/decorators';
 import { getAssetBalance } from '@/utils';

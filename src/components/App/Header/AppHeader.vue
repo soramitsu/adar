@@ -260,15 +260,11 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     filter: $app-controls-filter;
     border-radius: var(--s-border-radius-small);
 
-    & > *:not(:last-child) {
-      // border-right: 1px solid var(--s-color-base-content-tertiary) !important;
-      margin-right: 1px;
-    }
-
     & > * {
       box-shadow: none !important;
     }
     & > *:not(:last-child) {
+      margin-right: 1px;
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
