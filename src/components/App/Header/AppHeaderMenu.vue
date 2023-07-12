@@ -28,11 +28,10 @@
           >
             {{ text }}
           </s-dropdown-item>
-          <!--
           <div @click="openNotificationDialog" class="notif-option el-dropdown-menu__item header-menu__item">
             <bell-icon class="notif-option__bell notif-option__bell--dropdown"></bell-icon>
             <span class="notif-option__text">{{ t('browserNotificationDialog.title') }}</span>
-          </div> -->
+          </div>
         </template>
       </s-dropdown>
     </s-button>
@@ -48,7 +47,6 @@
       >
         <s-icon :name="icon" :size="iconSize" />
       </s-button>
-      <!--
       <s-button
         type="action"
         :tooltip="t('browserNotificationDialog.button')"
@@ -56,7 +54,7 @@
         class="notif-option s-pressed el-dropdown-menu__item header-menu__item"
       >
         <bell-icon class="notif-option__bell notif-option__bell--large"></bell-icon>
-      </s-button> -->
+      </s-button>
     </div>
   </div>
 </template>

@@ -286,6 +286,10 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         fillColor: [255, 250, 251],
       },
       columnStyles: {
+        0: {
+          cellWidth: 10,
+          cellPadding: { top: 10, right: 2, bottom: 10, left: 2 },
+        },
         1: {
           minCellWidth: 30,
         },
