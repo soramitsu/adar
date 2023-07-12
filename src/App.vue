@@ -63,8 +63,7 @@ import type { EthBridgeSettings, SubNetworkApps } from '@/store/web3/types';
 import type { ConnectToNodeOptions, Node } from '@/types/nodes';
 import { preloadFontFace, updateDocumentTitle } from '@/utils';
 
-import { RecipientStatus, TransactionInfo } from './store/routeAssets/types';
-import getters from './store/web3/getters';
+import { RecipientStatus, SwapTransferBatchStatus, TransactionInfo } from './store/routeAssets/types';
 
 import type { History, HistoryItem } from '@sora-substrate/util';
 import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
@@ -349,6 +348,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   @mutation.routeAssets.setRecipientCompleted private setRecipientCompleted!: any;
   @getter.wallet.transactions.activeTxs activeTransactions!: Array<HistoryItem>;
   @mutation.routeAssets.setTxInfo private setTxInfo!: (txInfo: TransactionInfo) => void;
+  @mutation.routeAssets.setTxStatus private setTxStatus!: (status: SwapTransferBatchStatus) => void;
   @action.routeAssets.getBlockNumber private getBlockNumber!: (blockId: string) => Promise<string>;
 
   async handleChangeTransactionADAR(value: Nullable<HistoryItem>, oldValue: Nullable<HistoryItem>): Promise<void> {
@@ -385,6 +385,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
         const { id, blockId, from } = value;
         const blockNumber = await this.getBlockNumber(blockId as string);
         this.setTxInfo({ txId: id as string, blockId: blockId as string, from: from as string, blockNumber });
+        this.setTxStatus(SwapTransferBatchStatus.PASSED);
         recipients.forEach((reciever) => {
           this.setRecipientStatus({
             id: reciever.id,
@@ -394,6 +395,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
         });
       }
     } else if (value.status === TransactionStatus.Finalized) {
+      this.setTxStatus(SwapTransferBatchStatus.SUCCESS);
       recipients.forEach((reciever) => {
         this.setRecipientStatus({
           id: reciever.id,
@@ -416,6 +418,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   private handleInvalidTransaction(value: HistoryItem): void {
     if (!value || ![Operation.SwapAndSend, Operation.Transfer].includes(value.type)) return;
     const recipients = this.recipients.filter((item) => item.txId === value.id);
+    this.setTxStatus(SwapTransferBatchStatus.FAILED);
     recipients.forEach((reciever) => {
       this.setRecipientStatus({
         id: reciever.id,

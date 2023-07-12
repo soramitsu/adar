@@ -16,6 +16,7 @@ export enum AdarComponents {
   RouteAssetsTransactionOverview = 'RouteAssets/Stages/TransactionOverview',
   RouteAssetsUploadTemplate = 'RouteAssets/Stages/UploadTemplate',
   RouteAssetsNavigation = 'App/Header/RouteAssetsNavigation',
+  BalanceWidget = 'App/Header/BalanceWidget',
   RouteAssetsFixIssuesDialog = 'RouteAssets/FixIssuesDialog',
   RouteAssetsSelectInputAssetDialog = 'RouteAssets/SelectInputAssetDialog',
   RouteAssetsSwapDialog = 'RouteAssets/SwapDialog',

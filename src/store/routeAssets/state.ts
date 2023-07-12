@@ -1,5 +1,7 @@
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 
+import { SwapTransferBatchStatus } from './types';
+
 import type { RouteAssetsState } from './types';
 
 function initialState(): RouteAssetsState {
@@ -18,6 +20,7 @@ function initialState(): RouteAssetsState {
       inputToken: XOR,
       datetime: undefined,
       txInfo: undefined,
+      status: SwapTransferBatchStatus.INITIAL,
     },
   };
 }

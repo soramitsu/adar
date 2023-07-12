@@ -114,7 +114,7 @@ import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { action, getter, state } from '@/store/decorators';
-import { Recipient, RecipientStatus, TransactionInfo } from '@/store/routeAssets/types';
+import { Recipient, RecipientStatus, SummaryAssetRecipientsInfo, TransactionInfo } from '@/store/routeAssets/types';
 
 import WarningMessage from '../WarningMessage.vue';
 
@@ -137,6 +137,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @state.wallet.account.fiatPriceObject private fiatPriceObject!: any;
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
+  @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
+    asset?: Asset | AccountAsset
+  ) => SummaryAssetRecipientsInfo[];
 
   showFailedTransactionsDialog = false;
   showFinishRoutingDialog = false;
@@ -147,11 +152,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   get totalAmount() {
-    return this.formatNumber(this.totalUSD / Number(this.getAssetUSDPrice(this.inputToken)));
+    return this.overallEstimatedTokens();
   }
 
   get totalUSD() {
-    return sumBy(this.completedRecipients, (item: Recipient) => Number(item.usd));
+    return this.overallUSDNumber;
   }
 
   get withErrors() {

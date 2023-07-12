@@ -154,8 +154,8 @@
       <s-button type="secondary" class="s-typography-button--big" @click.stop="previousStage">
         {{ `back` }}
       </s-button>
-      <div>
-        Total:
+      <div class="total-container">
+        <span>TOTAL:&nbsp;</span>
         <span class="usd">{{ overallUSDNumber }}</span>
       </div>
       <s-button type="primary" class="s-typography-button--big" @click.stop="onContinueClick">
@@ -197,7 +197,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
-  @getter.routeAssets.overallUSDNumber overallUSDNumber!: number;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
 
   showSelectInputAssetDialog = false;
 
@@ -441,11 +441,14 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   }
 }
 
-.usd {
-  color: var(--s-color-fiat-value);
-  &::before {
-    content: '~ $';
-    display: inline;
+.total-container {
+  color: var(--s-color-brand-day);
+  .usd {
+    color: var(--s-color-fiat-value);
+    &::before {
+      content: ' $';
+      display: inline;
+    }
   }
 }
 </style>

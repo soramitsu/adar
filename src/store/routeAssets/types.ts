@@ -1,4 +1,4 @@
-import { Asset } from '@sora-substrate/util/build/assets/types';
+import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { Subscription } from 'rxjs';
 
 import { DexQuoteData } from '../swap/types';
@@ -44,6 +44,14 @@ export enum RecipientStatus {
   SUCCESS = 'Success',
 }
 
+export enum SwapTransferBatchStatus {
+  INITIAL = 'Initial',
+  PENDING = 'Pending',
+  FAILED = 'Failed',
+  PASSED = 'Passed',
+  SUCCESS = 'Success',
+}
+
 export type RoutedToken = {
   token: Asset;
   amount: number;
@@ -62,6 +70,7 @@ export type ProcessingState = {
   tokensRouted?: Array<RoutedToken>;
   txInfo?: TransactionInfo;
   datetime?: Date;
+  status: SwapTransferBatchStatus;
 };
 
 export type Stage = {
@@ -82,4 +91,13 @@ export type PresetSwapData = {
   assetFrom: Asset;
   assetTo: Asset;
   valueTo: number;
+};
+
+export type SummaryAssetRecipientsInfo = {
+  recipientsNumber: number;
+  asset: Asset | AccountAsset;
+  usd: number;
+  total: number;
+  required: number;
+  totalTransactions: number;
 };

@@ -7,14 +7,6 @@
           <div class="field__value usd">{{ overallUSDNumber }}</div>
         </div>
         <s-divider />
-        <!-- <div class="field">
-          <div class="field__label">Total tokens required</div>
-          <div class="field__value">
-            12
-             {{ formatNumber(estimatedAmountWithFees) }} <token-logo class="token-logo" :token="inputToken" />
-          </div>
-        </div> -->
-
         <div v-for="(asset, idx) in tokensEstimate" :key="idx">
           <div class="field">
             <div class="field__label">Estimated {{ asset.asset.symbol }} required</div>
@@ -69,12 +61,12 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
-import { AccountAsset } from '@sora-substrate/util/build/assets/types';
+import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
-import { WalletPermissions } from '@soramitsu/soraneo-wallet-web/lib/consts';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import { getter, state } from '@/store/decorators';
+import { SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
 @Component({
   components: {
     DialogBase: components.DialogBase,
@@ -90,8 +82,11 @@ export default class SelectInputAssetDialog extends Mixins(
   mixins.FormattedAmountMixin
 ) {
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
-  @getter.routeAssets.overallUSDNumber overallUSDNumber!: number;
-  @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: any;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
+    asset?: Asset | AccountAsset
+  ) => SummaryAssetRecipientsInfo[];
+
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   get fileElement() {
     return (this as any).$refs.file;

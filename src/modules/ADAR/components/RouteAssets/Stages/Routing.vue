@@ -29,18 +29,6 @@
         <div class="field__label">total usd to be routed</div>
         <div class="field__value usd">{{ overallUSDNumber }}</div>
       </div>
-      <!-- <s-divider />
-      <div class="field">
-        <div class="field__label">total usd to be routed</div>
-        <div class="field__value usd">{{ usdToBeRouted }}</div>
-      </div>
-      <s-divider />
-      <div class="field">
-        <div class="field__label">Total tokens required</div>
-        <div class="field__value">
-          {{ formatNumber(estimatedAmountWithFees) }} <token-logo class="token-logo" :token="inputToken" />
-        </div>
-      </div> -->
     </div>
     <div v-if="!continueButtonDisabled" class="buttons-container">
       <s-button
@@ -63,7 +51,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { action, getter } from '@/store/decorators';
-import { Recipient, RecipientStatus } from '@/store/routeAssets/types';
+import { Recipient, RecipientStatus, SwapTransferBatchStatus } from '@/store/routeAssets/types';
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -75,7 +63,8 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.recipientsTokens recipientsTokens!: Asset[];
   @getter.routeAssets.inputToken inputToken!: Asset;
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
-  @getter.routeAssets.overallUSDNumber overallUSDNumber!: number;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
 
   get continueButtonDisabled() {
     return !!this.recipients.find(
@@ -92,28 +81,25 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get iconName() {
-    return this.status === 'routed' ? 'basic-check-marks-24' : 'basic-close-24';
+    return this.status === SwapTransferBatchStatus.SUCCESS ? 'basic-check-marks-24' : 'basic-close-24';
   }
 
   get statusText() {
-    return this.status === 'routed'
+    return this.status === SwapTransferBatchStatus.SUCCESS
       ? 'Completed'
-      : this.status === 'waiting'
+      : this.status === SwapTransferBatchStatus.PENDING
       ? 'Processing the routing transactions...'
-      : this.status === 'passed'
+      : this.status === SwapTransferBatchStatus.PASSED
       ? 'Transactions are passed'
       : 'Failed';
   }
 
   get spinner() {
-    return ['waiting', 'passed'].includes(this.status);
+    return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
   }
 
   get status() {
-    const transactions = this.recipients;
-    if (transactions.some((recipient) => recipient.status === RecipientStatus.FAILED)) return 'failed';
-    if (transactions.some((recipient) => recipient.status === RecipientStatus.PASSED)) return 'passed';
-    return transactions.find((recipient) => recipient.status === RecipientStatus.PENDING) ? 'waiting' : 'routed';
+    return this.batchTxStatus;
   }
 
   formatNumber(num) {
