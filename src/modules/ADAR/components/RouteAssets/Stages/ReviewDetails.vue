@@ -44,7 +44,7 @@
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">Maximum Price Impact (5%)</div>
+          <div class="field__label">Maximum Price Impact ({{ priceImpactPercent }}%)</div>
           <div class="field__value">
             {{ formatNumber(estimatedPriceImpact) }} <token-logo class="token-logo" :token="inputToken" />
           </div>
@@ -218,6 +218,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   get priceImpactMultiplier() {
     return new FPNumber(slippageMultiplier);
+  }
+
+  get priceImpactPercent() {
+    return this.priceImpactMultiplier.mul(FPNumber.HUNDRED).toString();
   }
 
   get networkFee() {
