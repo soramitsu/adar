@@ -57,14 +57,15 @@
 
 <script lang="ts">
 import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { Components } from '@/consts';
-import { lazyComponent } from '@/router';
+
 import TranslationMixin from '@/components/mixins/TranslationMixin';
+import { Components } from '@/consts';
+import { AdarComponents } from '@/modules/ADAR/consts';
+import { adarLazyComponent } from '@/modules/ADAR/router';
+import { lazyComponent } from '@/router';
 import { action, getter } from '@/store/decorators';
 import { Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
-import { AdarComponents } from '@/modules/ADAR/consts';
-import { adarLazyComponent } from '@/modules/ADAR/router';
 @Component({
   components: {
     FixIssuesDialog: adarLazyComponent(AdarComponents.RouteAssetsFixIssuesDialog),
@@ -217,7 +218,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
 <style lang="scss">
 .route-assets-processing-template {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -268,10 +268,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .dropping-area {
   border: 1px dashed #d5cdd0;
   border-radius: 24px;

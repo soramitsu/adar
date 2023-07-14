@@ -11,11 +11,7 @@
 
     <div class="asset-lists-container">
       <h3 v-if="hasFilteredAssets" class="network-label">
-        {{
-          isSoraToEvm
-            ? t('selectRegisteredAsset.search.networkLabelSora')
-            : t('selectRegisteredAsset.search.networkLabelEthereum')
-        }}
+        {{ label }}
       </h3>
 
       <select-asset-list
@@ -30,16 +26,19 @@
 </template>
 
 <script lang="ts">
+import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
-import { mixins, components, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
-import type { RegisteredAccountAsset } from '@sora-substrate/util';
-import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
-import TranslationMixin from '@/components/mixins/TranslationMixin';
 import SelectAssetMixin from '@/components/mixins/SelectAssetMixin';
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components, ObjectInit } from '@/consts';
 import { lazyComponent } from '@/router';
+import type { BridgeAccountAsset } from '@/store/assets/types';
 import { state, getter } from '@/store/decorators';
+import type { NetworkData } from '@/types/bridge';
+
+import type { RegisteredAccountAsset } from '@sora-substrate/util';
+import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 @Component({
   components: {
@@ -51,17 +50,24 @@ import { state, getter } from '@/store/decorators';
 export default class BridgeSelectAsset extends Mixins(TranslationMixin, SelectAssetMixin, mixins.LoadingMixin) {
   @Prop({ default: ObjectInit, type: Object }) readonly asset!: AccountAsset;
 
-  @state.assets.registeredAssets private registeredAssets!: Array<RegisteredAccountAsset>;
+  @getter.web3.selectedNetwork private selectedNetwork!: Nullable<NetworkData>;
+  @state.assets.registeredAssets private registeredAssets!: Record<string, BridgeAccountAsset>;
   @state.bridge.isSoraToEvm isSoraToEvm!: boolean;
   @state.wallet.settings.shouldBalanceBeHidden shouldBalanceBeHidden!: boolean;
-  @getter.wallet.account.accountAssetsAddressTable private accountAssetsAddressTable!: WALLET_TYPES.AccountAssetsTable;
+
+  get label(): string {
+    if (this.isSoraToEvm) return this.t('selectRegisteredAsset.search.networkLabelSora');
+
+    const network = this.selectedNetwork?.shortName ?? '';
+
+    return this.t('selectRegisteredAsset.search.networkLabelEthereum', { network });
+  }
 
   get assetsList(): Array<RegisteredAccountAsset> {
-    const { registeredAssets: assets, accountAssetsAddressTable, asset: excludeAsset } = this;
+    const assetsAddresses = Object.keys(this.registeredAssets);
+    const excludeAddress = this.asset?.address;
 
-    return this.getAssetsWithBalances({ assets, accountAssetsAddressTable, excludeAsset }).sort(
-      this.sortByBalance(!this.isSoraToEvm)
-    ) as Array<RegisteredAccountAsset>;
+    return this.getAssetsWithBalances(assetsAddresses, excludeAddress).sort(this.sortByBalance(!this.isSoraToEvm));
   }
 
   get filteredAssets(): Array<RegisteredAccountAsset> {

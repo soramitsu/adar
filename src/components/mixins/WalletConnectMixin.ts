@@ -1,13 +1,14 @@
 import { Component, Mixins } from 'vue-property-decorator';
-import type { BridgeNetworks } from '@sora-substrate/util';
-
-import router from '@/router';
-import { getWalletAddress, formatAddress } from '@/utils';
-import { PageNames } from '@/consts';
-import ethersUtil, { Provider } from '@/utils/ethers-util';
-import { action, getter, mutation, state } from '@/store/decorators';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
+import { PageNames } from '@/consts';
+import router from '@/router';
+import { action, getter, mutation, state } from '@/store/decorators';
+import type { NetworkData } from '@/types/bridge';
+import { getWalletAddress, formatAddress } from '@/utils';
+import { Provider } from '@/utils/ethers-util';
+
+import type { BridgeNetworkId } from '@sora-substrate/util/build/bridgeProxy/types';
 
 const checkExtensionKey = 'provider.messages.checkExtension';
 const installExtensionKey = 'provider.messages.installExtension';
@@ -45,39 +46,47 @@ const handleMetamaskError = (error: any): string => {
 
 @Component
 export default class WalletConnectMixin extends Mixins(TranslationMixin) {
+  @state.web3.subAddress subAddress!: string;
   @state.web3.evmAddress evmAddress!: string;
+  @state.web3.networkSelected networkSelected!: BridgeNetworkId;
 
   @getter.wallet.account.isLoggedIn isSoraAccountConnected!: boolean;
-  @getter.web3.isExternalAccountConnected isExternalAccountConnected!: boolean;
+  @getter.web3.selectedNetwork selectedNetwork!: Nullable<NetworkData>;
 
-  @mutation.web3.resetEvmAddress private resetEvmAddress!: FnWithoutArgs;
-  @mutation.web3.reset private resetWeb3Store!: FnWithoutArgs;
-  @mutation.web3.setEvmNetwork setEvmNetwork!: (networkId: BridgeNetworks) => void;
-  @mutation.web3.setEvmAddress switchExternalAccount!: (address: string) => void;
+  @getter.bridge.isSubBridge isSubBridge!: boolean;
 
-  @action.web3.connectExternalAccount private connectExternalAccount!: (provider: Provider) => Promise<void>;
-  @action.web3.setEvmNetworkType setEvmNetworkType!: (network?: string) => Promise<void>;
+  // update selected evm network without metamask request
+  @mutation.web3.setSelectedNetwork setSelectedNetwork!: (networkId: BridgeNetworkId) => void;
+  @mutation.web3.resetProvidedEvmNetwork resetProvidedEvmNetwork!: FnWithoutArgs;
+  @mutation.web3.resetEvmAddress resetEvmAddress!: FnWithoutArgs;
+  @mutation.web3.setEvmAddress setEvmAddress!: (address: string) => void;
+  @mutation.web3.setSelectAccountDialogVisibility private setSelectAccountDialogVisibility!: (flag: boolean) => void;
+
+  @action.web3.connectEvmAccount private connectEvmAccount!: (provider: Provider) => Promise<void>;
+  @action.web3.updateNetworkProvided updateNetworkProvided!: AsyncFnWithoutArgs;
+  @action.web3.connectExternalNetwork connectExternalNetwork!: (networkHex?: string) => Promise<void>;
+  @action.web3.disconnectExternalNetwork disconnectExternalNetwork!: AsyncFnWithoutArgs;
+  @action.web3.selectExternalNetwork selectExternalNetwork!: (networkId: BridgeNetworkId) => Promise<void>;
 
   getWalletAddress = getWalletAddress;
   formatAddress = formatAddress;
 
   isExternalWalletConnecting = false;
 
-  get areNetworksConnected(): boolean {
-    return this.isSoraAccountConnected && this.isExternalAccountConnected;
-  }
-
-  connectInternalWallet(): void {
+  connectSoraWallet(): void {
     router.push({ name: PageNames.Wallet });
   }
 
-  async connectExternalWallet(): Promise<void> {
+  connectSubWallet(): void {
+    this.setSelectAccountDialogVisibility(true);
+  }
+
+  async connectEvmWallet(): Promise<void> {
+    this.isExternalWalletConnecting = true;
     // For now it's only Metamask
     const provider = Provider.Metamask;
-
-    this.isExternalWalletConnecting = true;
     try {
-      await this.connectExternalAccount(provider);
+      await this.connectEvmAccount(provider);
     } catch (error: any) {
       const name = this.t(getProviderName(provider));
       const key = this.te(error.message) ? error.message : handleProviderError(provider, error);
@@ -97,36 +106,5 @@ export default class WalletConnectMixin extends Mixins(TranslationMixin) {
     } finally {
       this.isExternalWalletConnecting = false;
     }
-  }
-
-  // TODO: Check why we can't choose another account
-  async changeExternalWallet(options?: any): Promise<void> {
-    // For now it's only Metamask
-    if (this.isExternalWalletConnecting) {
-      return;
-    }
-    this.isExternalWalletConnecting = true;
-    try {
-      this.switchExternalAccount(options.address);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      this.isExternalWalletConnecting = false;
-    }
-  }
-
-  async checkConnectionToExternalAccount(func: FnWithoutArgs | AsyncFnWithoutArgs): Promise<void> {
-    const connected = await ethersUtil.checkAccountIsConnected(this.evmAddress);
-
-    if (!connected) {
-      await this.connectExternalWallet();
-    } else {
-      await func();
-    }
-  }
-
-  disconnectExternalAccount(): void {
-    this.resetEvmAddress();
-    this.resetWeb3Store();
   }
 }

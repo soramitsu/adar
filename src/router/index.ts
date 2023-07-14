@@ -1,17 +1,15 @@
+import { WALLET_CONSTS, api } from '@soramitsu/soraneo-wallet-web';
 import Vue from 'vue';
-import VueRouter, { RouteConfig } from 'vue-router';
 import { Component } from 'vue-property-decorator';
-import { WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import { api } from '@sora-substrate/util';
+import VueRouter, { RouteConfig } from 'vue-router';
 
-import store from '@/store';
-import { updateDocumentTitle } from '@/utils';
 import { PageNames, BridgeChildPages } from '@/consts';
 import { AdarPageNames } from '@/modules/ADAR/consts';
 import { adarLazyView } from '@/modules/ADAR/router';
-
 import { DemeterPageNames } from '@/modules/demeterFarming/consts';
 import { demeterLazyView } from '@/modules/demeterFarming/router';
+import store from '@/store';
+import { updateDocumentTitle } from '@/utils';
 
 Vue.use(VueRouter);
 
@@ -286,7 +284,7 @@ router.beforeEach((to, from, next) => {
     }
   }
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (BridgeChildPages.includes(current) && isLoggedIn && !store.getters.web3.isExternalAccountConnected) {
+    if (BridgeChildPages.includes(current) && isLoggedIn && !store.getters.web3.externalAccount) {
       setRoute(PageNames.Bridge);
       return;
     }

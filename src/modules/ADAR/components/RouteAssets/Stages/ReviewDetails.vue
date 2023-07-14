@@ -1,6 +1,6 @@
 <template>
   <div class="route-assets-review-details">
-    <div class="container route-assets-upload-template">
+    <div class="container review-details-section">
       <div class="route-assets__page-header-title">Review Routing Details</div>
       <div class="route-assets__page-header-description">
         {{ `Review the details of your routing transaction` }}
@@ -138,19 +138,22 @@
 </template>
 
 <script lang="ts">
+import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
+import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
+import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import { components, mixins } from '@soramitsu/soraneo-wallet-web';
+import { groupBy, sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
+
+import { ZeroStringValue } from '@/consts';
 import { AdarComponents, adarFee, slippageMultiplier } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { action, getter, state } from '@/store/decorators';
-import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { groupBy, sumBy } from 'lodash';
 import type { PresetSwapData, Recipient } from '@/store/routeAssets/types';
-import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
-import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { getAssetBalance } from '@/utils';
+
 import WarningMessage from '../WarningMessage.vue';
-import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
-import { ZeroStringValue } from '@/consts';
+
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -364,7 +367,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
 <style lang="scss">
 .route-assets-review-details {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -379,6 +381,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     > span {
       width: 16px;
       height: 16px;
+    }
+  }
+  .review-details-section {
+    & > * {
+      margin-bottom: $inner-spacing-medium;
     }
   }
 
@@ -416,10 +423,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .fields-container {
   .el-divider {
     margin-bottom: $inner-spacing-medium;

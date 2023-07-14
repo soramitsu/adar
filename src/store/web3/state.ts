@@ -1,36 +1,40 @@
-import { BridgeNetworks } from '@sora-substrate/util';
+import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
+import { EvmNetworkId } from '@sora-substrate/util/build/bridgeProxy/evm/consts';
 
 import { ZeroStringValue } from '@/consts';
 import ethersUtil from '@/utils/ethers-util';
+
 import type { Web3State } from './types';
 
 export function initialState(): Web3State {
   return {
-    evmAddress: ethersUtil.getEvmUserAddress(),
-    evmBalance: ZeroStringValue,
-    networkType: null,
-    subNetworks: [],
-    evmNetwork: BridgeNetworks.ETH_NETWORK_ID,
-    contractAddress: {
-      [BridgeNetworks.ETH_NETWORK_ID]: {
-        XOR: '',
-        VAL: '',
-        OTHER: '',
-      },
-      [BridgeNetworks.ENERGY_NETWORK_ID]: {
-        OTHER: '',
-      },
+    evmAddress: '', // external evm address
+    subAddress: '', // external sub address
+
+    networkType: ethersUtil.getSelectedBridgeType() ?? BridgeNetworkType.EvmLegacy,
+    networkSelected: null, // network selected by user
+    evmNetworkProvided: null, // evm network in provider
+
+    evmNetworkApps: [], // evm networks from app config
+    subNetworkApps: {}, // sub netowrks from app config
+
+    supportedApps: {
+      [BridgeNetworkType.EvmLegacy]: {},
+      [BridgeNetworkType.Evm]: {},
+      [BridgeNetworkType.Sub]: [],
+    }, // supported apps from chain
+
+    // eth bridge history
+    ethBridgeEvmNetwork: EvmNetworkId.EthereumSepolia,
+    ethBridgeContractAddress: {
+      XOR: '',
+      VAL: '',
+      OTHER: '',
     },
-    smartContracts: {
-      [BridgeNetworks.ETH_NETWORK_ID]: {
-        XOR: '',
-        VAL: '',
-        OTHER: '',
-      },
-      [BridgeNetworks.ENERGY_NETWORK_ID]: {
-        OTHER: '',
-      },
-    },
+
+    // dialogs
+    selectNetworkDialogVisibility: false,
+    selectAccountDialogVisibility: false,
   };
 }
 

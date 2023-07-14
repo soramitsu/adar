@@ -83,6 +83,7 @@
           </template>
         </s-table-column>
 
+        <!-- IN TOKENS -->
         <s-table-column>
           <template #header>
             <span>{{ 'In tokens' }}</span>
@@ -165,18 +166,19 @@
 </template>
 
 <script lang="ts">
+import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
+
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components, PageNames } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
-import router, { lazyComponent } from '@/router';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import TranslationMixin from '@/components/mixins/TranslationMixin';
+import router, { lazyComponent } from '@/router';
 import { action, getter, state } from '@/store/decorators';
-import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { RecipientStatus } from '@/store/routeAssets/types';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { copyToClipboard, formatAddress } from '@/utils';
 import validate from '@/store/routeAssets/utils';
+import { copyToClipboard, formatAddress } from '@/utils';
 @Component({
   components: {
     GenericPageHeader: lazyComponent(Components.GenericPageHeader),
@@ -376,7 +378,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 
 <style scoped lang="scss">
 .container {
-  min-height: auto;
+  max-width: none;
 }
 .routing-template-transactions {
   font-weight: 600;
@@ -388,6 +390,15 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 
   &__search {
     width: 300px;
+  }
+  @include tablet(true) {
+    max-width: 85%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @include mobile(true) {
+    max-width: 100%;
   }
 }
 
@@ -416,6 +427,12 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   &__asset {
     @include flex-start;
     gap: 8px;
+    white-space: nowrap;
+  }
+  @include tablet(true) {
+    &__asset {
+      font-size: 10px;
+    }
   }
 }
 </style>

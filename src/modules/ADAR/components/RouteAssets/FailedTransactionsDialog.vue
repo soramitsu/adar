@@ -137,12 +137,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Watch } from 'vue-property-decorator';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
+
 import { action, getter } from '@/store/decorators';
 import { Recipient, RecipientStatus } from '@/store/routeAssets/types';
 import { copyToClipboard, formatAddress } from '@/utils';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+
 @Component({
   components: {
     DialogBase: components.DialogBase,
@@ -398,6 +400,12 @@ export default class FailedTransactionsDialog extends Mixins(
   &__asset {
     @include flex-start;
     gap: 8px;
+    white-space: nowrap;
+  }
+  @include large-mobile(true) {
+    &__asset {
+      font-size: 10px;
+    }
   }
 }
 

@@ -21,13 +21,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { api, mixins } from '@soramitsu/soraneo-wallet-web';
+import { mixins } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
+
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { getter, action, mutation } from '@/store/decorators';
-import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { LiquiditySourceTypes, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy';
 import { FeatureFlags } from '@/store/settings/types';
 @Component({
   components: {
@@ -76,8 +76,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   max-width: 988px;
   margin: 0 auto $inner-spacing-medium;
   .container {
-    max-width: none;
     margin: $inner-spacing-medium auto;
+    max-width: 464px;
   }
 
   &__page-header-title {

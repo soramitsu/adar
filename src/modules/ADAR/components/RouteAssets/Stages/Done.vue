@@ -1,6 +1,6 @@
 <template>
   <div class="route-assets-review-details">
-    <div class="container route-assets-upload-template">
+    <div class="container routing-summary-section">
       <div class="route-assets__page-header-title">Routing completed</div>
       <div class="route-assets__page-header-description">
         {{ `View the details of your recent routing transaction` }}
@@ -102,20 +102,22 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
-import { AdarComponents } from '@/modules/ADAR/consts';
-import { lazyComponent } from '@/router';
-import { adarLazyComponent } from '@/modules/ADAR/router';
-import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { action, getter, state } from '@/store/decorators';
-import { components, SUBQUERY_TYPES } from '@soramitsu/soraneo-wallet-web';
-import { groupBy, sumBy } from 'lodash';
-import { Recipient, RecipientStatus, TransactionInfo } from '@/store/routeAssets/types';
 import { FPNumber } from '@sora-substrate/util/build';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
-import WarningMessage from '../WarningMessage.vue';
+import { components } from '@soramitsu/soraneo-wallet-web';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { groupBy, sumBy } from 'lodash';
+import { Component, Mixins } from 'vue-property-decorator';
+
+import TranslationMixin from '@/components/mixins/TranslationMixin';
+import { AdarComponents } from '@/modules/ADAR/consts';
+import { adarLazyComponent } from '@/modules/ADAR/router';
+import { action, getter, state } from '@/store/decorators';
+import { Recipient, RecipientStatus, TransactionInfo } from '@/store/routeAssets/types';
+
+import WarningMessage from '../WarningMessage.vue';
+
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -214,11 +216,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         `${idx + 1}`,
         recipient.name.toString(),
         recipient.wallet.toString(),
-        recipient.usd.toString(),
+        recipient.usd.toFixed(2),
         this.inputToken.symbol,
         recipient.asset.symbol,
-        (recipient.amount?.toFixed(5) || '').toString(),
-        recipient.exchangeRate || '',
+        (recipient.amount?.toFixed(4) || '').toString(),
+        recipient.amountInTokens ? '-' : recipient.exchangeRate || '',
         recipient.status.toString(),
       ];
     });
@@ -279,8 +281,31 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         fillColor: [255, 250, 251],
       },
       columnStyles: {
+        0: {
+          cellWidth: 10,
+          cellPadding: { top: 10, right: 2, bottom: 10, left: 2 },
+        },
+        1: {
+          minCellWidth: 30,
+        },
+        3: {
+          minCellWidth: 25,
+        },
+        4: {
+          cellWidth: 25,
+        },
+        5: {
+          cellWidth: 25,
+        },
+        6: {
+          minCellWidth: 25,
+        },
+        7: {
+          minCellWidth: 25,
+        },
         8: {
           fontStyle: 'bold',
+          cellWidth: 25,
         },
       },
       didParseCell: function (data) {
@@ -302,7 +327,6 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 
 <style lang="scss">
 .route-assets-review-details {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -317,6 +341,12 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     > span {
       width: 16px;
       height: 16px;
+    }
+  }
+
+  .routing-summary-section {
+    & > * {
+      margin-bottom: $inner-spacing-medium;
     }
   }
 
@@ -354,10 +384,6 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .usd {
   color: var(--s-color-status-warning);
   &::before {

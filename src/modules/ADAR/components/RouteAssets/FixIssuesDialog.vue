@@ -24,12 +24,21 @@
             </div>
           </div>
         </s-form-item>
-        <s-form-item prop="usd">
-          <s-input :placeholder="'USD'" v-model="model.usd" />
+        <s-form-item v-if="!amountInTokens" prop="usd">
+          <s-input :placeholder="'USD'" :value="model.usd" @input="onUsdChanged($event)" />
           <div class="error-message" :class="!usdError ? 'error-message_valid' : 'error-message_invalid'">
             <div>{{ `USD number is ${usdError ? 'incorrect' : 'correct'}` }}</div>
             <div>
               <s-icon class="icon-status" :name="!usdError ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'" />
+            </div>
+          </div>
+        </s-form-item>
+        <s-form-item v-else prop="amount">
+          <s-input :placeholder="'amount'" :value="model.amount" @input="onAmountChanged($event)" />
+          <div class="error-message" :class="!amountError ? 'error-message_valid' : 'error-message_invalid'">
+            <div>{{ `Amount number is ${amountError ? 'incorrect' : 'correct'}` }}</div>
+            <div>
+              <s-icon class="icon-status" :name="!amountError ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'" />
             </div>
           </div>
         </s-form-item>
@@ -74,13 +83,15 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
-import { mixins, components, api, SUBQUERY_TYPES } from '@soramitsu/soraneo-wallet-web';
-import { Recipient } from '@/store/routeAssets/types';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { action, mutation, state } from '@/store/decorators';
 import { FPNumber } from '@sora-substrate/util/build';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { mixins, components, api, SUBQUERY_TYPES } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
+
+import { action, mutation, state } from '@/store/decorators';
+import { Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
+
 import WarningMessage from './WarningMessage.vue';
 
 const initModel: any = {
@@ -135,6 +146,10 @@ export default class FixIssuesDialog extends Mixins(
     return !validate.amount(this.model.amount) ? "Token price hasn't been found" : '';
   }
 
+  get amountInTokens() {
+    return this.recipient?.amountInTokens;
+  }
+
   changeIssueIdx(delta) {
     const newValue = this.currentIssueIdx + delta;
     if (newValue >= this.totalIssuesCount || newValue < 0) return;
@@ -142,7 +157,7 @@ export default class FixIssuesDialog extends Mixins(
   }
 
   get localTokenAmount() {
-    return (Number(this.model.usd) / Number(this.assetUSDPrice)).toLocaleString('en-US', {
+    return this.model.amount.toLocaleString('en-US', {
       maximumFractionDigits: 4,
     });
   }
@@ -156,6 +171,16 @@ export default class FixIssuesDialog extends Mixins(
     return !validate.validate(this.model);
   }
 
+  onUsdChanged(newUsd) {
+    this.model.usd = Number(newUsd);
+    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice)).toNumber();
+  }
+
+  onAmountChanged(newAmount) {
+    this.model.amount = Number(newAmount);
+    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice)).toNumber();
+  }
+
   onDeleteClick() {
     this.deleteRecipient(this.recipient.id);
   }
@@ -167,6 +192,7 @@ export default class FixIssuesDialog extends Mixins(
       usd: this.model.usd,
       id: this.recipient.id,
       asset: this.model.asset,
+      amount: this.model.amount,
     });
   }
 

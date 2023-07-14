@@ -1,42 +1,134 @@
-import { Mixins, Component } from 'vue-property-decorator';
-import { BridgeNetworks } from '@sora-substrate/util';
+import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
+import { EvmNetworkId } from '@sora-substrate/util/build/bridgeProxy/evm/consts';
+import { SubNetwork } from '@sora-substrate/util/build/bridgeProxy/sub/consts';
 import { WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
 
-import { EvmNetworkType } from '@/utils/ethers-util';
+import { EvmLinkType, EVM_NETWORKS } from '@/consts/evm';
+import { SUB_NETWORKS } from '@/consts/sub';
 import { state, getter } from '@/store/decorators';
+import type { AvailableNetwork } from '@/store/web3/types';
+import type { NetworkData } from '@/types/bridge';
 
 import TranslationMixin from './TranslationMixin';
 
+import type { BridgeNetworkId } from '@sora-substrate/util/build/bridgeProxy/types';
+
 @Component
 export default class NetworkFormatterMixin extends Mixins(TranslationMixin) {
-  @state.web3.networkType networkType!: Nullable<EvmNetworkType>;
   @state.wallet.settings.soraNetwork soraNetwork!: Nullable<WALLET_CONSTS.SoraNetwork>;
+  @getter.web3.selectedNetwork selectedNetwork!: Nullable<NetworkData>;
+  @getter.web3.availableNetworks availableNetworks!: Record<
+    BridgeNetworkType,
+    Partial<Record<BridgeNetworkId, AvailableNetwork>>
+  >;
 
-  @getter.web3.defaultNetworkType defaultNetworkType!: Nullable<EvmNetworkType>;
+  readonly EvmLinkType = EvmLinkType;
 
-  formatNetwork(isSora: boolean, isDefaultNetworkType = false): string {
+  formatSelectedNetwork(isSora: boolean): string {
     if (isSora && this.soraNetwork) {
       return this.TranslationConsts.soraNetwork[this.soraNetwork];
     }
 
-    const network = isDefaultNetworkType ? this.defaultNetworkType : this.networkType;
-
-    return network ? this.TranslationConsts.bridgeNetwork[network] : '';
+    return this.selectedNetwork?.name ?? '';
   }
 
-  getEvmIcon(externalNetwork?: BridgeNetworks): string {
-    if (externalNetwork === BridgeNetworks.ENERGY_NETWORK_ID) {
-      return 'energy';
+  formatNetworkShortName(isSora: boolean): string {
+    if (isSora) {
+      return this.TranslationConsts.Sora;
     }
-    return 'eth';
+
+    return this.selectedNetwork?.shortName ?? '';
   }
 
-  getEtherscanLink(hash: string, isDefaultNetworkType = false): string {
-    const network = isDefaultNetworkType ? this.defaultNetworkType : this.networkType;
-    // TODO: Generate the link for Energy Web Chain
-    if (!(network && hash) || network === EvmNetworkType.Private) {
-      return '';
+  getNetworkName(type: Nullable<BridgeNetworkType>, id: Nullable<BridgeNetworkId>): string {
+    if (!(type && id)) return '';
+
+    const networks = type === BridgeNetworkType.Sub ? SUB_NETWORKS : EVM_NETWORKS;
+
+    return networks[id]?.shortName ?? '';
+  }
+
+  getNetworkIcon(network?: Nullable<BridgeNetworkId>): string {
+    switch (network) {
+      // special case
+      case 0:
+        return 'sora';
+      // evm
+      case EvmNetworkId.BinanceSmartChainMainnet:
+      case EvmNetworkId.BinanceSmartChainTestnet:
+        return 'binance-smart-chain';
+      case EvmNetworkId.PolygonMainnet:
+      case EvmNetworkId.PolygonTestnetMumbai:
+        return 'polygon';
+      case EvmNetworkId.KlaytnMainnet:
+      case EvmNetworkId.KlaytnTestnetBaobab:
+        return 'klaytn';
+      case EvmNetworkId.AvalancheMainnet:
+      case EvmNetworkId.AvalancheTestnetFuji:
+        return 'avalanche';
+      case EvmNetworkId.EthereumClassicMainnet:
+      case EvmNetworkId.EthereumClassicTestnetMordor:
+        return 'ethereum-classic';
+      // sub
+      case SubNetwork.Polkadot:
+        return 'polkadot';
+      case SubNetwork.Kusama:
+        return 'kusama';
+      case SubNetwork.Rococo:
+        return 'rococo';
+      case SubNetwork.RococoKarura:
+        return 'karura';
+      default:
+        return 'ethereum';
     }
-    return `https://${network !== EvmNetworkType.Mainnet ? network + '.' : ''}etherscan.io/tx/${hash}`;
+  }
+
+  getNetworkExplorerLinks(
+    networkType: BridgeNetworkType,
+    networkId: BridgeNetworkId,
+    value: string,
+    blockHash = '',
+    type = EvmLinkType.Transaction
+  ) {
+    if (!value) return [];
+
+    const networkData = this.availableNetworks[networkType][networkId]?.data;
+
+    if (!networkData) {
+      console.error(`Network data for "${networkId}" is not defined"`);
+      return [];
+    }
+
+    const explorerUrl = networkData.blockExplorerUrls[0];
+
+    if (!explorerUrl) {
+      console.error(`"blockExplorerUrls" is not provided for network id "${networkId}"`);
+      return [];
+    }
+
+    if (networkType === BridgeNetworkType.Sub) {
+      if (type === EvmLinkType.Account) return [];
+
+      if (!blockHash) return [];
+
+      const baseLink = `https://polkadot.js.org/apps/?rpc=${explorerUrl}#/explorer/query`;
+
+      return [
+        {
+          type: WALLET_CONSTS.ExplorerType.Polkadot,
+          value: `${baseLink}/${blockHash}`,
+        },
+      ];
+    } else {
+      const path = type === EvmLinkType.Transaction ? 'tx' : 'address';
+
+      return [
+        {
+          type: this.TranslationConsts.Etherscan as WALLET_CONSTS.ExplorerType,
+          value: `${explorerUrl}/${path}/${value}`,
+        },
+      ];
+    }
   }
 }

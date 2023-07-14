@@ -14,16 +14,15 @@
 </template>
 
 <script lang="ts">
+import { XOR, XSTUSD } from '@sora-substrate/util/build/assets/consts';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
-import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-
-import router, { lazyComponent } from '@/router';
 import { PageNames, Components } from '@/consts';
-import { isXorAccountAsset } from '@/utils';
+import router, { lazyComponent } from '@/router';
 import { action, getter } from '@/store/decorators';
+
+import type { AccountAsset, Whitelist } from '@sora-substrate/util/build/assets/types';
 
 @Component({
   components: {
@@ -33,7 +32,7 @@ import { action, getter } from '@/store/decorators';
 export default class Wallet extends Mixins(TranslationMixin) {
   @Prop({ type: Boolean, default: false }) readonly parentLoading!: boolean;
 
-  @getter.addLiquidity.isAvailable private isAddLiquidityAvailable!: boolean;
+  @getter.wallet.account.whitelist private whitelist!: Whitelist;
 
   @action.swap.setTokenFromAddress private setSwapFromAsset!: (address?: string) => Promise<void>;
   @action.swap.setTokenToAddress private setSwapToAsset!: (address?: string) => Promise<void>;
@@ -54,15 +53,22 @@ export default class Wallet extends Mixins(TranslationMixin) {
   }
 
   async handleLiquidity(asset: AccountAsset): Promise<void> {
-    if (isXorAccountAsset(asset)) {
+    if (asset.address === XOR.address) {
+      router.push({ name: PageNames.AddLiquidity });
+      return;
+    }
+    if (asset.address === XSTUSD.address) {
+      this.setAddliquidityAssetA(XSTUSD.address);
+      this.setAddliquidityAssetB('');
       router.push({ name: PageNames.AddLiquidity });
       return;
     }
     const assetAAddress = XOR.address;
     const assetBAddress = asset.address;
-    const params = { assetAAddress, assetBAddress };
-    await this.setAddliquidityAssetA(assetAAddress);
-    await this.setAddliquidityAssetB(assetBAddress);
+
+    const first = this.whitelist[assetAAddress]?.symbol ?? assetAAddress;
+    const second = this.whitelist[assetBAddress]?.symbol ?? assetBAddress;
+    const params = { first, second };
     router.push({ name: PageNames.AddLiquidity, params });
   }
 

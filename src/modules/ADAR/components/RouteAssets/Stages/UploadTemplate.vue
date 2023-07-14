@@ -17,19 +17,27 @@
       <p class="dropping-area__description">Drop your completed process routing template or click to upload</p>
       <p>Supported file types: CSV</p>
       <div>
-        <s-button
-          type="primary"
-          class="s-typography-button--big route-assets-upload-template__button"
-          @click.stop="onBrowseButtonClick"
+        <label
+          class="
+            file-upload
+            s-typography-button--big
+            route-assets-upload-template__button
+            el-button el-tooltip
+            button
+            el-button--primary el-button--medium
+            neumorphic
+            s-medium s-border-radius-small s-primary
+          "
         >
-          {{ 'Upload' }}
-        </s-button>
+          <input type="file" @change="onInputChanged" ref="file" aria-label="false" accept=".csv" />
+          Upload
+        </label>
       </div>
     </div>
     <p class="route-assets-upload-template__label">
       Don’t have a template? <a href="/adar/template.csv" download class="route-assets__ref">Download</a>
     </p>
-    <input type="file" @change="uploadFile" ref="file" hidden accept=".csv" />
+    <input type="file" @change="onInputChanged" ref="file" hidden accept=".csv" />
   </div>
   <div v-else class="container route-assets-upload-template">
     <div class="route-assets__page-header-title">The .csv file couldn’t be parsed.</div>
@@ -44,6 +52,7 @@
 
 <script lang="ts">
 import { Component, Mixins } from 'vue-property-decorator';
+
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { action } from '@/store/decorators';
 @Component({
@@ -71,17 +80,28 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
   drop(event) {
     event.preventDefault();
     this.dragOver = false;
+    const file = event.dataTransfer.files[0];
+    const allowedExtensions = /(\.csv)$/i;
+    if (!allowedExtensions.exec(file.name)) {
+      this.parsingError = true;
+      return;
+    }
     (this as any).$refs.file.files = event.dataTransfer.files;
-    this.uploadFile();
+    this.uploadFile((this as any).$refs.file.files[0]);
   }
 
   onRestartClick() {
     this.cancelProcessing();
     this.parsingError = false;
+    (this as any).$refs.file = null;
   }
 
-  async uploadFile() {
-    this.updateRecipients(this.fileElement.files[0])
+  onInputChanged(event) {
+    this.uploadFile(event.target.files[0]);
+  }
+
+  async uploadFile(file: File) {
+    this.updateRecipients(file)
       .then(() => {
         this.nextStage();
       })
@@ -91,20 +111,11 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
         this.parsingError = true;
       });
   }
-
-  onBrowseButtonClick() {
-    this.fileElement.click();
-  }
-
-  get fileElement() {
-    return (this as any).$refs.file;
-  }
 }
 </script>
 
 <style lang="scss">
 .route-assets-upload-template {
-  width: 464px;
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;
@@ -136,10 +147,6 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.container {
-  min-height: auto;
-}
-
 .dropping-area {
   border: 1px dashed var(--s-color-base-content-tertiary);
   border-radius: var(--s-border-radius-small);
@@ -167,5 +174,13 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
   margin-bottom: 16px;
   margin-left: 0;
   margin-right: 0;
+}
+
+.file-upload {
+  width: 110px;
+  input {
+    overflow: hidden;
+    width: 0;
+  }
 }
 </style>

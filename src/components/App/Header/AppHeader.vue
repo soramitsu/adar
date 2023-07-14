@@ -18,10 +18,10 @@
       </s-button>
       <moonpay-history-button v-if="isLoggedIn" class="moonpay-button moonpay-button--history" /> -->
     <!-- </div> -->
-    <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex" />
+    <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex route-assets-navigation" />
     <div
       class="app-controls app-controls--settings-panel s-flex"
-      :class="{ 'app-controls--settings-panel--dark': themeIsDark }"
+      :class="{ 'without-moonpay': !areMoonpayButtonsVisible }"
     >
       <!-- <market-maker-countdown /> -->
       <!-- <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
@@ -42,21 +42,22 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins, Prop } from 'vue-property-decorator';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
+import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
+import { PageNames, Components } from '@/consts';
+import { AdarComponents } from '@/modules/ADAR/consts';
+import { adarLazyComponent } from '@/modules/ADAR/router';
+import { lazyComponent, goTo } from '@/router';
+import { getter, mutation } from '@/store/decorators';
+
 import AppAccountButton from './AppAccountButton.vue';
 import AppHeaderMenu from './AppHeaderMenu.vue';
 import AppLogoButton from './AppLogoButton.vue';
 
-import { lazyComponent, goTo } from '@/router';
-import { PageNames, Components } from '@/consts';
-import { AdarComponents } from '@/modules/ADAR/consts';
-import { adarLazyComponent } from '@/modules/ADAR/router';
-import { getter, mutation } from '@/store/decorators';
+import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 
 @Component({
   components: {
@@ -93,10 +94,6 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
     };
   }
 
-  get themeIsDark() {
-    return this.libraryTheme === Theme.DARK;
-  }
-
   get showRouteAssetsNavigation() {
     return this.$route.path.includes('route-assets');
   }
@@ -107,11 +104,10 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
 
   async openMoonpayDialog(): Promise<void> {
     if (!this.isSoraAccountConnected) {
-      return this.connectInternalWallet();
+      return this.connectSoraWallet();
     }
-    await this.checkConnectionToExternalAccount(async () => {
-      this.setMoonpayVisibility(true);
-    });
+    await this.connectEvmWallet();
+    this.setMoonpayVisibility(true);
   }
 
   toggleMenu(): void {
@@ -195,6 +191,12 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 }
 
 .app-controls {
+  &.route-assets-navigation {
+    @include tablet(true) {
+      display: none;
+    }
+  }
+
   &:not(:last-child) {
     margin-right: $inner-spacing-mini;
   }

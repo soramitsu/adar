@@ -30,7 +30,7 @@
                     :font-size-rate="FontSizeRate.MEDIUM"
                     :asset-symbol="item.formatted.crypto"
                   />
-                  <i class="s-icon--network s-icon-eth" />&nbsp; <span>{{ t('forText') }}</span>
+                  <i class="network-icon network-icon--ethereum" />&nbsp; <span>{{ t('forText') }}</span>
                   &nbsp;
                 </template>
                 <formatted-amount
@@ -67,7 +67,7 @@
           :type="actionButtonType"
           :disabled="actionButtonDisabled"
           :loading="loading"
-          class="moonpay-details-button s-typography-button--large"
+          class="moonpay-details-button s-typography-button--big"
           @click="handleTransaction"
         >
           {{ actionButtonText }}
@@ -78,22 +78,21 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
 import { WALLET_CONSTS, components, mixins } from '@soramitsu/soraneo-wallet-web';
-import type { BridgeHistory } from '@sora-substrate/util';
+import { Component, Mixins } from 'vue-property-decorator';
 
 import MoonpayBridgeInitMixin from '@/components/pages/Moonpay/BridgeInitMixin';
 import MoonpayLogo from '@/components/shared/Logo/Moonpay.vue';
-
-import ethersUtil from '@/utils/ethers-util';
-import { getCssVariableValue, toQueryString } from '@/utils';
 import { Components } from '@/consts';
 import { lazyComponent } from '@/router';
-import { MoonpayTransactionStatus } from '@/utils/moonpay';
 import { action, getter, state } from '@/store/decorators';
-
-import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
+import { getCssVariableValue, toQueryString } from '@/utils';
+import ethersUtil from '@/utils/ethers-util';
+import { MoonpayTransactionStatus } from '@/utils/moonpay';
 import type { MoonpayTransaction, MoonpayCurrency, MoonpayCurrenciesById } from '@/utils/moonpay';
+
+import type { BridgeHistory } from '@sora-substrate/util';
+import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 
 const HistoryView = 'history';
 const DetailsView = 'details';
@@ -113,7 +112,7 @@ export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin,
   @state.moonpay.transactions private transactions!: Array<MoonpayTransaction>;
   @state.moonpay.currencies private currencies!: MoonpayCurrency[];
 
-  @getter.web3.isValidNetworkType private isValidNetworkType!: boolean;
+  @getter.web3.isValidNetwork private isValidNetwork!: boolean;
   @getter.libraryTheme libraryTheme!: Theme;
 
   @action.moonpay.getTransactions private getTransactions!: AsyncFnWithoutArgs;
@@ -129,22 +128,23 @@ export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin,
     this.withApi(async () => {
       this.initMoonpayApi(); // MoonpayBridgeInitMixin
 
+      await this.prepareEvmNetwork();
+
       await Promise.all([this.getTransactions(), this.getCurrencies()]);
-      this.setHistory();
 
       this.unwatchEthereum = await ethersUtil.watchEthereum({
         onAccountChange: (addressList: string[]) => {
           if (addressList.length) {
-            this.changeExternalWallet({ address: addressList[0] });
+            this.setEvmAddress(addressList[0]);
           } else {
-            this.disconnectExternalAccount();
+            this.resetEvmAddress();
           }
         },
-        onNetworkChange: (networkId: string) => {
-          this.setEvmNetworkType(networkId);
+        onNetworkChange: (networkHex: string) => {
+          this.connectExternalNetwork(networkHex);
         },
         onDisconnect: () => {
-          this.disconnectExternalAccount();
+          this.resetProvidedEvmNetwork();
         },
       });
     });
@@ -234,17 +234,15 @@ export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin,
   }
 
   get actionButtonDisabled(): boolean {
-    if (this.bridgeTxToSora) return false;
-
-    return !this.externalAccountIsMoonpayRecipient || !this.isValidNetworkType;
+    return !this.externalAccountIsMoonpayRecipient;
   }
 
   get actionButtonText(): string {
-    if (!this.isExternalAccountConnected) return this.t('connectWalletText');
+    if (!this.evmAddress) return this.t('connectWalletText');
 
     if (this.bridgeTxToSora) return this.t('moonpay.buttons.view');
     if (!this.externalAccountIsMoonpayRecipient) return this.t('bridgeTransaction.changeAccount');
-    if (!this.isValidNetworkType) return this.t('bridgeTransaction.changeNetwork');
+    if (!this.isValidNetwork) return this.t('changeNetworkText');
 
     return this.t('moonpay.buttons.transfer');
   }
@@ -288,11 +286,8 @@ export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin,
 
   async navigateToDetails(item): Promise<void> {
     try {
-      await this.checkConnectionToExternalAccount(async () => {
-        await this.prepareEvmNetwork(); // MoonpayBridgeInitMixin
-        this.selectedItem = item;
-        this.changeView(DetailsView);
-      });
+      this.selectedItem = item;
+      this.changeView(DetailsView);
     } catch (error) {
       console.error(error);
     }
@@ -301,8 +296,10 @@ export default class MoonpayHistory extends Mixins(mixins.PaginationSearchMixin,
   async handleTransaction(): Promise<void> {
     if (!this.selectedItem.id) return;
 
-    if (this.bridgeTxToSora?.id) {
-      await this.prepareEvmNetwork(this.bridgeTxToSora.externalNetwork); // MoonpayBridgeInitMixin
+    if (!this.isValidNetwork) {
+      this.updateNetworkProvided();
+    } else if (this.bridgeTxToSora?.id) {
+      await this.prepareEvmNetwork(); // MoonpayBridgeInitMixin
       await this.showHistory(this.bridgeTxToSora.id); // MoonpayBridgeInitMixin
     } else {
       await this.prepareMoonpayTxForBridgeTransfer(this.selectedItem);
@@ -400,7 +397,7 @@ $separator-margin: calc(var(--s-basic-spacing) / 2);
       }
     }
 
-    .s-icon--network {
+    .network-icon {
       margin-left: $separator-margin;
     }
   }

@@ -30,11 +30,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Mixins } from 'vue-property-decorator';
 import { components, mixins, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
+import { Component, Mixins } from 'vue-property-decorator';
+
+import { state } from '@/store/decorators';
 
 import TranslationMixin from '../../mixins/TranslationMixin';
-import { state } from '@/store/decorators';
 
 type StatisticsModel = {
   fiat: Nullable<string>;
@@ -69,7 +70,7 @@ export default class StatisticsDialog extends Mixins(mixins.DialogMixin, Transla
           {
             key: 'fiatCeres',
             name: 'Ceres',
-            endpoint: 'https://cerestoken.io/api/prices',
+            endpoint: 'https://data.cerestoken.io/api/prices',
             online: true,
           },
           {

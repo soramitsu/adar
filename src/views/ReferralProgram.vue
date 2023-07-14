@@ -172,21 +172,21 @@
 </template>
 
 <script lang="ts">
+import { FPNumber } from '@sora-substrate/util';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { components, mixins, api, WALLET_TYPES, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import last from 'lodash/fp/last';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
-import { components, mixins, api, WALLET_TYPES, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { FPNumber } from '@sora-substrate/util';
-import type { CodecString } from '@sora-substrate/util';
-import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
-import router, { lazyView } from '@/router';
+import { getFullBaseUrl, getRouterMode } from '@/api';
+import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
 import { PageNames, ZeroStringValue } from '@/consts';
-import { detectBaseUrl } from '@/api';
+import router, { lazyView } from '@/router';
+import { action, getter, mutation, state } from '@/store/decorators';
 import { formatAddress } from '@/utils';
 
-import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-import { action, getter, mutation, state } from '@/store/decorators';
+import type { CodecString } from '@sora-substrate/util';
+import type { AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 @Component({
   components: {
@@ -307,12 +307,8 @@ export default class ReferralProgram extends Mixins(
     return cssClasses;
   }
 
-  get routerMode(): string {
-    return router.mode === 'hash' ? '#/' : '';
-  }
-
   get linkHrefBase(): string {
-    return `${detectBaseUrl(router)}${this.routerMode}referral/`;
+    return `${getFullBaseUrl(router)}referral/`;
   }
 
   get referralLink() {
@@ -404,7 +400,8 @@ export default class ReferralProgram extends Mixins(
   }
 
   getLinkLabel(address: string): string {
-    return `<span class="referral-link-address">Polkaswap.io/</span>${this.routerMode}referral/${address}`;
+    const routerMode = getRouterMode(router);
+    return `<span class="referral-link-address">Polkaswap.io/</span>${routerMode}referral/${address}`;
   }
 
   getInvitedUserReward(invitedUser: string): string {
@@ -417,7 +414,7 @@ export default class ReferralProgram extends Mixins(
 
   handleConnect(): void {
     if (!this.isSoraAccountConnected) {
-      this.connectInternalWallet();
+      this.connectSoraWallet();
     }
   }
 
