@@ -39,9 +39,14 @@
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">ESTImated Network fee (5%)</div>
+          <div class="field__label">Network fee</div>
+          <div class="field__value">{{ formatNumber(networkFee) }} <token-logo class="token-logo" :token="xor" /></div>
+        </div>
+        <s-divider />
+        <div class="field">
+          <div class="field__label">Maximum Price Impact ({{ priceImpactPercent }}%)</div>
           <div class="field__value">
-            {{ formatNumber(estimatedNetworkFee) }} <token-logo class="token-logo" :token="inputToken" />
+            {{ formatNumber(estimatedPriceImpact) }} <token-logo class="token-logo" :token="inputToken" />
           </div>
         </div>
         <s-divider />
@@ -110,7 +115,7 @@
     </div>
     <div class="container routing-details-section">
       <div class="route-assets__page-header-title">Routing Details</div>
-      <div v-for="(assetData, idx) in summaryData" :key="idx" class="asset-data-container fields-container">
+      <div v-for="(assetData, idx) in recipientsData" :key="idx" class="asset-data-container fields-container">
         <div class="asset-title">
           <div>
             <token-logo class="token-logo" :token="assetData.asset" />
@@ -142,14 +147,13 @@ import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-subst
 import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { groupBy, sumBy } from 'lodash';
+import { sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
-import { ZeroStringValue } from '@/consts';
 import { AdarComponents, adarFee, slippageMultiplier } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { action, getter, state } from '@/store/decorators';
-import type { PresetSwapData, Recipient } from '@/store/routeAssets/types';
+import type { PresetSwapData, Recipient, SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
 import { getAssetBalance } from '@/utils';
 
 import WarningMessage from '../WarningMessage.vue';
@@ -173,6 +177,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   @action.routeAssets.runAssetsRouting private runAssetsRouting!: any;
   @state.wallet.settings.networkFees private networkFees!: NetworkFeesObject;
   @getter.assets.xor xor!: Nullable<AccountAsset>;
+  @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
+    asset?: Asset | AccountAsset
+  ) => SummaryAssetRecipientsInfo[];
+
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -182,18 +191,21 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     this.showSelectInputAssetDialog = false;
   }
 
+  get isInputAssetXor() {
+    return this.inputToken?.address === XOR.address;
+  }
+
   get noIssues() {
     return this.remainingAmountRequired.toNumber() <= 0;
   }
 
   get usdToBeRouted() {
-    return this.formatNumber(new FPNumber(this.recipients?.reduce((partialSum, a) => partialSum + Number(a.usd), 0)));
+    return this.overallUSDNumber;
   }
 
   get estimatedAmount() {
-    const sum = sumBy(this.summaryData, (item) => item.required);
-    const isInputAssetXor = this.inputToken?.symbol === XOR.symbol;
-    return isInputAssetXor ? new FPNumber(sum).add(this.xorFeeAmount) : new FPNumber(sum);
+    const sum = sumBy(this.recipientsData, (item: any) => item.required);
+    return new FPNumber(sum);
   }
 
   get adarFeeMultiplier() {
@@ -204,75 +216,57 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return this.adarFeeMultiplier.mul(FPNumber.HUNDRED).toString();
   }
 
-  get networkFeeMultiplier() {
+  get priceImpactMultiplier() {
     return new FPNumber(slippageMultiplier);
   }
 
-  get adarFee() {
-    return this.estimatedAmount.add(this.estimatedNetworkFee).mul(this.adarFeeMultiplier);
+  get priceImpactPercent() {
+    return this.priceImpactMultiplier.mul(FPNumber.HUNDRED).toString();
   }
 
-  get estimatedNetworkFee() {
-    return this.estimatedAmount.mul(this.networkFeeMultiplier);
+  get networkFee() {
+    return FPNumber.fromCodecValue(this.networkFees[Operation.SwapTransferBatch]).mul(
+      new FPNumber(this.recipients.length)
+    );
+  }
+
+  get adarFee() {
+    return this.estimatedAmount.add(this.estimatedPriceImpact).mul(this.adarFeeMultiplier);
+  }
+
+  get estimatedPriceImpact() {
+    return this.estimatedAmount.mul(this.priceImpactMultiplier);
   }
 
   get estimatedAmountWithFees() {
-    return this.estimatedAmount.add(this.adarFee).add(this.estimatedNetworkFee);
+    return this.isInputAssetXor
+      ? this.estimatedAmount.add(this.adarFee).add(this.estimatedPriceImpact).add(this.networkFee)
+      : this.estimatedAmount.add(this.adarFee).add(this.estimatedPriceImpact);
   }
 
   get totalTokensAvailable() {
     return this.formattedBalance;
   }
 
-  get xorNetworkFee() {
-    return FPNumber.fromCodecValue(this.networkFees[Operation.SwapAndSend]).toNumber();
-  }
-
   get remainingAmountRequired() {
-    const isInputAssetXor = this.inputToken?.symbol === XOR.symbol;
-    return isInputAssetXor
-      ? this.estimatedAmountWithFees.add(this.xorFeeAmount).sub(this.fpBalance)
-      : this.estimatedAmountWithFees.sub(this.fpBalance);
-  }
-
-  get xorFeeAmount() {
-    return this.summaryData.reduce((sum, item) => {
-      const isTransfer = item.asset.address === this.inputToken.address;
-      const fee = isTransfer ? this.networkFees[Operation.Transfer] : this.networkFees[Operation.SwapAndSend];
-      return sum.add(FPNumber.fromCodecValue(fee));
-    }, FPNumber.ZERO);
+    return this.estimatedAmountWithFees.sub(this.fpBalance);
   }
 
   get xorFeeRequired() {
-    return this.xorFeeAmount.mul(new FPNumber(1.05)).sub(this.xorBalance);
+    return this.networkFee.sub(this.xorBalance);
   }
 
   get showXorRequiredField() {
-    return this.xorFeeAmount > this.xorBalance && this.inputToken.address !== XOR.address;
+    return this.networkFee > this.xorBalance && !this.isInputAssetXor;
   }
 
   get xorBalance() {
-    const xorBalance = this.xor?.balance;
-    return this.getFPNumberFromCodec(xorBalance?.transferable ?? ZeroStringValue, this.xor?.decimals);
+    const xor = this.accountAssets.find((item) => item.address === XOR.address);
+    return FPNumber.fromCodecValue(getAssetBalance(xor), xor?.decimals);
   }
 
-  get summaryData() {
-    return Object.values(
-      groupBy(
-        this.recipients.map((item) => ({ symbol: item.asset.symbol, ...item })),
-        'symbol'
-      )
-    ).map((assetArray: Array<Recipient>) => {
-      return {
-        recipientsNumber: assetArray.length,
-        asset: assetArray[0].asset,
-        usd: sumBy(assetArray, (item: Recipient) => Number(item.usd)),
-        total: sumBy(assetArray, (item: Recipient) => Number(item.amount)),
-        required:
-          sumBy(assetArray, (item: Recipient) => Number(item.usd)) / Number(this.getAssetUSDPrice(this.inputToken)),
-        totalTransactions: assetArray.length,
-      };
-    });
+  get recipientsData() {
+    return this.recipientsGroupedByToken();
   }
 
   action: 'fee' | 'routing' = 'fee';
@@ -431,7 +425,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 }
 
 .usd {
-  color: var(--s-color-status-warning);
+  color: var(--s-color-fiat-value);
   &::before {
     content: '~ $';
     display: inline;

@@ -339,17 +339,6 @@ export default class AppMenu extends Mixins(TranslationMixin) {
       right: initial;
     }
 
-    &__about {
-      @include tablet {
-        position: relative;
-      }
-    }
-
-    &__route-assets {
-      @include tablet {
-        position: relative;
-      }
-    }
     &__loading {
       z-index: $app-above-loader-layer;
     }

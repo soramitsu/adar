@@ -297,7 +297,7 @@ export default class FailedTransactionsDialog extends Mixins(
 
     .usd-column {
       &__data {
-        color: var(--s-color-status-warning);
+        color: var(--s-color-fiat-value);
       }
       &__data::before {
         content: '$';
