@@ -86,7 +86,7 @@ export async function setI18nLocale(lang: Language): Promise<void> {
     );
 
     const { default: messagesAdar } = await import(
-      /* webpackChunkName: "lang-card-[request]" */
+      /* webpackChunkName: "adar-[request]" */
       /* webpackMode: "lazy" */
       `@/lang/adar/${filename}.json`
     );

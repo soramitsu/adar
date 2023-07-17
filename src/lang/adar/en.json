@@ -1,5 +1,5 @@
 {
-    "ADAR": {
+    "adar": {
         "routeAssets": {
             "continue": "Continue",
             "cancelProcessing": "Cancel processing",
@@ -20,7 +20,12 @@
                     "typesInfo": "Supported file types: CSV",
                     "uploadButtonTitle": "upload",
                     "templateHelp": "Dont have a template?",
-                    "download": "Download"
+                    "download": "Download",
+                    "parcingError": {
+                        "title": "The .csv file couldn’t be parsed.",
+                        "description": "Please, upload new file or re-start the process.",
+                        "buttonTitle": "Re-start process"
+                    }
                 },
                 "processTemplate": {
                     "recipients": "Recipients",
