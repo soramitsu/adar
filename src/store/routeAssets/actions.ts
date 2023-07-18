@@ -15,9 +15,9 @@ import Papa from 'papaparse';
 import { slippageMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsActionContext } from '@/store/routeAssets';
 import type { DexQuoteData } from '@/store/swap/types';
-import { formatAddress, getAssetBalance, delay } from '@/utils';
+import { delay } from '@/utils';
 
-import { RouteAssetsSubscription, RecipientStatus } from './types';
+import { RouteAssetsSubscription, RecipientStatus, SwapTransferBatchStatus } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
 import type { QuotePayload, SwapResult } from '@sora-substrate/liquidity-proxy/build/types';
@@ -94,6 +94,7 @@ const actions = defineActions({
           if (errors.length < 1) {
             resolve();
             commit.setData({ file, recipients: data });
+            commit.setTxStatus(SwapTransferBatchStatus.INITIAL);
             dispatch.subscribeOnReserves();
           } else {
             reject(new Error('Parcing failed'));
@@ -239,6 +240,7 @@ const actions = defineActions({
   async runAssetsRouting(context): Promise<void> {
     const { getters, commit } = routeAssetsActionContext(context);
     const inputAsset = getters.inputToken;
+    commit.setTxStatus(SwapTransferBatchStatus.PENDING);
     const data = getters.incompletedRecipients.map((recipient) => {
       commit.setRecipientStatus({
         id: recipient.id,
@@ -423,6 +425,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
         })
         .catch((err) => {
           console.dir(err);
+          commit.setTxStatus(SwapTransferBatchStatus.FAILED);
           swapTransferData.forEach((swapTransferItem) => {
             swapTransferItem.receivers.forEach((receiver) => {
               commit.setRecipientStatus({
@@ -434,6 +437,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
         });
     } catch (err) {
       console.dir(err);
+      commit.setTxStatus(SwapTransferBatchStatus.FAILED);
       swapTransferData.forEach((swapTransferItem) => {
         swapTransferItem.receivers.forEach((receiver) => {
           commit.setRecipientStatus({

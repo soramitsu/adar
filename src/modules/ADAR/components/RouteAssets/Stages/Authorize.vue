@@ -164,7 +164,7 @@ export default class AuthorizeRoutingTemplate extends Mixins(TranslationMixin) {
   }
 }
 .usd {
-  color: var(--s-color-status-warning);
+  color: var(--s-color-fiat-value);
   &::before {
     content: '~ $';
     display: inline;
