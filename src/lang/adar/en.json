@@ -3,6 +3,16 @@
         "routeAssets": {
             "continue": "Continue",
             "cancelProcessing": "Cancel processing",
+            "back": "back",
+            "total": "total",
+            "name": "name",
+            "wallet": "wallet",
+            "usd": "usd",
+            "status": "status",
+            "recipients": "Recipients",            
+            "totalUsdToRoute": "total usd to be routed",
+            "totalTokensRequired": "total tokens required",
+            "inputAsset": "input asset",
             "stagesNames": {
                 "authorize": "Authorize",
                 "done": "Done",
@@ -10,7 +20,7 @@
                 "reviewDetails": "Review Details",
                 "routing": "Routing",
                 "transactionOverview": "Transaction overview",
-                "uploadTemplate": "Upload tempolte"
+                "uploadTemplate": "Upload template"
             },
             "stages": {
                 "uploadTemplate": {
@@ -41,6 +51,34 @@
                     "title": "Process routing template",
                     "description": "Our system is processing your uploaded Routing Template",
                     "fixButton": "fix issues"
+                },
+                "transactionOverview": {
+                    "title": "transaction overview",
+                    "amount": "in tokens",
+                    "addressValid": "address valid"
+                },
+                "reviewDetails": {
+                    "title": "Review Routing Details",
+                    "description": "Review the details of your routing transaction",
+                    "asset": "input asset",
+                    "adarFee": "estimated adar fee ({adarFee}%)",
+                    "networkFee": "network fee",
+                    "priceImpact": "maximum price impact ({priceImpact}%)",
+                    "feeRequired": "XOR fee required",
+                    "tokensAvailable": "total tokens available",
+                    "remainingAmount": "remaining amount required",
+                    "badBalance": "insufficient funds",
+                    "okBalance": "balance is ok",
+                    "routingDetails": {
+                        "title": "Routing Details",
+                        "amount": "Token amount required"
+                    }
+
+                },
+                "routing": {
+                    ""
+                },
+                "done": {
                 }
             },
             "dialogs": {
@@ -55,6 +93,12 @@
                     "amount": "estimated amount",
                     "fixButton": "fix issue",
                     "deleteButton": "delete recipient"
+                },
+                "selectInputAssetDialog": {
+                    "title": "Select an input asset",
+                    "totalUsd": "total usd to be routed",
+                    "estimatedToken": "estimated {assetName} required",
+                    "description": "Select an asset you want to work with"
                 }
             },
             "messages": {}
