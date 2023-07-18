@@ -10,7 +10,7 @@
     </div>
     <div class="fields-container">
       <div class="field">
-        <div class="field__label">INPUT ASSET</div>
+        <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
         <div class="field__value">
           <div>{{ inputToken.symbol }}</div>
           <div>
@@ -20,12 +20,12 @@
       </div>
       <s-divider />
       <div class="field">
-        <div class="field__label">Total tokens required</div>
+        <div class="field__label">{{ t('adar.routeAssets.totalTokensRequired') }}</div>
         <div class="field__value">{{ tokensEstimate }} <token-logo class="token-logo" :token="inputToken" /></div>
       </div>
       <s-divider />
       <div class="field">
-        <div class="field__label">total usd to be routed</div>
+        <div class="field__label">{{ t('adar.routeAssets.totalUsdToRoute') }}</div>
         <div class="field__value usd">{{ overallUSDNumber }}</div>
       </div>
     </div>
@@ -36,7 +36,7 @@
         :disabled="continueButtonDisabled"
         @click.stop="onContinueClick"
       >
-        {{ 'Continue' }}
+        {{ t('adar.routeAssets.continue') }}
       </s-button>
     </div>
   </div>
@@ -84,10 +84,10 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get statusText() {
-    if (this.status === SwapTransferBatchStatus.SUCCESS) return 'Completed';
-    if (this.status === SwapTransferBatchStatus.PENDING) return 'Processing the routing transactions...';
-    if (this.status === SwapTransferBatchStatus.PASSED) return 'Transactions are passed';
-    return 'Failed';
+    if (this.status === SwapTransferBatchStatus.SUCCESS) return `${this.t('adar.routeAssets.stages.routing.success')}`;
+    if (this.status === SwapTransferBatchStatus.PENDING) return `${this.t('adar.routeAssets.stages.routing.pending')}`;
+    if (this.status === SwapTransferBatchStatus.PASSED) return `${this.t('adar.routeAssets.stages.routing.passed')}`;
+    return `${this.t('adar.routeAssets.stages.routing.failed')}`;
   }
 
   get spinner() {

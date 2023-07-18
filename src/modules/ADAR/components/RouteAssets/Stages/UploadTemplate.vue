@@ -1,8 +1,8 @@
 <template>
   <div v-if="!parsingError" class="container route-assets-upload-template">
-    <div class="route-assets__page-header-title">{{ t('ADAR.routeAssets.stages.uploadTemplate.title') }}</div>
+    <div class="route-assets__page-header-title">{{ t('adar.routeAssets.stages.uploadTemplate.title') }}</div>
     <div class="route-assets__page-header-description">
-      {{ `Upload your Process Routing Template as a .CSV file` }}
+      {{ t('adar.routeAssets.stages.uploadTemplate.description') }}
     </div>
     <div
       @dragover="dragover"
@@ -14,8 +14,8 @@
       <div>
         <s-icon class="icon-divider" name="arrows-arrow-top-24" />
       </div>
-      <p class="dropping-area__description">Drop your completed process routing template or click to upload</p>
-      <p>Supported file types: CSV</p>
+      <p class="dropping-area__description">{{ t('adar.routeAssets.stages.uploadTemplate.instruction') }}</p>
+      <p>{{ t('adar.routeAssets.stages.uploadTemplate.typesInfo') }}</p>
       <div>
         <label
           class="
@@ -30,22 +30,27 @@
           "
         >
           <input type="file" @change="onInputChanged" ref="file" aria-label="false" accept=".csv" />
-          Upload
+          {{ t('adar.routeAssets.stages.uploadTemplate.uploadButtonTitle') }}
         </label>
       </div>
     </div>
     <p class="route-assets-upload-template__label">
-      Don’t have a template? <a href="/adar/template.csv" download class="route-assets__ref">Download</a>
+      {{ t('adar.routeAssets.stages.uploadTemplate.templateHelp') }}
+      <a href="/adar/template.csv" download class="route-assets__ref">{{
+        t('adar.routeAssets.stages.uploadTemplate.download')
+      }}</a>
     </p>
     <input type="file" @change="onInputChanged" ref="file" hidden accept=".csv" />
   </div>
   <div v-else class="container route-assets-upload-template">
-    <div class="route-assets__page-header-title">The .csv file couldn’t be parsed.</div>
+    <div class="route-assets__page-header-title">
+      {{ t('adar.routeAssets.stages.uploadTemplate.parcingError.title') }}
+    </div>
     <div class="route-assets__page-header-description">
-      {{ `Please, upload new file or re-start the process.` }}
+      {{ t('adar.routeAssets.stages.uploadTemplate.parcingError.description') }}
     </div>
     <s-button type="primary" class="s-typography-button--big restart-button" @click.stop="onRestartClick">
-      {{ 'RE-START PROCESS' }}
+      {{ t('adar.routeAssets.stages.uploadTemplate.parcingError.buttonTitle') }}
     </s-button>
   </div>
 </template>

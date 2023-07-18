@@ -1,6 +1,10 @@
 <template>
   <div class="failed-transaction-dialog">
-    <dialog-base :visible.sync="isVisible" :title="'Failed transactions'" custom-class="dialog__failed-transaction">
+    <dialog-base
+      :visible.sync="isVisible"
+      :title="`${t('adar.routeAssets.dialogs.failedTransactionDialog.title')}`"
+      custom-class="dialog__failed-transaction"
+    >
       <div>
         <s-table :data="tableData" :highlight-current-row="false" size="big" class="failed-transactions-table">
           <!-- INDEX -->
@@ -29,14 +33,14 @@
           <!-- NAME -->
           <s-table-column prop="name" sortable>
             <template #header>
-              <span>{{ 'name' }}</span>
+              <span>{{ t('adar.routeAssets.name') }}</span>
             </template>
           </s-table-column>
 
           <!-- WALLET -->
           <s-table-column prop="wallet" width="130">
             <template #header>
-              <span>{{ 'wallet' }}</span>
+              <span>{{ t('adar.routeAssets.wallet') }}</span>
             </template>
             <template v-slot="{ row }">
               <s-dropdown
@@ -62,7 +66,7 @@
           <!-- USD -->
           <s-table-column prop="usd" class="usd-column" sortable>
             <template #header>
-              <span>{{ 'usd' }}</span>
+              <span>{{ t('adar.routeAssets.usd') }}</span>
             </template>
             <template v-slot="{ row }">
               <div>
@@ -73,7 +77,7 @@
 
           <s-table-column>
             <template #header>
-              <span>{{ 'In tokens' }}</span>
+              <span>{{ t('adar.routeAssets.stages.transactionOverview.amount') }}</span>
             </template>
             <template v-slot="{ row }">
               <div class="in-tokens">
@@ -89,7 +93,7 @@
           <!-- STATUS -->
           <s-table-column prop="status" class="status-property" width="158">
             <template #header>
-              <span>{{ 'status' }}</span>
+              <span>{{ t('adar.routeAssets.status') }}</span>
             </template>
             <template v-slot="{ row }">
               <div class="status-property__data">
@@ -130,7 +134,7 @@
         @click.stop="reRunAll"
         :disabled="rerunAllButtonDisabled"
       >
-        {{ 'RE-RUN ALL' }}
+        {{ t('adar.routeAssets.dialogs.failedTransactionDialog.rerunButton') }}
       </s-button>
     </dialog-base>
   </div>

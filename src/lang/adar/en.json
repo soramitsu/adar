@@ -3,11 +3,13 @@
         "routeAssets": {
             "continue": "Continue",
             "cancelProcessing": "Cancel processing",
+            "cancel": "cancel",
             "back": "back",
             "total": "total",
             "name": "name",
             "wallet": "wallet",
             "usd": "usd",
+            "asset": "asset",
             "status": "status",
             "recipients": "Recipients",            
             "totalUsdToRoute": "total usd to be routed",
@@ -40,7 +42,7 @@
                 "processTemplate": {
                     "recipients": "Recipients",
                     "assets": "Assets",
-                    "usd": "usd",
+                    "usd": "usd equivalent",
                     "wallets": "wallets",
                     "amount": "ESTIMATED AMOUNTS",
                     "calculated": "calculated",
@@ -69,6 +71,7 @@
                     "remainingAmount": "remaining amount required",
                     "badBalance": "insufficient funds",
                     "okBalance": "balance is ok",
+                    "add": "add",
                     "routingDetails": {
                         "title": "Routing Details",
                         "amount": "Token amount required"
@@ -76,32 +79,78 @@
 
                 },
                 "routing": {
-                    ""
+                    "pending": "Processing the routing transactions...",
+                    "passed": "Transactions are passed",
+                    "success": "Completed",
+                    "failed": "Failed"
                 },
                 "done": {
+                    "title": "Review Routing Details",
+                    "description": "Review the details of your routing transaction",
+                    "failedTransactions": "FAILED TRANSACTIONS",
+                    "rerun": "re-run failed transactions",
+                    "finishAnyway": "Re-run doesn’t help? Finish routing anyway",
+                    "pdfButton": "download report",
+                    "finish": "finish",
+                    "routingDetails": {
+                        "title": "Routing Details",
+                        "amount": "Token amount routed",
+                        "status": {
+                            "status": "status",
+                            "success": "routed",
+                            "pending": "pending",                            
+                            "passed": "passed",
+                            "failed": "failed"
+                        }
+                    }
+
                 }
             },
             "dialogs": {
                 "fixIssuesDialog": {
                     "title": "Fix or remove issues",
+                    "issue": "Issue",
                     "recipient": "recipient",
                     "wallets": "wallets",
-                    "fieldStatusCorrect": "{field} correct",
-                    "fieldStatusIncorrect": "{field} incorrect",
-                    "usd": "usd",
+                    "walletAddress": "wallet address",
+                    "fieldStatusCorrect": "correct",
+                    "fieldStatusIncorrect": "incorrect",
+                    "usd": "usd number",
                     "assets": "Assets",
-                    "amount": "estimated amount",
+                    "estimatedAmount": "estimated amount",
+                    "amount": "amount",
                     "fixButton": "fix issue",
-                    "deleteButton": "delete recipient"
+                    "deleteButton": "delete recipient",
+                    "usdError": "Should be a number",
+                    "amountError": "Token price hasn't been found"
                 },
                 "selectInputAssetDialog": {
                     "title": "Select an input asset",
                     "totalUsd": "total usd to be routed",
                     "estimatedToken": "estimated {assetName} required",
                     "description": "Select an asset you want to work with"
+                },
+                "reportDialog": {
+                    "title": "Select report file format",
+                    "description": "Please, upload new file or re-start the process.",
+                    "pdf": "pdf",
+                    "csv": "csv"
+                },
+                "failedTransactionDialog": {
+                    "title": "Failed transactions",
+                    "rerunButton": "re-run all"
+                },
+                "finishAnywayDialog": {
+                    "title": "Confirm finishing routing despite transaction issues",
+                    "description": "If there is a certain transaction issue and re-running it doesn’t help, you can finish the routing process despite transaction issues.",
+                    "confirmButton": "I confirm, finish routing"
                 }
             },
             "messages": {}
+        },
+        "about": {
+            "description": "ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis.",
+            "learnMore": "Learn More"
         }
     }
 }

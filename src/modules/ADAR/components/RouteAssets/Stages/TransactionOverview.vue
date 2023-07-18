@@ -2,11 +2,14 @@
   <div v-loading="!tableData" class="container routing-template-transactions">
     <div class="routing-template-transactions__header">
       <!-- <div> -->
-      <generic-page-header :title="`Transaction overview (${recipients.length})`" class="page-header__title">
+      <generic-page-header
+        :title="`${t('adar.routeAssets.stages.transactionOverview.title')} (${recipients.length})`"
+        class="page-header__title"
+      >
       </generic-page-header>
       <search-input
         v-model="query"
-        :placeholder="'Search...'"
+        :placeholder="`${t('searchText')}...`"
         autofocus
         @clear="handleResetSearch"
         class="routing-template-transactions__search"
@@ -41,14 +44,14 @@
         <!-- NAME -->
         <s-table-column prop="name" sortable>
           <template #header>
-            <span>{{ 'name' }}</span>
+            <span>{{ t('adar.routeAssets.name') }}</span>
           </template>
         </s-table-column>
 
         <!-- WALLET -->
         <s-table-column prop="wallet" width="130">
           <template #header>
-            <span>{{ 'wallet' }}</span>
+            <span>{{ t('adar.routeAssets.wallet') }}</span>
           </template>
           <template v-slot="{ row }">
             <s-dropdown
@@ -74,7 +77,7 @@
         <!-- USD -->
         <s-table-column prop="usd" class="usd-column" sortable>
           <template #header>
-            <span>{{ 'usd' }}</span>
+            <span>{{ t('adar.routeAssets.usd') }}</span>
           </template>
           <template v-slot="{ row }">
             <div>
@@ -86,7 +89,7 @@
         <!-- IN TOKENS -->
         <s-table-column>
           <template #header>
-            <span>{{ 'In tokens' }}</span>
+            <span>{{ t('adar.routeAssets.stages.transactionOverview.amount') }}</span>
           </template>
           <template v-slot="{ row }">
             <div class="in-tokens">
@@ -102,7 +105,7 @@
         <!-- STATUS -->
         <s-table-column prop="status" class="status-property" width="158">
           <template #header>
-            <span>{{ 'status' }}</span>
+            <span>{{ t('adar.routeAssets.status') }}</span>
           </template>
           <template v-slot="{ row }">
             <div class="status-property__data">
@@ -112,33 +115,6 @@
             </div>
           </template>
         </s-table-column>
-
-        <!-- MENU -->
-        <!-- <s-table-column width="40">
-          <template v-slot="{ row }">
-            <s-dropdown
-              class="s-dropdown--hash-menu"
-              borderRadius="mini"
-              type="ellipsis"
-              icon="basic-more-vertical-24"
-              placement="bottom-end"
-              @select="(action) => action(row)"
-              @click="() => {}"
-            >
-              <template slot="menu">
-                <s-dropdown-item
-                  v-for="(link, idx) in dropdownMenuItems"
-                  :key="idx"
-                  :value="link.action"
-                  :disabled="true"
-                  class="s-dropdown-menu__item menu__link"
-                >
-                  {{ link.title }}
-                </s-dropdown-item>
-              </template>
-            </s-dropdown>
-          </template>
-        </s-table-column> -->
       </s-table>
       <s-pagination
         class="transactions-table-pagination"
@@ -152,14 +128,14 @@
     </div>
     <div class="buttons-container">
       <s-button type="secondary" class="s-typography-button--big" @click.stop="previousStage">
-        {{ `back` }}
+        {{ t('adar.routeAssets.back') }}
       </s-button>
       <div class="total-container">
-        <span>TOTAL:&nbsp;</span>
+        <span>{{ t('adar.routeAssets.total') }}:&nbsp;</span>
         <span class="usd">{{ overallUSDNumber }}</span>
       </div>
       <s-button type="primary" class="s-typography-button--big" @click.stop="onContinueClick">
-        {{ 'Continue' }}
+        {{ t('adar.routeAssets.continue') }}
       </s-button>
     </div>
     <select-input-asset-dialog
@@ -179,7 +155,7 @@ import { Components, PageNames } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import router, { lazyComponent } from '@/router';
-import { action, getter, state } from '@/store/decorators';
+import { action, getter } from '@/store/decorators';
 import { RecipientStatus } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 import { copyToClipboard, formatAddress } from '@/utils';
@@ -200,13 +176,6 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
 
   showSelectInputAssetDialog = false;
-
-  dropdownMenuItems = [
-    {
-      title: 'SoraScan',
-      action: () => {},
-    },
-  ];
 
   async handleCopyAddress(address): Promise<void> {
     try {
@@ -443,6 +412,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 
 .total-container {
   color: var(--s-color-brand-day);
+  text-transform: uppercase;
   .usd {
     color: var(--s-color-fiat-value);
     &::before {
