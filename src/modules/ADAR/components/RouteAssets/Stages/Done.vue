@@ -82,7 +82,7 @@
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.stages.done.routingDetails.status.status') }}</div>
+          <div class="field__label">{{ t('adar.routeAssets.txStatus.status') }}</div>
           <div class="field__value" :class="`field__value_${assetData.status}`">{{ assetData.status }}</div>
         </div>
       </div>
@@ -185,10 +185,10 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 
   getStatus(assetArray) {
     if (assetArray.some((recipient) => recipient.status === RecipientStatus.FAILED))
-      return this.t('adar.routeAssets.stages.done.routingDetails.status.failed');
+      return this.t('adar.routeAssets.txStatus.failed');
     return assetArray.find((recipient) => recipient.status === RecipientStatus.PENDING)
-      ? this.t('adar.routeAssets.stages.done.routingDetails.status.waiting')
-      : this.t('adar.routeAssets.stages.done.routingDetails.status.success');
+      ? this.t('adar.routeAssets.txStatus.waiting')
+      : this.t('adar.routeAssets.txStatus.success');
   }
 
   getAssetUSDPrice(asset: Asset) {

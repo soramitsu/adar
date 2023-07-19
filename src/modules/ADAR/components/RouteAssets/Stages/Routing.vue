@@ -20,13 +20,11 @@
       </div>
       <s-divider />
       <div class="field">
-        <div class="field__label">{{ t('adar.routeAssets.totalTokensRequired') }}</div>
-        <div class="field__value">{{ tokensEstimate }} <token-logo class="token-logo" :token="inputToken" /></div>
-      </div>
-      <s-divider />
-      <div class="field">
-        <div class="field__label">{{ t('adar.routeAssets.totalUsdToRoute') }}</div>
-        <div class="field__value usd">{{ overallUSDNumber }}</div>
+        <div class="field__label">{{ amountText }}</div>
+        <div class="field__value">
+          {{ tokensEstimate }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
+          <span class="usd">{{ overallUSDNumber }}</span>
+        </div>
       </div>
     </div>
     <div v-if="!continueButtonDisabled" class="buttons-container">
@@ -88,6 +86,16 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     if (this.status === SwapTransferBatchStatus.PENDING) return `${this.t('adar.routeAssets.stages.routing.pending')}`;
     if (this.status === SwapTransferBatchStatus.PASSED) return `${this.t('adar.routeAssets.stages.routing.passed')}`;
     return `${this.t('adar.routeAssets.stages.routing.failed')}`;
+  }
+
+  get amountText() {
+    if (this.status === SwapTransferBatchStatus.SUCCESS)
+      return `${this.t('adar.routeAssets.stages.routing.amountText.success')}`;
+    if (this.status === SwapTransferBatchStatus.PENDING)
+      return `${this.t('adar.routeAssets.stages.routing.amountText.pending')}`;
+    if (this.status === SwapTransferBatchStatus.PASSED)
+      return `${this.t('adar.routeAssets.stages.routing.amountText.passed')}`;
+    return `${this.t('adar.routeAssets.stages.routing.amountText.default')}`;
   }
 
   get spinner() {

@@ -14,7 +14,7 @@
       <div class="disclaimer__text">
         <p
           v-html="
-            t('disclaimer', {
+            t('adar.disclaimer', {
               disclaimerPrefix,
               polkaswapFaqLink,
               memorandumLink,
@@ -77,7 +77,7 @@ export default class AppDisclaimer extends Mixins(TranslationMixin) {
   }
 
   get disclaimerPrefix(): string {
-    return `<span class="disclaimer__prefix">${this.t('disclaimerTitle')}:</span>`;
+    return `<span class="disclaimer__prefix">${this.t('adar.disclaimerTitle')}:</span>`;
   }
 
   get memorandumLink(): string {

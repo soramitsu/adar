@@ -13,7 +13,6 @@
         <s-divider />
         <div v-for="(asset, idx) in tokensEstimate" :key="idx">
           <div class="field">
-            <!-- <div class="field__label">Estimated {{ asset.asset.symbol }} required</div> -->
             <div class="field__label">
               {{
                 t('adar.routeAssets.dialogs.selectInputAssetDialog.estimatedToken', { assetName: asset.asset.symbol })

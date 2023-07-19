@@ -1,5 +1,7 @@
 {
     "adar": {
+        "disclaimerTitle": "Disclaimer",
+        "disclaimer": "The token swap functionality on ADAR Technologies Inc’s website is powered by  the Polkaswap website (www.polkaswap.io) which is not maintained by us and is maintained by the SORA community. Therefore, in addition to our terms {adarTS} {adarPrivacy}, the terms of Polkaswap apply mutatis mutandis.  The terms of Polkaswap are available at {polkaswapFaqLink}, {memorandumLink}, and {privacyLink} ",
         "routeAssets": {
             "continue": "Continue",
             "cancelProcessing": "Cancel processing",
@@ -56,8 +58,7 @@
                 },
                 "transactionOverview": {
                     "title": "transaction overview",
-                    "amount": "in tokens",
-                    "addressValid": "address valid"
+                    "amount": "in tokens"
                 },
                 "reviewDetails": {
                     "title": "Review Routing Details",
@@ -82,7 +83,13 @@
                     "pending": "Processing the routing transactions...",
                     "passed": "Transactions are passed",
                     "success": "Completed",
-                    "failed": "Failed"
+                    "failed": "Failed",
+                    "amountText": {
+                        "pending": "total amount to be routed",
+                        "passed": "total amount authorized",
+                        "success": "total amount routed",
+                        "default": "total amount"
+                    }
                 },
                 "done": {
                     "title": "Review Routing Details",
@@ -146,7 +153,15 @@
                     "confirmButton": "I confirm, finish routing"
                 }
             },
-            "messages": {}
+            "txStatus": {
+                "status": "status",
+                "success": "success",
+                "pending": "pending",                  
+                "passed": "passed",
+                "failed": "failed",
+                "addressValid": "address valid",
+                "addressInvalid": "address Invalid"
+            }
         },
         "about": {
             "description": "ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis.",

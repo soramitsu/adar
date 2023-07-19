@@ -212,7 +212,7 @@ export default class FailedTransactionsDialog extends Mixins(
   }
 
   getStatus(recipient) {
-    return recipient.status;
+    return this.t(`adar.routeAssets.txStatus.${recipient.status}`);
   }
 
   getStatusClass(recipient) {
@@ -247,7 +247,9 @@ export default class FailedTransactionsDialog extends Mixins(
   }
 
   get rerunAllButtonDisabled() {
-    return this.recipients.some((item) => item.status === RecipientStatus.PENDING);
+    return this.recipients.some(
+      (item) => item.status === RecipientStatus.PENDING || item.status === RecipientStatus.PASSED
+    );
   }
 
   get filteredItems() {
@@ -336,7 +338,8 @@ export default class FailedTransactionsDialog extends Mixins(
         display: inline;
         color: var(--s-color-status-success);
       }
-      &_pending::after {
+      &_pending::after,
+      &_passed::after {
         content: '...';
         display: inline;
         color: var(--s-color-status-warning);

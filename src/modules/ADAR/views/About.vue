@@ -18,7 +18,7 @@
             </h3>
           </div>
           <div class="description-section__ref">
-            <a href="https://www.adar.com" target="_blank">{{ t('adar.about.learnMore') }}</a>
+            <a href="https://www.adar.com" target="_blank" rel="noopener">{{ t('adar.about.learnMore') }}</a>
           </div>
         </div>
       </section>

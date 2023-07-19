@@ -26,13 +26,13 @@ export enum AdarComponents {
 }
 
 export const Stages: Array<Stage> = [
-  createStage('Upload template', 'uploadTemplate'),
-  createStage('Process template', 'processTemplate'),
-  createStage('Transaction Overview', 'transactionOverview'),
-  createStage('Review details', 'reviewDetails'),
-  // createStage('Authorize', 'authorize'),
-  createStage('Routing', 'routing'),
-  createStage('Done', 'done'),
+  createStage('uploadTemplate', 'uploadTemplate'),
+  createStage('processTemplate', 'processTemplate'),
+  createStage('transactionOverview', 'transactionOverview'),
+  createStage('reviewDetails', 'reviewDetails'),
+  // createStage('authorize', 'authorize'),
+  createStage('routing', 'routing'),
+  createStage('done', 'done'),
 ];
 
 export const Links = {

@@ -156,7 +156,6 @@ import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import router, { lazyComponent } from '@/router';
 import { action, getter } from '@/store/decorators';
-import { RecipientStatus } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 import { copyToClipboard, formatAddress } from '@/utils';
 @Component({
@@ -219,7 +218,9 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   }
 
   getStatus(recipient) {
-    return validate.wallet(recipient.wallet) ? RecipientStatus.ADDRESS_VALID : RecipientStatus.ADDRESS_INVALID;
+    return validate.wallet(recipient.wallet)
+      ? this.t('adar.routeAssets.txStatus.addressValid')
+      : this.t('adar.routeAssets.txStatus.addressInvalid');
   }
 
   getStatusClass(recipient) {
