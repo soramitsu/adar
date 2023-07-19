@@ -20,13 +20,11 @@
       </div>
       <s-divider />
       <div class="field">
-        <div class="field__label">Total tokens required</div>
-        <div class="field__value">{{ tokensEstimate }} <token-logo class="token-logo" :token="inputToken" /></div>
-      </div>
-      <s-divider />
-      <div class="field">
-        <div class="field__label">total usd to be routed</div>
-        <div class="field__value usd">{{ overallUSDNumber }}</div>
+        <div class="field__label">{{ amountText }}</div>
+        <div class="field__value">
+          {{ tokensEstimate }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
+          <span class="usd">{{ overallUSDNumber }}</span>
+        </div>
       </div>
     </div>
     <div v-if="!continueButtonDisabled" class="buttons-container">
@@ -88,6 +86,13 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     if (this.status === SwapTransferBatchStatus.PENDING) return 'Processing the routing transactions...';
     if (this.status === SwapTransferBatchStatus.PASSED) return 'Transactions are passed';
     return 'Failed';
+  }
+
+  get amountText() {
+    if (this.status === SwapTransferBatchStatus.SUCCESS) return 'total amount routed';
+    if (this.status === SwapTransferBatchStatus.PENDING) return 'total amount to be routed';
+    if (this.status === SwapTransferBatchStatus.PASSED) return 'total amount authorized';
+    return 'total amount';
   }
 
   get spinner() {
