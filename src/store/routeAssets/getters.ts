@@ -1,12 +1,23 @@
+import { FPNumber } from '@sora-substrate/util/build';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineGetters } from 'direct-vuex';
+import { groupBy, sumBy } from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { Stages } from '@/modules/ADAR/consts';
+import { Stages, slippageMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsGetterContext } from '@/store/routeAssets';
 
-import type { Recipient, RouteAssetsState, RouteAssetsSubscription, TransactionInfo } from './types';
-import type { Asset } from '@sora-substrate/util/build/assets/types';
+import { getAssetUSDPrice } from './utils';
+
+import type {
+  Recipient,
+  RouteAssetsState,
+  RouteAssetsSubscription,
+  SummaryAssetRecipientsInfo,
+  SwapTransferBatchStatus,
+  TransactionInfo,
+} from './types';
+import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const getters = defineGetters<RouteAssetsState>()({
   recipients(...args): Array<Recipient> {
@@ -67,6 +78,52 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.datetime;
   },
+  batchTxStatus(...args): SwapTransferBatchStatus {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.status;
+  },
+  overallUSDNumber(...args): string {
+    const { state } = routeAssetsGetterContext(args);
+    return state.recipients
+      .reduce((acc, recipient) => {
+        return acc + recipient.usd;
+      }, 0)
+      .toFixed(2);
+  },
+  recipientsGroupedByToken:
+    (...args) =>
+    (asset: Asset | AccountAsset): SummaryAssetRecipientsInfo[] => {
+      const { getters, rootState } = routeAssetsGetterContext(args);
+      const priceObject = rootState.wallet.account.fiatPriceObject;
+      const token = asset || getters.inputToken;
+      return Object.values(
+        groupBy(
+          getters.recipients.map((item) => ({ symbol: item.asset.symbol, ...item })),
+          'symbol'
+        )
+      ).map((assetArray: Array<Recipient>) => {
+        return {
+          recipientsNumber: assetArray.length,
+          asset: assetArray[0].asset,
+          usd: sumBy(assetArray, (item: Recipient) => Number(item.usd)),
+          total: sumBy(assetArray, (item: Recipient) => Number(item.amount)),
+          required: sumBy(assetArray, (item: Recipient) =>
+            new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).toNumber()
+          ),
+          totalTransactions: assetArray.length,
+        };
+      });
+    },
+
+  overallEstimatedTokens:
+    (...args) =>
+    (asset) => {
+      const { getters } = routeAssetsGetterContext(args);
+      const token = asset || getters.inputToken;
+      const summaryData = getters.recipientsGroupedByToken(token);
+      const sum = new FPNumber(sumBy(summaryData, (item) => item.required));
+      return new FPNumber(slippageMultiplier).mul(sum).add(sum);
+    },
 });
 
 export default getters;

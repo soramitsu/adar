@@ -19,16 +19,19 @@
       <moonpay-history-button v-if="isLoggedIn" class="moonpay-button moonpay-button--history" /> -->
     <!-- </div> -->
     <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex route-assets-navigation" />
-    <div
-      class="app-controls app-controls--settings-panel s-flex"
-      :class="{ 'without-moonpay': !areMoonpayButtonsVisible }"
-    >
-      <!-- <market-maker-countdown /> -->
-      <!-- <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
+    <div class="s-flex app-controls">
+      <balance-widget class="app-controls s-flex balance-widget" />
+      <div
+        class="app-controls app-controls--settings-panel s-flex"
+        :class="{ 'without-moonpay': !areMoonpayButtonsVisible }"
+      >
+        <!-- <market-maker-countdown /> -->
+        <!-- <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
         <token-logo class="node-control__logo token-logo" v-bind="nodeLogo" />
       </s-button> -->
-      <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
-      <app-header-menu />
+        <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
+        <app-header-menu />
+      </div>
     </div>
 
     <select-language-dialog />
@@ -70,6 +73,7 @@ import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
     MoonpayHistoryButton: lazyComponent(Components.MoonpayHistoryButton),
     MoonpayConfirmation: lazyComponent(Components.MoonpayConfirmation),
     RouteAssetsNavigation: adarLazyComponent(AdarComponents.RouteAssetsNavigation),
+    BalanceWidget: adarLazyComponent(AdarComponents.BalanceWidget),
     TokenLogo: components.TokenLogo,
     WalletAvatar: components.WalletAvatar,
   },
@@ -168,6 +172,7 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: $inner-spacing-mini;
   min-height: $header-height;
   position: relative;
@@ -192,25 +197,23 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 
 .app-controls {
   &.route-assets-navigation {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     @include tablet(true) {
+      display: none;
+    }
+  }
+
+  .balance-widget {
+    @media (max-width: 1200px) {
       display: none;
     }
   }
 
   &:not(:last-child) {
     margin-right: $inner-spacing-mini;
-  }
-
-  & > *:not(:last-child) {
-    // margin-right: $inner-spacing-mini;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  & > *:not(:first-child) {
-    // margin-right: $inner-spacing-mini;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
   }
 
   .node-control {
@@ -231,7 +234,7 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     margin-left: auto;
   }
 
-  margin-left: auto;
+  // margin-left: auto;
 
   &--moonpay {
     margin-left: auto;
@@ -257,13 +260,18 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     filter: $app-controls-filter;
     border-radius: var(--s-border-radius-small);
 
-    & > *:not(:last-child) {
-      // border-right: 1px solid var(--s-color-base-content-tertiary) !important;
-      margin-right: 1px;
-    }
-
     & > * {
       box-shadow: none !important;
+    }
+    & > *:not(:last-child) {
+      margin-right: 1px;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    & > *:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
     }
   }
 
