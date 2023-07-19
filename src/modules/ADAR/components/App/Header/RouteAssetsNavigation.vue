@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-import { Component, Prop, Vue, Mixins } from 'vue-property-decorator';
+import { Component, Prop, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import AdarLogo from '@/components/shared/Logo/Adar.vue';
