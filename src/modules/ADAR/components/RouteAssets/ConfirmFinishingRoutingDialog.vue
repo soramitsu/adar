@@ -1,15 +1,13 @@
 <template>
   <div class="confirm-finishing-dialog">
     <dialog-base :visible.sync="isVisible" custom-class="dialog__fix-issues">
-      <div class="route-assets__page-header-title">Confirm finishing routing despite transaction issues</div>
+      <div class="route-assets__page-header-title">{{ t('adar.routeAssets.dialogs.finishAnywayDialog.title') }}</div>
       <div class="route-assets__page-header-description">
-        {{
-          `If there is a certain transaction issue and re-running it doesn’t help, you can finish the routing process despite transaction issues.`
-        }}
+        {{ t('adar.routeAssets.dialogs.finishAnywayDialog.description') }}
       </div>
       <div class="buttons-container">
         <s-button type="primary" class="s-typography-button--big browse-button" @click.stop="onConfirmClick">
-          {{ 'I CONFIRM, FINISH ROUTING' }}
+          {{ t('adar.routeAssets.dialogs.finishAnywayDialog.confirmButton') }}
         </s-button>
         <s-button
           type="secondary"
@@ -20,7 +18,7 @@
             }
           "
         >
-          {{ 'Cancel' }}
+          {{ t('adar.routeAssets.cancel') }}
         </s-button>
       </div>
     </dialog-base>

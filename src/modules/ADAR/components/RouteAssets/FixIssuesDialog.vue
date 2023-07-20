@@ -1,24 +1,38 @@
 <template>
   <div class="fix-issues-dialog">
-    <dialog-base :visible.sync="isVisible" :title="`Fix or remove issues`" custom-class="dialog__fix-issues">
+    <dialog-base
+      :visible.sync="isVisible"
+      :title="t('adar.routeAssets.dialogs.fixIssuesDialog.title')"
+      custom-class="dialog__fix-issues"
+    >
       <div class="issues-iterator">
         <button @click="changeIssueIdx(-1)">
           <s-icon class="icon-status" name="chevron-left-16" />
         </button>
-        <div>{{ `Issue ${currentIssueIdx + 1}/${totalIssuesCount}` }}</div>
+        <div>
+          {{ `${t('adar.routeAssets.dialogs.fixIssuesDialog.issue')} ${currentIssueIdx + 1}/${totalIssuesCount}` }}
+        </div>
         <button @click="changeIssueIdx(1)">
           <s-icon class="icon-status" name="chevron-right-16" />
         </button>
       </div>
       <s-form :model="model" class="kyc-form">
         <s-form-item prop="name">
-          <s-input :placeholder="'Recipient'" v-model="model.name" />
+          <s-input :placeholder="t('adar.routeAssets.dialogs.fixIssuesDialog.recipient')" v-model="model.name" />
         </s-form-item>
         <s-form-item prop="wallet">
-          <s-input :placeholder="'Wallet'" v-model="model.wallet" />
+          <s-input :placeholder="t('adar.routeAssets.wallet')" v-model="model.wallet" />
           <!-- <p v-if="walletError" class="error-message">wallet ADDRESS incorrect</p> -->
           <div class="error-message" :class="!walletError ? 'error-message_valid' : 'error-message_invalid'">
-            <div>{{ `wallet ADDRESS ${walletError ? 'incorrect' : 'correct'}` }}</div>
+            <div>
+              {{
+                `${t('adar.routeAssets.dialogs.fixIssuesDialog.walletAddress')} ${
+                  walletError
+                    ? `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusIncorrect')}`
+                    : `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusCorrect')}`
+                }`
+              }}
+            </div>
             <div>
               <s-icon class="icon-status" :name="!walletError ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'" />
             </div>
@@ -27,7 +41,15 @@
         <s-form-item v-if="!amountInTokens" prop="usd">
           <s-input :placeholder="'USD'" :value="model.usd" @input="onUsdChanged($event)" />
           <div class="error-message" :class="!usdError ? 'error-message_valid' : 'error-message_invalid'">
-            <div>{{ `USD number is ${usdError ? 'incorrect' : 'correct'}` }}</div>
+            <div>
+              {{
+                `${t('adar.routeAssets.dialogs.fixIssuesDialog.usd')} ${
+                  usdError
+                    ? `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusIncorrect')}`
+                    : `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusCorrect')}`
+                }`
+              }}
+            </div>
             <div>
               <s-icon class="icon-status" :name="!usdError ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'" />
             </div>
@@ -36,7 +58,15 @@
         <s-form-item v-else prop="amount">
           <s-input :placeholder="'amount'" :value="model.amount" @input="onAmountChanged($event)" />
           <div class="error-message" :class="!amountError ? 'error-message_valid' : 'error-message_invalid'">
-            <div>{{ `Amount number is ${amountError ? 'incorrect' : 'correct'}` }}</div>
+            <div>
+              {{
+                `${t('adar.routeAssets.dialogs.fixIssuesDialog.amount')} ${
+                  amountError
+                    ? `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusIncorrect')}`
+                    : `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusCorrect')}`
+                }`
+              }}
+            </div>
             <div>
               <s-icon class="icon-status" :name="!amountError ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'" />
             </div>
@@ -44,7 +74,7 @@
         </s-form-item>
       </s-form>
       <div class="field">
-        <p class="field__label">{{ 'ASSET' }}</p>
+        <p class="field__label">{{ `${t('adar.routeAssets.asset')}` }}</p>
         <div class="field__status">
           <div>{{ assetSymbol }}</div>
           <div>
@@ -55,7 +85,7 @@
       </div>
       <s-divider />
       <div class="field">
-        <p class="field__label">{{ 'estimated amount' }}</p>
+        <p class="field__label">{{ `${t('adar.routeAssets.dialogs.fixIssuesDialog.estimatedAmount')}` }}</p>
         <div class="field__status">
           <div>{{ amount }}</div>
           <div>{{ assetSymbol }}</div>
@@ -73,10 +103,10 @@
         @click.stop="onSaveClick"
         :disabled="submitIsDisabled"
       >
-        {{ 'Fix issue' }}
+        {{ `${t('adar.routeAssets.dialogs.fixIssuesDialog.fixButton')}` }}
       </s-button>
       <s-button type="primary" class="s-typography-button--big browse-button" @click.stop="onDeleteClick">
-        {{ 'Delete recipient' }}
+        {{ `${t('adar.routeAssets.dialogs.fixIssuesDialog.deleteButton')}` }}
       </s-button>
     </dialog-base>
   </div>
@@ -85,10 +115,10 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { mixins, components, api, SUBQUERY_TYPES } from '@soramitsu/soraneo-wallet-web';
+import { mixins, components, api } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
-import { action, mutation, state } from '@/store/decorators';
+import { action } from '@/store/decorators';
 import { Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 
@@ -139,11 +169,13 @@ export default class FixIssuesDialog extends Mixins(
   }
 
   get usdError() {
-    return !validate.usd(this.model.usd) ? 'Should be a number' : null;
+    return !validate.usd(this.model.usd) ? `${this.t('adar.routeAssets.dialogs.fixIssuesDialog.usdError')}` : null;
   }
 
   get amountError() {
-    return !validate.amount(this.model.amount) ? "Token price hasn't been found" : '';
+    return !validate.amount(this.model.amount)
+      ? `${this.t('adar.routeAssets.dialogs.fixIssuesDialog.amountError')}`
+      : '';
   }
 
   get amountInTokens() {

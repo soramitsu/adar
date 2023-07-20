@@ -163,7 +163,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
             color: var(--s-color-status-error);
           }
         }
-        &_routed {
+        &_routed,
+        &_success {
           color: var(--s-color-status-success);
           font-weight: 600;
           fill: var(--s-color-status-success);

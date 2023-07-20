@@ -353,7 +353,8 @@
         "CreatePair": "Créer une paire",
         "StakingContainer": "Staking",
         "Explore\/Container": "Explorer",
-        "SoraCard": "{Sora} Carte"
+        "SoraCard": "{Sora} Carte",
+        "RouteAssets": "Itinéraire des actifs"
     },
     "social": {
         "twitter": "Twitter",

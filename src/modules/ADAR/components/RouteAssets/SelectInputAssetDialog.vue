@@ -1,15 +1,23 @@
 <template>
   <div class="select-input-asset-dialog">
-    <dialog-base :visible.sync="isVisible" :title="'Select an input asset'" custom-class="dialog__select-input-asset">
+    <dialog-base
+      :visible.sync="isVisible"
+      :title="`${t('adar.routeAssets.dialogs.selectInputAssetDialog.title')}`"
+      custom-class="dialog__select-input-asset"
+    >
       <div class="fields-container">
         <div class="field">
-          <div class="field__label">total usd to be routed</div>
+          <div class="field__label">{{ t('adar.routeAssets.dialogs.selectInputAssetDialog.totalUsd') }}</div>
           <div class="field__value usd">{{ overallUSDNumber }}</div>
         </div>
         <s-divider />
         <div v-for="(asset, idx) in tokensEstimate" :key="idx">
           <div class="field">
-            <div class="field__label">Estimated {{ asset.asset.symbol }} required</div>
+            <div class="field__label">
+              {{
+                t('adar.routeAssets.dialogs.selectInputAssetDialog.estimatedToken', { assetName: asset.asset.symbol })
+              }}
+            </div>
             <div class="field__value pointer">
               <div>{{ asset.estimateNumber }}</div>
               <div>
@@ -20,7 +28,7 @@
           <s-divider />
         </div>
       </div>
-      <div>{{ 'Select an asset you want to work with' }}</div>
+      <div>{{ t('adar.routeAssets.dialogs.selectInputAssetDialog.description') }}</div>
       <div>
         <AssetListItem
           v-for="(asset, idx) in assetList"
@@ -92,7 +100,7 @@ export default class SelectInputAssetDialog extends Mixins(
     return (this as any).$refs.file;
   }
 
-  availableAssets = ['pswap', 'val', 'xor'];
+  availableAssets = ['xor', 'val', 'pswap'];
 
   get assetList(): Array<AccountAsset> {
     return this.accountAssets.filter((item) => this.availableAssets.includes(item.symbol.toLowerCase()));

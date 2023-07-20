@@ -1,7 +1,9 @@
 <template>
   <div v-loading="isSpinner || !fileName" class="container route-assets-processing-template">
-    <div class="route-assets__page-header-title">Process routing template</div>
-    <div class="route-assets__page-header-description">Our system is processing your uploaded Routing Template</div>
+    <div class="route-assets__page-header-title">{{ t('adar.routeAssets.stages.processTemplate.title') }}</div>
+    <div class="route-assets__page-header-description">
+      {{ t('adar.routeAssets.stages.processTemplate.description') }}
+    </div>
     <div v-if="!isSpinner && fileName" class="content-container">
       <div class="route-assets-processing-template__file-info">
         <div>
@@ -41,7 +43,7 @@
           {{ nextButtonTitle }}
         </s-button>
         <s-button type="secondary" class="s-typography-button--big" @click.stop="cancelButtonAction">
-          {{ `CANCEL PROCESSING` }}
+          {{ t('adar.routeAssets.cancelProcessing') }}
         </s-button>
       </div>
     </div>
@@ -90,17 +92,17 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
   get fields() {
     return [
-      { title: 'Recipients', status: this.recipientsStatus },
-      { title: 'Assets', status: this.assetsStatus },
-      { title: 'USD Equivalent', status: this.usdStatus },
-      { title: 'Wallets', status: this.walletsStatus },
-      { title: 'Estimated Amounts', status: this.amountsStatus },
+      { title: this.t('adar.routeAssets.recipients'), status: this.recipientsStatus },
+      { title: this.t('adar.routeAssets.stages.processTemplate.assets'), status: this.assetsStatus },
+      { title: this.t('adar.routeAssets.stages.processTemplate.usd'), status: this.usdStatus },
+      { title: this.t('adar.routeAssets.stages.processTemplate.wallets'), status: this.walletsStatus },
+      { title: this.t('adar.routeAssets.stages.processTemplate.amount'), status: this.amountsStatus },
     ];
   }
 
   get recipientsStatus() {
     return {
-      title: `${this.recipientsCount} payeers`,
+      title: `${this.recipientsCount} ${this.t('adar.routeAssets.stages.processTemplate.payeers')}`,
       correct: true,
     };
   }
@@ -108,7 +110,9 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   get assetsStatus() {
     const areErrors = this.invalidAssetsCount > 0;
     return {
-      title: areErrors ? `${this.invalidAssetsCount} issues found` : `${this.assetsCount} assets`,
+      title: areErrors
+        ? `${this.invalidAssetsCount} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
+        : `${this.assetsCount} ${this.t('adar.routeAssets.stages.processTemplate.assets')}`,
       correct: !areErrors,
     };
   }
@@ -116,7 +120,9 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   get usdStatus() {
     const areErrors = this.incorrectUSD > 0;
     return {
-      title: areErrors ? `${this.incorrectUSD} issues found` : `Calculated`,
+      title: areErrors
+        ? `${this.incorrectUSD} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
+        : `${this.t('adar.routeAssets.stages.processTemplate.calculated')}`,
       correct: !areErrors,
     };
   }
@@ -124,7 +130,9 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   get walletsStatus() {
     const areErrors = this.invalidWalletCount > 0;
     return {
-      title: areErrors ? `${this.invalidWalletCount} issues found` : `${this.recipientsCount} wallets`,
+      title: areErrors
+        ? `${this.invalidWalletCount} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
+        : `${this.recipientsCount} ${this.t('adar.routeAssets.stages.processTemplate.wallets')}`,
       correct: !areErrors,
     };
   }
@@ -132,7 +140,9 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   get amountsStatus() {
     const areErrors = this.incorrectAmountCount > 0;
     return {
-      title: areErrors ? `${this.incorrectAmountCount} issues found` : `Calculated`,
+      title: areErrors
+        ? `${this.incorrectAmountCount} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
+        : `${this.t('adar.routeAssets.stages.processTemplate.calculated')}`,
       correct: !areErrors,
     };
   }
@@ -183,7 +193,9 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   }
 
   get nextButtonTitle() {
-    return this.incorrectRecipients.length > 0 ? 'fix issues' : 'continue';
+    return this.incorrectRecipients.length > 0
+      ? `${this.t('adar.routeAssets.stages.processTemplate.fixButton')}`
+      : `${this.t('adar.routeAssets.continue')}`;
   }
 
   nextButtonAction() {

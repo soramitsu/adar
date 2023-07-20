@@ -36,12 +36,12 @@ export type RouteAssetsSubscription = {
 };
 
 export enum RecipientStatus {
-  PENDING = 'Pending',
-  FAILED = 'Failed',
-  PASSED = 'Passed',
-  ADDRESS_INVALID = 'Address invalid',
-  ADDRESS_VALID = 'Address valid',
-  SUCCESS = 'Success',
+  PENDING = 'pending',
+  FAILED = 'failed',
+  PASSED = 'passed',
+  ADDRESS_INVALID = 'addressInvalid',
+  ADDRESS_VALID = 'addressValid',
+  SUCCESS = 'success',
 }
 
 export enum SwapTransferBatchStatus {

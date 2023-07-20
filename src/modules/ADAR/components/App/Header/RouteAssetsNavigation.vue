@@ -5,7 +5,7 @@
         <div class="circle">
           <div>{{ num }}</div>
         </div>
-        <p v-if="isActive(num)">{{ currentStageComponentTitle }}</p>
+        <p v-if="isActive(num)">{{ stageTitle }}</p>
       </div>
       <div v-if="num !== totalStagesNumber" class="link"></div>
     </div>
@@ -14,8 +14,9 @@
 
 <script lang="ts">
 import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Mixins } from 'vue-property-decorator';
 
+import TranslationMixin from '@/components/mixins/TranslationMixin';
 import AdarLogo from '@/components/shared/Logo/Adar.vue';
 import { Stages } from '@/modules/ADAR/consts';
 import { getter } from '@/store/decorators';
@@ -25,7 +26,7 @@ import { getter } from '@/store/decorators';
     AdarLogo,
   },
 })
-export default class RouteAssetsNavigation extends Vue {
+export default class RouteAssetsNavigation extends Mixins(TranslationMixin) {
   @getter.routeAssets.currentStageIndex private currentStageIndex!: number;
   @getter.routeAssets.currentStageComponentTitle currentStageComponentTitle!: string;
 
@@ -34,6 +35,10 @@ export default class RouteAssetsNavigation extends Vue {
 
   isActive(num: number) {
     return num === this.currentStageIndex + 1;
+  }
+
+  get stageTitle() {
+    return this.t(`adar.routeAssets.stagesNames.${this.currentStageComponentTitle}`);
   }
 
   get dark() {

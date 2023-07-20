@@ -1,13 +1,13 @@
 <template>
   <div class="route-assets-review-details">
     <div class="container review-details-section">
-      <div class="route-assets__page-header-title">Review Routing Details</div>
+      <div class="route-assets__page-header-title">{{ t('adar.routeAssets.stages.reviewDetails.title') }}</div>
       <div class="route-assets__page-header-description">
-        {{ `Review the details of your routing transaction` }}
+        {{ t('adar.routeAssets.stages.reviewDetails.description') }}
       </div>
       <div class="fields-container">
         <div class="field">
-          <div class="field__label">INPUT ASSET</div>
+          <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
           <div
             class="field__value pointer"
             @click="
@@ -27,58 +27,66 @@
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">total usd to be routed</div>
+          <div class="field__label">{{ t('adar.routeAssets.totalUsdToRoute') }}</div>
           <div class="field__value usd">{{ usdToBeRouted }}</div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">ESTImated ADAR fee ({{ adarFeePercent }}%)</div>
+          <div class="field__label">
+            {{ t('adar.routeAssets.stages.reviewDetails.adarFee', { adarFee: adarFeePercent }) }}
+          </div>
           <div class="field__value">
             {{ formatNumber(adarFee) }} <token-logo class="token-logo" :token="inputToken" />
           </div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">Network fee</div>
+          <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.networkFee') }}</div>
           <div class="field__value">{{ formatNumber(networkFee) }} <token-logo class="token-logo" :token="xor" /></div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">Maximum Price Impact ({{ priceImpactPercent }}%)</div>
+          <div class="field__label">
+            {{ t('adar.routeAssets.stages.reviewDetails.priceImpact', { priceImpact: priceImpactPercent }) }}
+          </div>
           <div class="field__value">
             {{ formatNumber(estimatedPriceImpact) }} <token-logo class="token-logo" :token="inputToken" />
           </div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">Total tokens required</div>
+          <div class="field__label">{{ t('adar.routeAssets.totalTokensRequired') }}</div>
           <div class="field__value">
             {{ formatNumber(estimatedAmountWithFees) }} <token-logo class="token-logo" :token="inputToken" />
           </div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">Total Tokens available</div>
+          <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.tokensAvailable') }}</div>
           <div class="field__value">
             {{ totalTokensAvailable }} <token-logo class="token-logo" :token="inputToken" />
           </div>
           <warning-message
             class="warning-message"
-            :text="noIssues ? 'balance is ok' : 'insufficient funds'"
+            :text="
+              noIssues
+                ? `${t('adar.routeAssets.stages.reviewDetails.okBalance')}`
+                : `${t('adar.routeAssets.stages.reviewDetails.badBalance')}`
+            "
             :isError="!noIssues"
           />
         </div>
         <template v-if="!noIssues">
           <s-divider />
           <div class="field">
-            <div class="field__label">remaining AMOUNT required</div>
+            <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.remainingAmount') }}</div>
             <div class="field__value">
               <s-button
                 type="primary"
                 class="s-typography-button--mini add-button"
                 @click.stop="onAddFundsClick('routing')"
               >
-                {{ 'Add' }}
+                {{ t('adar.routeAssets.stages.reviewDetails.add') }}
               </s-button>
               {{ formatNumber(remainingAmountRequired) }}
               <token-logo class="token-logo" :token="inputToken" />
@@ -95,7 +103,7 @@
                 class="s-typography-button--mini add-button"
                 @click.stop="onAddFundsClick('fee')"
               >
-                {{ 'Add' }}
+                {{ t('adar.routeAssets.stages.reviewDetails.add') }}
               </s-button>
               {{ formatNumber(xorFeeRequired) }}
               <token-logo class="token-logo" :token="xor" />
@@ -105,16 +113,18 @@
         <s-divider v-if="!noIssues" />
         <div class="buttons-container">
           <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
-            {{ 'Continue' }}
+            {{ t('adar.routeAssets.continue') }}
           </s-button>
           <s-button type="secondary" class="s-typography-button--big" @click.stop="cancelButtonAction">
-            {{ `CANCEL PROCESSING` }}
+            {{ t('adar.routeAssets.cancelProcessing') }}
           </s-button>
         </div>
       </div>
     </div>
     <div class="container routing-details-section">
-      <div class="route-assets__page-header-title">Routing Details</div>
+      <div class="route-assets__page-header-title">
+        {{ t('adar.routeAssets.stages.reviewDetails.routingDetails.title') }}
+      </div>
       <div v-for="(assetData, idx) in recipientsData" :key="idx" class="asset-data-container fields-container">
         <div class="asset-title">
           <div>
@@ -123,12 +133,12 @@
           <div>{{ assetData.asset.symbol }}</div>
         </div>
         <div class="field">
-          <div class="field__label">recepients</div>
+          <div class="field__label">{{ t('adar.routeAssets.recipients') }}</div>
           <div class="field__value">{{ assetData.recipientsNumber }}</div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">token AMOUNT required</div>
+          <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.routingDetails.amount') }}</div>
           <div class="field__value">{{ formatNumberJs(assetData.total) }}</div>
           <div class="field__value usd">{{ formatNumberJs(assetData.usd) }}</div>
         </div>

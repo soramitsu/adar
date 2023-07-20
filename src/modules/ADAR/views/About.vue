@@ -14,12 +14,11 @@
           <div>
             <!-- <h1>Advanced Digital Asset Routing</h1> -->
             <h3 style="line-height: 1.2; font-weight: 300">
-              ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy
-              And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis
+              {{ t('adar.about.description') }}
             </h3>
           </div>
           <div class="description-section__ref">
-            <a href="https://www.adar.com" target="_blank">learn more</a>
+            <a href="https://www.adar.com" target="_blank" rel="noopener">{{ t('adar.about.learnMore') }}</a>
           </div>
         </div>
       </section>

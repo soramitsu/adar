@@ -1,0 +1,170 @@
+{
+    "adar": {
+      "disclaimerTitle": "Clause de non-responsabilité",
+      "disclaimer": "La fonctionnalité d'échange de jetons sur le site web de ADAR Technologies Inc est alimentée par le site web Polkaswap (www.polkaswap.io), qui n'est pas maintenu par nous mais par la communauté de SORA. Par conséquent, en plus de nos conditions {adarTS} {adarPrivacy}, les conditions de Polkaswap s'appliquent mutatis mutandis. Les conditions de Polkaswap sont disponibles sur {polkaswapFaqLink}, {memorandumLink} et {privacyLink}.",
+      "routeAssets": {
+        "continue": "Continuer",
+        "cancelProcessing": "Annuler le traitement",
+        "cancel": "Annuler",
+        "back": "Retour",
+        "total": "total",
+        "name": "nom",
+        "wallet": "portefeuille",
+        "usd": "USD",
+        "asset": "actif",
+        "status": "statut",
+        "recipients": "Destinataires",
+        "totalUsdToRoute": "USD total à router",
+        "totalTokensRequired": "Total de jetons requis",
+        "inputAsset": "Actif d'entrée",
+        "stagesNames": {
+          "authorize": "Autoriser",
+          "done": "Terminé",
+          "processTemplate": "Traiter le modèle",
+          "reviewDetails": "Vérifier les détails",
+          "routing": "Routage",
+          "transactionOverview": "Aperçu des transactions",
+          "uploadTemplate": "Téléverser le modèle"
+        },
+        "stages": {
+          "uploadTemplate": {
+            "title": "Téléverser le modèle de routage pour le traitement",
+            "description": "Téléchargez votre modèle de routage de processus au format .CSV",
+            "instruction": "Faites glisser votre modèle de routage de processus complété ou cliquez pour téléverser",
+            "typesInfo": "Types de fichier pris en charge: CSV",
+            "uploadButtonTitle": "téléverser",
+            "templateHelp": "Vous n'avez pas de modèle?",
+            "download": "Télécharger",
+            "parcingError": {
+              "title": "Le fichier .csv n'a pas pu être analysé.",
+              "description": "Veuillez télécharger un nouveau fichier ou recommencer le processus.",
+              "buttonTitle": "Recommencer le processus"
+            }
+          },
+          "processTemplate": {
+            "recipients": "Destinataires",
+            "assets": "Actifs",
+            "usd": "USD équivalent",
+            "wallets": "Portefeuilles",
+            "amount": "MONTANTS ESTIMÉS",
+            "calculated": "calculé",
+            "issues": "problèmes trouvés",
+            "payeers": "payeurs",
+            "processing": "en cours de traitement",
+            "waiting": "en attente",
+            "title": "Modèle de routage de processus",
+            "description": "Notre système traite votre Modèle de Routage de Processus téléversé",
+            "fixButton": "corriger les problèmes"
+          },
+          "transactionOverview": {
+            "title": "Aperçu des transactions",
+            "amount": "en jetons"
+          },
+          "reviewDetails": {
+            "title": "Vérifier les détails de routage",
+            "description": "Vérifiez les détails de votre transaction de routage",
+            "asset": "Actif d'entrée",
+            "adarFee": "frais ADAR estimés ({adarFee}%)",
+            "networkFee": "frais de réseau",
+            "priceImpact": "impact maximal sur le prix ({priceImpact}%)",
+            "feeRequired": "frais XOR requis",
+            "tokensAvailable": "jetons disponibles au total",
+            "remainingAmount": "montant restant requis",
+            "badBalance": "fonds insuffisants",
+            "okBalance": "solde correct",
+            "add": "ajouter",
+            "routingDetails": {
+              "title": "Détails de routage",
+              "amount": "Montant de jetons requis"
+            }
+          },
+          "routing": {
+            "pending": "Traitement des transactions de routage...",
+            "passed": "Transactions approuvées",
+            "success": "Terminé",
+            "failed": "Échec",
+            "amountText": {
+              "pending": "montant total à router",
+              "passed": "montant total approuvé",
+              "success": "montant total routé",
+              "default": "montant total"
+            }
+          },
+          "done": {
+            "title": "Vérifier les détails de routage",
+            "description": "Vérifiez les détails de votre transaction de routage",
+            "failedTransactions": "TRANSACTIONS ÉCHOUÉES",
+            "rerun": "relancer les transactions échouées",
+            "finishAnyway": "Le redémarrage ne suffit pas? Terminer le routage de toute façon",
+            "pdfButton": "télécharger le rapport",
+            "finish": "terminer",
+            "routingDetails": {
+              "title": "Détails de routage",
+              "amount": "Montant de jetons routé",
+              "status": {
+                "status": "statut",
+                "success": "routé",
+                "pending": "en attente",
+                "passed": "approuvée",
+                "failed": "échec"
+              }
+            }
+          }
+        },
+        "dialogs": {
+          "fixIssuesDialog": {
+            "title": "Corriger ou supprimer les problèmes",
+            "issue": "Problème",
+            "recipient": "destinataire",
+            "wallets": "portefeuilles",
+            "walletAddress": "adresse de portefeuille",
+            "fieldStatusCorrect": "correct",
+            "fieldStatusIncorrect": "incorrect",
+            "usd": "nombre d'USD",
+            "assets": "Actifs",
+            "estimatedAmount": "montant estimé",
+            "amount": "montant",
+            "fixButton": "corriger le problème",
+            "deleteButton": "supprimer le destinataire",
+            "usdError": "Doit être un nombre",
+            "amountError": "Le prix du jeton n'a pas été trouvé"
+          },
+          "selectInputAssetDialog": {
+            "title": "Sélectionnez un actif d'entrée",
+            "totalUsd": "USD total à router",
+            "estimatedToken": "estimation {assetName} requise",
+            "description": "Sélectionnez un actif avec lequel vous souhaitez travailler"
+          },
+          "reportDialog": {
+            "title": "Sélectionner le format du fichier de rapport",
+            "description": "Veuillez télécharger un nouveau fichier ou recommencer le processus.",
+            "pdf": "pdf",
+            "csv": "csv"
+          },
+          "failedTransactionDialog": {
+            "title": "Transactions échouées",
+            "rerunButton": "relancer toutes les transactions"
+          },
+          "finishAnywayDialog": {
+            "title": "Confirmer la finalisation du routage malgré les problèmes de transaction",
+            "description": "S'il y a un certain problème de transaction et que le redémarrage ne suffit pas, vous pouvez terminer le processus de routage malgré les problèmes de transaction.",
+            "confirmButton": "Je confirme, terminer le routage"
+          }
+        },
+        "txStatus": {
+          "status": "statut",
+          "success": "réussite",
+          "pending": "en attente",
+          "passed": "approuvée",
+          "failed": "échec",
+          "addressValid": "adresse valide",
+          "addressInvalid": "adresse invalide"
+        }
+      },
+      "about": {
+        "description": "ADAR permet aux propriétaires de petites et moyennes entreprises (PME) de gagner du temps et de l'argent en facilitant et en réduisant le coût du paiement à un grand nombre de fournisseurs et d'employés mondiaux de manière récurrente.",
+        "learnMore": "En savoir plus"
+      }
+    }
+  }
+  
