@@ -375,6 +375,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
     if (recipients.length < 1) return;
 
     if (value.status === TransactionStatus.Error) {
+      this.setTxStatus(SwapTransferBatchStatus.FAILED);
       recipients.forEach((reciever) => {
         this.setRecipientStatus({
           id: reciever.id,

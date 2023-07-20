@@ -192,6 +192,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   ) => SummaryAssetRecipientsInfo[];
 
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -249,9 +250,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get estimatedAmountWithFees() {
-    return this.isInputAssetXor
-      ? this.estimatedAmount.add(this.adarFee).add(this.estimatedPriceImpact).add(this.networkFee)
-      : this.estimatedAmount.add(this.adarFee).add(this.estimatedPriceImpact);
+    return this.isInputAssetXor ? this.overallEstimatedTokens().add(this.networkFee) : this.overallEstimatedTokens();
   }
 
   get totalTokensAvailable() {
@@ -267,7 +266,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get showXorRequiredField() {
-    return this.networkFee > this.xorBalance && !this.isInputAssetXor;
+    return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
   }
 
   get xorBalance() {

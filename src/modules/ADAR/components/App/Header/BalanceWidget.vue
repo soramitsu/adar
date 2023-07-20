@@ -51,7 +51,7 @@ export default class BalanceWidget extends Vue {
 <style lang="scss" scoped>
 .balance-widget {
   display: flex;
-  width: 180px;
+  max-width: 250px;
   height: 42px;
   padding: 0px 4px;
   justify-content: center;
