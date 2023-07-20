@@ -215,8 +215,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get estimatedAmount() {
-    const sum = sumBy(this.recipientsData, (item: any) => item.required);
-    return new FPNumber(sum);
+    return this.recipientsData.reduce((acc, item) => {
+      return new FPNumber(item.required).add(acc);
+    }, FPNumber.ZERO);
   }
 
   get adarFeeMultiplier() {
@@ -242,7 +243,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get adarFee() {
-    return this.estimatedAmount.add(this.estimatedPriceImpact).mul(this.adarFeeMultiplier);
+    return this.estimatedAmount.mul(this.adarFeeMultiplier);
   }
 
   get estimatedPriceImpact() {
