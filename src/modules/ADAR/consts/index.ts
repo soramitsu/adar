@@ -16,6 +16,7 @@ export enum AdarComponents {
   RouteAssetsTransactionOverview = 'RouteAssets/Stages/TransactionOverview',
   RouteAssetsUploadTemplate = 'RouteAssets/Stages/UploadTemplate',
   RouteAssetsNavigation = 'App/Header/RouteAssetsNavigation',
+  BalanceWidget = 'App/Header/BalanceWidget',
   RouteAssetsFixIssuesDialog = 'RouteAssets/FixIssuesDialog',
   RouteAssetsSelectInputAssetDialog = 'RouteAssets/SelectInputAssetDialog',
   RouteAssetsSwapDialog = 'RouteAssets/SwapDialog',
@@ -46,6 +47,6 @@ function createStage(title: string, componentName: string): Stage {
   };
 }
 
-export const slippageMultiplier = '0.05';
+export const slippageMultiplier = '0.03';
 
 export const adarFee = '0.0025';

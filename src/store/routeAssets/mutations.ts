@@ -1,6 +1,8 @@
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { defineMutations } from 'direct-vuex';
 
+import { SwapTransferBatchStatus } from './types';
+
 import type { RouteAssetsState, Recipient, TransactionInfo, RouteAssetsSubscription } from './types';
 import type { PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
 
@@ -16,6 +18,7 @@ const mutations = defineMutations<RouteAssetsState>()({
     state.processingState.inputToken = XOR;
     state.processingState.txInfo = undefined;
     state.processingState.datetime = undefined;
+    state.processingState.status = SwapTransferBatchStatus.INITIAL;
   },
   setSubscriptions(state, subscriptions: Array<RouteAssetsSubscription> = []): void {
     state.subscriptions = subscriptions;
@@ -109,6 +112,9 @@ const mutations = defineMutations<RouteAssetsState>()({
   },
   setTxDatetime(state, date: Date) {
     state.processingState.datetime = date;
+  },
+  setTxStatus(state, status: SwapTransferBatchStatus) {
+    state.processingState.status = status;
   },
   setPrimaryMarketsEnabledAssets(state, assets: PrimaryMarketsEnabledAssets): void {
     state.enabledAssets = Object.freeze({ ...assets });

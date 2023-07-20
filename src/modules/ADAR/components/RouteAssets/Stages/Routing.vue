@@ -1,21 +1,33 @@
 <template>
   <div class="container route-assets-routing-process">
-    <div class="route-assets__page-header-title">Routing assets...</div>
-    <div class="fields-container">
-      <div v-for="(token, idx) in recipientsTokens" :key="idx">
-        <div class="field">
-          <div class="field__value pointer">
-            <div>{{ token.symbol }}</div>
-            <div>
-              <token-logo class="token-logo" :token="token" />
-            </div>
-          </div>
-          <div class="field__label" :class="`field__label_${getStatus(token)}`">{{ getStatus(token) }}</div>
+    <div>
+      <div v-loading="spinner" class="route-assets-routing-process__spinner">
+        <div class="status">
+          <s-icon :name="iconName" size="30px" />
         </div>
-        <s-divider />
+      </div>
+      <div class="route-assets-routing-process__status-text">{{ statusText }}</div>
+    </div>
+    <div class="fields-container">
+      <div class="field">
+        <div class="field__label">INPUT ASSET</div>
+        <div class="field__value">
+          <div>{{ inputToken.symbol }}</div>
+          <div>
+            <token-logo class="token-logo" :token="inputToken" />
+          </div>
+        </div>
+      </div>
+      <s-divider />
+      <div class="field">
+        <div class="field__label">{{ amountText }}</div>
+        <div class="field__value">
+          {{ tokensEstimate }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
+          <span class="usd">{{ overallUSDNumber }}</span>
+        </div>
       </div>
     </div>
-    <div class="buttons-container">
+    <div v-if="!continueButtonDisabled" class="buttons-container">
       <s-button
         type="primary"
         class="s-typography-button--big"
@@ -29,13 +41,14 @@
 </template>
 
 <script lang="ts">
-import { Asset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/util/build';
+import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { action, getter } from '@/store/decorators';
-import { Recipient, RecipientStatus } from '@/store/routeAssets/types';
+import { Recipient, RecipientStatus, SwapTransferBatchStatus } from '@/store/routeAssets/types';
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -45,6 +58,10 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @action.routeAssets.processingNextStage nextStage!: any;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @getter.routeAssets.recipientsTokens recipientsTokens!: Asset[];
+  @getter.routeAssets.inputToken inputToken!: Asset;
+  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
 
   get continueButtonDisabled() {
     return !!this.recipients.find(
@@ -56,11 +73,34 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     this.nextStage();
   }
 
-  getStatus(asset) {
-    const transactions = this.recipients.filter((recipient) => recipient.asset.address === asset.address);
-    if (transactions.some((recipient) => recipient.status === RecipientStatus.FAILED)) return 'failed';
-    if (transactions.some((recipient) => recipient.status === RecipientStatus.PASSED)) return 'passed';
-    return transactions.find((recipient) => recipient.status === RecipientStatus.PENDING) ? 'waiting' : 'routed';
+  get tokensEstimate() {
+    return this.overallEstimatedTokens()?.toFixed();
+  }
+
+  get iconName() {
+    return this.status === SwapTransferBatchStatus.SUCCESS ? 'basic-check-marks-24' : 'basic-close-24';
+  }
+
+  get statusText() {
+    if (this.status === SwapTransferBatchStatus.SUCCESS) return 'Completed';
+    if (this.status === SwapTransferBatchStatus.PENDING) return 'Processing the routing transactions...';
+    if (this.status === SwapTransferBatchStatus.PASSED) return 'Transactions are passed';
+    return 'Failed';
+  }
+
+  get amountText() {
+    if (this.status === SwapTransferBatchStatus.SUCCESS) return 'total amount routed';
+    if (this.status === SwapTransferBatchStatus.PENDING) return 'total amount to be routed';
+    if (this.status === SwapTransferBatchStatus.PASSED) return 'total amount authorized';
+    return 'total amount';
+  }
+
+  get spinner() {
+    return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
+  }
+
+  get status() {
+    return this.batchTxStatus;
   }
 
   formatNumber(num) {
@@ -88,6 +128,38 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
       width: 24px;
       height: 24px;
     }
+  }
+
+  &__spinner {
+    height: 75px;
+    width: 75px;
+    margin: 0 auto;
+    border-radius: 999px;
+    overflow: hidden;
+    .status {
+      background: color-mix(in srgb, var(--s-color-theme-accent) 20%, transparent);
+      height: 100%;
+      position: relative;
+      // opacity: 0.3;
+      i {
+        // font-size: 16px !important;
+        // display: block;
+        color: var(--s-color-theme-accent);
+        opacity: 1;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
+
+  &__status-text {
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 36px;
+    letter-spacing: -0.02em;
+    text-align: center;
   }
 }
 </style>
@@ -135,12 +207,20 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 }
 
 .buttons-container {
-  margin-top: 150px;
+  // margin-top: 150px;
 
   button {
     width: 100%;
     display: block;
     margin: 0;
+  }
+}
+
+.usd {
+  color: var(--s-color-fiat-value);
+  &::before {
+    content: '~ $';
+    display: inline;
   }
 }
 </style>
