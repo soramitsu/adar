@@ -1,16 +1,16 @@
 <template>
   <div class="select-report-fromat-dialog">
     <dialog-base :visible.sync="isVisible" custom-class="dialog__select-report-format">
-      <div class="route-assets__page-header-title">Select report file format</div>
+      <div class="route-assets__page-header-title">{{ t('adar.routeAssets.dialogs.reportDialog.title') }}</div>
       <div class="route-assets__page-header-description">
-        {{ `You can either use the PDF or CSV format.` }}
+        {{ t('adar.routeAssets.dialogs.reportDialog.description') }}
       </div>
       <div class="buttons-container">
         <s-button type="primary" class="s-typography-button--big browse-button" @click.stop="onPDFSelect">
-          {{ 'PDF' }}
+          {{ t('adar.routeAssets.dialogs.reportDialog.pdf') }}
         </s-button>
         <s-button type="primary" class="s-typography-button--big browse-button" @click.stop="onCSVSelect">
-          {{ 'CSV' }}
+          {{ t('adar.routeAssets.dialogs.reportDialog.csv') }}
         </s-button>
       </div>
     </dialog-base>

@@ -1,13 +1,13 @@
 <template>
   <div class="route-assets-review-details">
     <div class="container routing-summary-section">
-      <div class="route-assets__page-header-title">Routing completed</div>
+      <div class="route-assets__page-header-title">{{ t('adar.routeAssets.stages.done.title') }}</div>
       <div class="route-assets__page-header-description">
-        {{ `View the details of your recent routing transaction` }}
+        {{ t('adar.routeAssets.stages.done.description') }}
       </div>
       <div class="fields-container">
         <div class="field">
-          <div class="field__label">INPUT ASSET</div>
+          <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
           <div class="field__value">
             <div>{{ inputToken.symbol }}</div>
             <div>
@@ -17,14 +17,14 @@
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">total</div>
+          <div class="field__label">{{ t('adar.routeAssets.total') }}</div>
           <div class="field__value">
             {{ totalAmount }} <span class="usd">{{ totalUSD }}</span>
           </div>
         </div>
         <s-divider />
         <div class="field" v-if="incompletedRecipientsLength > 0">
-          <div class="field__label">FAILED TRANSACTIONS</div>
+          <div class="field__label">{{ t('adar.routeAssets.stages.done.failedTransactions') }}</div>
           <warning-message class="warning-message" :text="'re-run failed transactions'" :isError="true" />
           <div class="field__value">
             {{ incompletedRecipientsLength }}
@@ -38,7 +38,7 @@
           @click.stop="showFailedTransactionsDialog = true"
           v-if="withErrors"
         >
-          {{ 'RE-RUN FAILED TRANSACTIONS' }}
+          {{ t('adar.routeAssets.stages.done.rerun') }}
         </s-button>
         <s-button
           v-if="!withErrors"
@@ -46,7 +46,7 @@
           class="s-typography-button--big"
           @click.stop="onReportDownloadClick()"
         >
-          {{ 'DOWNLOAD Report' }}
+          {{ t('adar.routeAssets.stages.done.pdfButton') }}
         </s-button>
         <s-button
           type="link"
@@ -54,15 +54,15 @@
           @click.stop="openFinishRoutingDialog"
           v-if="withErrors"
         >
-          <span>{{ `Re-run doesn’t help? Finish routing anyway` }}</span>
+          <span>{{ t('adar.routeAssets.stages.done.finishAnyway') }}</span>
         </s-button>
         <s-button v-else type="primary" class="s-typography-button--big" @click.stop="onFinishRouting">
-          {{ 'FINISH' }}
+          {{ t('adar.routeAssets.stages.done.finish') }}
         </s-button>
       </div>
     </div>
     <div v-if="summaryData.length > 0" class="container routing-details-section">
-      <div class="route-assets__page-header-title">Routing Details</div>
+      <div class="route-assets__page-header-title">{{ t('adar.routeAssets.stages.done.routingDetails.title') }}</div>
       <div v-for="(assetData, idx) in summaryData" :key="idx" class="asset-data-container fields-container">
         <div class="asset-title">
           <div>
@@ -71,18 +71,18 @@
           <div>{{ assetData.asset.symbol }}</div>
         </div>
         <div class="field">
-          <div class="field__label">recipients</div>
+          <div class="field__label">{{ t('adar.routeAssets.recipients') }}</div>
           <div class="field__value">{{ assetData.recipientsNumber }}</div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">token AMOUNT routed</div>
+          <div class="field__label">{{ t('adar.routeAssets.stages.done.routingDetails.amount') }}</div>
           <div class="field__value">{{ formatNumber(assetData.total) }}</div>
           <div class="field__value usd">{{ formatNumber(assetData.usd) }}</div>
         </div>
         <s-divider />
         <div class="field">
-          <div class="field__label">Status</div>
+          <div class="field__label">{{ t('adar.routeAssets.txStatus.status') }}</div>
           <div class="field__value" :class="`field__value_${assetData.status}`">{{ assetData.status }}</div>
         </div>
       </div>
@@ -184,8 +184,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   getStatus(assetArray) {
-    if (assetArray.some((recipient) => recipient.status === RecipientStatus.FAILED)) return 'failed';
-    return assetArray.find((recipient) => recipient.status === RecipientStatus.PENDING) ? 'waiting' : 'routed';
+    if (assetArray.some((recipient) => recipient.status === RecipientStatus.FAILED))
+      return this.t('adar.routeAssets.txStatus.failed');
+    return assetArray.find((recipient) => recipient.status === RecipientStatus.PENDING)
+      ? this.t('adar.routeAssets.txStatus.waiting')
+      : this.t('adar.routeAssets.txStatus.success');
   }
 
   getAssetUSDPrice(asset: Asset) {
