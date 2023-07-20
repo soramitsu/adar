@@ -21,6 +21,9 @@ def pipeline = new org.js.AppPipeline(steps: this,
     ipfsHashChatIDStage: '',
     ipfsHashChatIDProd: '',
     // ipfsHashChatID: '-1001375555544',
-    secretScannerExclusion: 'Jenkinsfile-UCAN|.*env.json\$|.*env-stage.json\$'
+    secretScannerExclusion: 'Jenkinsfile-UCAN|.*env.json\$|.*env-stage.json\$',
+    sonarSrcPath: 'src',
+    sonarTestsPath: 'tests',
+    dojoProductType: 'Dev'
 )
 pipeline.runPipeline()
