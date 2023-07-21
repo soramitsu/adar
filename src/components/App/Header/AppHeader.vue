@@ -204,6 +204,9 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     @include tablet(true) {
       display: none;
     }
+    @media (max-width: 1550px) and (min-width: 1440px) {
+      left: 40%;
+    }
   }
 
   .balance-widget {

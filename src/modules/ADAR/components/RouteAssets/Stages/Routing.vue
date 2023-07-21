@@ -72,7 +72,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get tokensEstimate() {
-    return this.overallEstimatedTokens()?.toFixed();
+    return this.overallEstimatedTokens()?.toLocaleString();
   }
 
   get iconName() {
