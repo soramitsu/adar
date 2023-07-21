@@ -1,12 +1,10 @@
-// RECIPIENT_NAME;WALLET_ADDRESS;AMOUNT;TARGET_TOKEN;IS_AMOUNT_IN_TOKENS
-// RECIPIENT_NAME - name
-// WALLET_ADDRESS - Sora Network wallet address
-// AMOUNT - The amount the recipient should receive. It can be expressed either in dollars or in target tokens. If you 
-// want the recipient to receive an amount of tokens equivalent to the specified dollar value, leave the last parameter 
-// empty. If you want to send a specific number of tokens to the recipient, set the last parameter to true.
-// TARGET_TOKEN - tokens that the recipient will receive
-// IS_AMOUNT_IN_TOKENS - optional parameter, if true - AMOUNT parameter becomes token value, if nothing (false) - AMOUNT parameter is in $
-// Example - in the first row recipient will get 2000 XOR
-// Example - in the second row recipient will get amount of PSWAP tokens, equivalent 3000$
-Melanie Wilson;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;2000;XOR;true
-Charles Scott;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;3000;PSWAP
+// RECIPIENT_NAME;WALLET_ADDRESS;AMOUNT;TARGET_TOKEN;IS_AMOUNT_IN_TOKENS					
+// RECIPIENT_NAME - Name					
+// WALLET_ADDRESS - SORA network wallet address					
+// AMOUNT - Amount to be received recipient should receive. Amounts can be expressed either in Dollars or in target tokens. If you want the recipient to receive tokens equivalent to the specified Dollar value, leave IS_AMOUNT_IN_TOKENS parameter empty. If you want to send a specific number of tokens to the recipient, set IS_AMOUNT_IN_TOKENS parameter to true.					
+// TARGET_TOKEN - The token that the recipient will receive (eg XOR, XSTUSD, etc)					
+// IS_AMOUNT_IN_TOKENS - optional parameter, if true - the AMOUNT parameter becomes the value of tokens sent					
+// Example - in the first row, the recipient will get 2000 XOR					
+// Example - in the second row, the recipient will get $3000 worth of PSWAP tokens					
+Melanie Wilson;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;2000;XOR;true					
+Charles Scott;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;3000;PSWAP					
