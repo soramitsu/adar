@@ -128,9 +128,9 @@ const initModel: any = {
   name: '',
   wallet: '',
   asset: XOR,
-  amount: FPNumber.ZERO,
+  amount: '0',
   id: '',
-  usd: FPNumber.ZERO,
+  usd: '0',
 };
 @Component({
   components: {
@@ -194,9 +194,9 @@ export default class FixIssuesDialog extends Mixins(
 
   get assetUSDPrice() {
     if (!this.model.asset?.address) return 0;
-    return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, 18)
+    return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, this.model.asset.decimals)
       .dp(8)
-      .toLocaleString();
+      .toString();
   }
 
   get submitIsDisabled() {
@@ -204,17 +204,17 @@ export default class FixIssuesDialog extends Mixins(
   }
 
   getModelPropValue(propName) {
-    return this.model[propName].toLocaleString();
+    return this.model[propName];
   }
 
   onUsdChanged(newUsd) {
-    this.model.usd = new FPNumber(newUsd);
-    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice));
+    this.model.usd = newUsd;
+    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice)).toString();
   }
 
   onAmountChanged(newAmount) {
-    this.model.amount = new FPNumber(newAmount);
-    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice));
+    this.model.amount = newAmount;
+    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice)).toString();
   }
 
   onDeleteClick() {
@@ -225,20 +225,22 @@ export default class FixIssuesDialog extends Mixins(
     this.editRecipient({
       name: this.model.name,
       wallet: this.model.wallet,
-      usd: this.model.usd,
+      usd: new FPNumber(this.model.usd),
       id: this.recipient.id,
       asset: this.model.asset,
-      amount: this.model.amount,
+      amount: new FPNumber(this.model.amount),
+    });
+    this.$nextTick(() => {
+      this.reloadRecipient();
     });
   }
 
-  @Watch('recipient', { immediate: true, deep: true })
-  onRecipientChanged(newVal) {
-    if (newVal) {
-      Object.assign(this.model, this.recipient);
-    } else {
-      this.resetState();
-    }
+  reloadRecipient() {
+    Object.assign(this.model, this.recipient);
+  }
+
+  mounted() {
+    this.reloadRecipient();
   }
 }
 </script>
