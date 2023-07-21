@@ -30,9 +30,7 @@ export default class BalanceWidget extends Vue {
   }
 
   get formattedBalance(): string {
-    return this.fpBalance.toNumber().toLocaleString(undefined, {
-      maximumFractionDigits: 6,
-    });
+    return this.fpBalance.dp(6).toLocaleString();
   }
 
   get fpBalance(): FPNumber {
@@ -51,7 +49,7 @@ export default class BalanceWidget extends Vue {
 <style lang="scss" scoped>
 .balance-widget {
   display: flex;
-  width: 180px;
+  max-width: 250px;
   height: 42px;
   padding: 0px 4px;
   justify-content: center;

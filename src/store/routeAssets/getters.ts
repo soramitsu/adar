@@ -4,7 +4,7 @@ import { defineGetters } from 'direct-vuex';
 import { groupBy, sumBy } from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { Stages, slippageMultiplier } from '@/modules/ADAR/consts';
+import { Stages, slippageMultiplier, adarFee as adarFeeMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsGetterContext } from '@/store/routeAssets';
 
 import { getAssetUSDPrice } from './utils';
@@ -86,9 +86,10 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.recipients
       .reduce((acc, recipient) => {
-        return acc + recipient.usd;
-      }, 0)
-      .toFixed(2);
+        return acc.add(new FPNumber(recipient.usd));
+      }, FPNumber.ZERO)
+      .dp(2)
+      .toLocaleString();
   },
   recipientsGroupedByToken:
     (...args) =>
@@ -121,8 +122,12 @@ const getters = defineGetters<RouteAssetsState>()({
       const { getters } = routeAssetsGetterContext(args);
       const token = asset || getters.inputToken;
       const summaryData = getters.recipientsGroupedByToken(token);
-      const sum = new FPNumber(sumBy(summaryData, (item) => item.required));
-      return new FPNumber(slippageMultiplier).mul(sum).add(sum);
+      const totalAmount = summaryData.reduce((acc, item) => {
+        return new FPNumber(item.required).add(acc);
+      }, FPNumber.ZERO);
+      const adarFee = new FPNumber(adarFeeMultiplier).mul(totalAmount);
+      const priceImpact = new FPNumber(slippageMultiplier).mul(totalAmount);
+      return totalAmount.add(priceImpact).add(adarFee);
     },
 });
 

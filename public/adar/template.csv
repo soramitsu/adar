@@ -1,2 +1,12 @@
-Melanie Wilson;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;2000;XOR
+// RECIPIENT_NAME;WALLET_ADDRESS;AMOUNT;TARGET_TOKEN;IS_AMOUNT_IN_TOKENS
+// RECIPIENT_NAME - name
+// WALLET_ADDRESS - Sora Network wallet address
+// AMOUNT - The amount the recipient should receive. It can be expressed either in dollars or in target tokens. If you 
+// want the recipient to receive an amount of tokens equivalent to the specified dollar value, leave the last parameter 
+// empty. If you want to send a specific number of tokens to the recipient, set the last parameter to true.
+// TARGET_TOKEN - tokens that the recipient will receive
+// IS_AMOUNT_IN_TOKENS - optional parameter, if true - AMOUNT parameter becomes token value, if nothing (false) - AMOUNT parameter is in $
+// Example - in the first row recipient will get 2000 XOR
+// Example - in the second row recipient will get amount of PSWAP tokens, equivalent 3000$
+Melanie Wilson;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;2000;XOR;true
 Charles Scott;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;3000;PSWAP
