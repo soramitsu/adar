@@ -241,7 +241,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   }
 
   formatNumber(num) {
-    return new FPNumber(num).dp(4).toLocaleString();
+    return num.dp(4).toLocaleString();
   }
 
   handleResetSearch(): void {

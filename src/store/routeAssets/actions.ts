@@ -68,11 +68,11 @@ const actions = defineActions({
             const csvAmount = row.data[2]?.replace(/,/g, '');
             const asset = findAsset(row.data[3]);
             const amount = amountInTokens
-              ? Number(csvAmount)
-              : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject)).toNumber();
+              ? new FPNumber(csvAmount)
+              : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject));
             const usd = amountInTokens
-              ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject)).toNumber()
-              : Number(csvAmount);
+              ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject))
+              : new FPNumber(csvAmount);
             data.push({
               name: row.data[0],
               wallet: row.data[1],
@@ -189,7 +189,7 @@ const actions = defineActions({
     const recipients = getters.recipients;
     recipients.forEach((recipient) => {
       if (!recipient.amountInTokens) {
-        const amount = new FPNumber(recipient.usd).div(getAssetUSDPrice(recipient.asset, priceObject)).toNumber();
+        const amount = recipient.usd.div(getAssetUSDPrice(recipient.asset, priceObject));
         commit.setRecipientTokenAmount({ id: recipient.id, amount });
       }
     });

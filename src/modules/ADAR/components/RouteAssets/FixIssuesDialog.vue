@@ -39,7 +39,7 @@
           </div>
         </s-form-item>
         <s-form-item v-if="!amountInTokens" prop="usd">
-          <s-input :placeholder="'USD'" :value="model.usd" @input="onUsdChanged($event)" />
+          <s-input :placeholder="'USD'" :value="getModelPropValue('usd')" @input="onUsdChanged($event)" />
           <div class="error-message" :class="!usdError ? 'error-message_valid' : 'error-message_invalid'">
             <div>
               {{
@@ -56,7 +56,7 @@
           </div>
         </s-form-item>
         <s-form-item v-else prop="amount">
-          <s-input :placeholder="'amount'" :value="model.amount" @input="onAmountChanged($event)" />
+          <s-input :placeholder="'amount'" :value="getModelPropValue('amount')" @input="onAmountChanged($event)" />
           <div class="error-message" :class="!amountError ? 'error-message_valid' : 'error-message_invalid'">
             <div>
               {{
@@ -128,9 +128,9 @@ const initModel: any = {
   name: '',
   wallet: '',
   asset: XOR,
-  amount: 0,
+  amount: FPNumber.ZERO,
   id: '',
-  usd: 0,
+  usd: FPNumber.ZERO,
 };
 @Component({
   components: {
@@ -203,14 +203,18 @@ export default class FixIssuesDialog extends Mixins(
     return !validate.validate(this.model);
   }
 
+  getModelPropValue(propName) {
+    return this.model[propName].toLocaleString();
+  }
+
   onUsdChanged(newUsd) {
-    this.model.usd = Number(newUsd);
-    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice)).toNumber();
+    this.model.usd = new FPNumber(newUsd);
+    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice));
   }
 
   onAmountChanged(newAmount) {
-    this.model.amount = Number(newAmount);
-    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice)).toNumber();
+    this.model.amount = new FPNumber(newAmount);
+    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice));
   }
 
   onDeleteClick() {
