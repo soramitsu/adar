@@ -48,7 +48,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { action, getter } from '@/store/decorators';
-import { Recipient, RecipientStatus, SwapTransferBatchStatus } from '@/store/routeAssets/types';
+import { Recipient, SwapTransferBatchStatus } from '@/store/routeAssets/types';
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -64,9 +64,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
 
   get continueButtonDisabled() {
-    return !!this.recipients.find(
-      (recipient) => recipient.status === RecipientStatus.PENDING || recipient.status === RecipientStatus.PASSED
-    );
+    return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
   }
 
   onContinueClick() {
@@ -74,7 +72,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get tokensEstimate() {
-    return this.overallEstimatedTokens()?.toFixed();
+    return this.overallEstimatedTokens()?.toLocaleString();
   }
 
   get iconName() {
@@ -104,14 +102,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 
   get status() {
     return this.batchTxStatus;
-  }
-
-  formatNumber(num) {
-    return !num || !Number.isFinite(num)
-      ? '-'
-      : num.toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
   }
 }
 </script>

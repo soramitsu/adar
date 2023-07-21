@@ -25,7 +25,7 @@
         <s-divider />
         <div class="field" v-if="incompletedRecipientsLength > 0">
           <div class="field__label">{{ t('adar.routeAssets.stages.done.failedTransactions') }}</div>
-          <warning-message class="warning-message" :text="'re-run failed transactions'" :isError="true" />
+          <warning-message class="warning-message" :text="t('adar.routeAssets.stages.done.rerun')" :isError="true" />
           <div class="field__value">
             {{ incompletedRecipientsLength }}
           </div>
@@ -34,7 +34,7 @@
       <div class="buttons-container">
         <s-button
           type="primary"
-          class="s-typography-button--big"
+          class="s-typography-button--medium"
           @click.stop="showFailedTransactionsDialog = true"
           v-if="withErrors"
         >
@@ -196,11 +196,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   formatNumber(num) {
-    return !num || !Number.isFinite(num)
-      ? '-'
-      : num.toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
+    return new FPNumber(num).dp(4).toLocaleString();
   }
 
   openFinishRoutingDialog() {

@@ -58,13 +58,12 @@
 </template>
 
 <script lang="ts">
+import { FPNumber } from '@sora-substrate/util/build';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { lazyComponent } from '@/router';
 import { action, getter } from '@/store/decorators';
 import { Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
@@ -152,12 +151,11 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   }
 
   get lastModified() {
-    const options = { month: 'short', day: 'numeric' } as const;
-    return new Date(this.file?.lastModified || 0).toLocaleDateString('en-US', options);
+    return this.formatDate(this.file?.lastModified || 0, 'D MMM');
   }
 
   get fileSize() {
-    return ((this.file?.size || 1) / 1024).toFixed(2);
+    return new FPNumber(this.file?.size || 1).div(new FPNumber(1024)).dp(2).toLocaleString();
   }
 
   get recipientsCount() {

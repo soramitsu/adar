@@ -108,17 +108,17 @@ export default class SelectInputAssetDialog extends Mixins(
 
   get valEstimate() {
     const val = this.assetList.find((item) => item.symbol.toLowerCase() === 'val');
-    return this.overallEstimatedTokens(val)?.toFixed();
+    return this.overallEstimatedTokens(val)?.toLocaleString();
   }
 
   get xorEstimate() {
     const xor = this.assetList.find((item) => item.symbol.toLowerCase() === 'xor');
-    return this.overallEstimatedTokens(xor)?.toFixed();
+    return this.overallEstimatedTokens(xor)?.toLocaleString();
   }
 
   get pswapEstimate() {
     const pswap = this.assetList.find((item) => item.symbol.toLowerCase() === 'pswap');
-    return this.overallEstimatedTokens(pswap)?.toFixed();
+    return this.overallEstimatedTokens(pswap)?.toLocaleString();
   }
 
   get tokensEstimate() {

@@ -189,14 +189,14 @@ export default class FixIssuesDialog extends Mixins(
   }
 
   get localTokenAmount() {
-    return this.model.amount.toLocaleString('en-US', {
-      maximumFractionDigits: 4,
-    });
+    return this.formatStringValue(this.model.amount, 4);
   }
 
   get assetUSDPrice() {
     if (!this.model.asset?.address) return 0;
-    return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, 18).toFixed(8);
+    return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, 18)
+      .dp(8)
+      .toString();
   }
 
   get submitIsDisabled() {

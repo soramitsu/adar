@@ -192,6 +192,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   ) => SummaryAssetRecipientsInfo[];
 
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -214,8 +215,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get estimatedAmount() {
-    const sum = sumBy(this.recipientsData, (item: any) => item.required);
-    return new FPNumber(sum);
+    return this.recipientsData.reduce((acc, item) => {
+      return new FPNumber(item.required).add(acc);
+    }, FPNumber.ZERO);
   }
 
   get adarFeeMultiplier() {
@@ -241,7 +243,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get adarFee() {
-    return this.estimatedAmount.add(this.estimatedPriceImpact).mul(this.adarFeeMultiplier);
+    return this.estimatedAmount.mul(this.adarFeeMultiplier);
   }
 
   get estimatedPriceImpact() {
@@ -249,9 +251,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get estimatedAmountWithFees() {
-    return this.isInputAssetXor
-      ? this.estimatedAmount.add(this.adarFee).add(this.estimatedPriceImpact).add(this.networkFee)
-      : this.estimatedAmount.add(this.adarFee).add(this.estimatedPriceImpact);
+    return this.isInputAssetXor ? this.overallEstimatedTokens().add(this.networkFee) : this.overallEstimatedTokens();
   }
 
   get totalTokensAvailable() {
@@ -267,7 +267,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get showXorRequiredField() {
-    return this.networkFee > this.xorBalance && !this.isInputAssetXor;
+    return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
   }
 
   get xorBalance() {
@@ -324,9 +324,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get formattedBalance(): string {
-    return this.fpBalance.toNumber().toLocaleString('en-US', {
-      maximumFractionDigits: 6,
-    });
+    return this.fpBalance.dp(6).toLocaleString();
   }
 
   getAssetUSDPrice(asset: Asset) {
@@ -339,19 +337,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   formatNumberJs(num) {
-    return !num || !Number.isFinite(num)
-      ? '-'
-      : num.toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
+    return new FPNumber(num).dp(4).toLocaleString();
   }
 
   formatNumber(num: FPNumber) {
-    return !num || !num.isFinity()
-      ? '-'
-      : num.toNumber().toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
+    return !num || !num.isFinity() ? '-' : num.dp(4).toLocaleString();
   }
 
   // onAddFundsClick() {
