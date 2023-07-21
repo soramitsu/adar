@@ -196,7 +196,7 @@ export default class FixIssuesDialog extends Mixins(
     if (!this.model.asset?.address) return 0;
     return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, 18)
       .dp(8)
-      .toLocaleString();
+      .toString();
   }
 
   get submitIsDisabled() {
