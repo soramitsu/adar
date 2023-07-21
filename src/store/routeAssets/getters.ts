@@ -86,9 +86,10 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.recipients
       .reduce((acc, recipient) => {
-        return acc + recipient.usd;
-      }, 0)
-      .toFixed(2);
+        return acc.add(new FPNumber(recipient.usd));
+      }, FPNumber.ZERO)
+      .dp(2)
+      .toLocaleString();
   },
   recipientsGroupedByToken:
     (...args) =>

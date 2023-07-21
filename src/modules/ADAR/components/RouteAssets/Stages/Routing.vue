@@ -103,14 +103,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   get status() {
     return this.batchTxStatus;
   }
-
-  formatNumber(num) {
-    return !num || !Number.isFinite(num)
-      ? '-'
-      : num.toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
-  }
 }
 </script>
 

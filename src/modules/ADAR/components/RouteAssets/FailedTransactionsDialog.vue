@@ -141,6 +141,7 @@
 </template>
 
 <script lang="ts">
+import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
@@ -232,9 +233,7 @@ export default class FailedTransactionsDialog extends Mixins(
   }
 
   formatNumber(num) {
-    return num.toLocaleString('en-US', {
-      maximumFractionDigits: 4,
-    });
+    return new FPNumber(num).dp(4).toLocaleString();
   }
 
   handleResetSearch(): void {

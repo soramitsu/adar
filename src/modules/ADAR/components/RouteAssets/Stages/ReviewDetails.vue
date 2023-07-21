@@ -324,9 +324,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get formattedBalance(): string {
-    return this.fpBalance.toNumber().toLocaleString('en-US', {
-      maximumFractionDigits: 6,
-    });
+    return this.fpBalance.dp(6).toLocaleString();
   }
 
   getAssetUSDPrice(asset: Asset) {
@@ -339,19 +337,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   formatNumberJs(num) {
-    return !num || !Number.isFinite(num)
-      ? '-'
-      : num.toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
+    return new FPNumber(num).dp(4).toLocaleString();
   }
 
   formatNumber(num: FPNumber) {
-    return !num || !num.isFinity()
-      ? '-'
-      : num.toNumber().toLocaleString('en-US', {
-          maximumFractionDigits: 4,
-        });
+    return !num || !num.isFinity() ? '-' : num.dp(4).toLocaleString();
   }
 
   // onAddFundsClick() {
