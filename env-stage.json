@@ -31,6 +31,10 @@
   "NETWORK_TYPE": "Stage",
   "CHAIN_GENESIS_HASH": "0x1a0983c6c9fd3178ae24656bcfca4510a439ab7b90c83e360a1671609752b09a",
   "EVM_NETWORKS_IDS": [63, 97, 1001, 8001, 43113, 11155111],
+  "SUB_NETWORKS": {
+    "Rococo":  "wss://rococo-rpc.polkadot.io",
+    "RococoSora": "wss://ws.parachain-collator-1.c1.stg1.sora2.soramitsu.co.jp"
+  },
   "ETH_BRIDGE": {
     "evmNetwork": 11155111,
     "address": {
