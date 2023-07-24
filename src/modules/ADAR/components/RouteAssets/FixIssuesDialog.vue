@@ -39,7 +39,13 @@
           </div>
         </s-form-item>
         <s-form-item v-if="!amountInTokens" prop="usd">
-          <s-input :placeholder="'USD'" :value="getModelPropValue('usd')" @input="onUsdChanged($event)" />
+          <s-float-input
+            has-locale-string
+            :placeholder="`${t('adar.routeAssets.usd')}`"
+            :value="model.usd"
+            :delimiters="delimiters"
+            @input="onUsdChanged($event)"
+          />
           <div class="error-message" :class="!usdError ? 'error-message_valid' : 'error-message_invalid'">
             <div>
               {{
@@ -56,7 +62,13 @@
           </div>
         </s-form-item>
         <s-form-item v-else prop="amount">
-          <s-input :placeholder="'amount'" :value="getModelPropValue('amount')" @input="onAmountChanged($event)" />
+          <s-float-input
+            has-locale-string
+            :placeholder="`${t('adar.routeAssets.dialogs.fixIssuesDialog.amount')}`"
+            :value="model.amount"
+            :delimiters="delimiters"
+            @input="onAmountChanged($event)"
+          />
           <div class="error-message" :class="!amountError ? 'error-message_valid' : 'error-message_invalid'">
             <div>
               {{
@@ -151,6 +163,8 @@ export default class FixIssuesDialog extends Mixins(
   @Prop() readonly currentIssueIdx!: number;
   @Prop() readonly totalIssuesCount!: number;
 
+  readonly delimiters = FPNumber.DELIMITERS_CONFIG;
+
   model: any = { ...initModel };
   resetState(): void {
     this.model = { ...initModel };
@@ -201,10 +215,6 @@ export default class FixIssuesDialog extends Mixins(
 
   get submitIsDisabled() {
     return !validate.validate(this.model);
-  }
-
-  getModelPropValue(propName) {
-    return this.model[propName];
   }
 
   onUsdChanged(newUsd) {
