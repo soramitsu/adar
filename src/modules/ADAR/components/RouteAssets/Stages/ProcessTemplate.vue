@@ -58,6 +58,7 @@
 </template>
 
 <script lang="ts">
+import { FPNumber } from '@sora-substrate/util/build';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
@@ -154,7 +155,7 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   }
 
   get fileSize() {
-    return ((this.file?.size || 1) / 1024).toFixed(2);
+    return new FPNumber(this.file?.size || 1).div(new FPNumber(1024)).dp(2).toLocaleString();
   }
 
   get recipientsCount() {
