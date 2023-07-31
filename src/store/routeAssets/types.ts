@@ -72,6 +72,7 @@ export type ProcessingState = {
   txInfo?: TransactionInfo;
   datetime?: Date;
   status: SwapTransferBatchStatus;
+  slippageTolerance: string;
 };
 
 export type Stage = {

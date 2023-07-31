@@ -159,6 +159,10 @@
           "failed": "fallida",
           "addressValid": "dirección válida",
           "addressInvalid": "dirección inválida"
+        },
+        "slippageTolerance": {
+            "title": "TOLERANCIA AL DESLIZAMIENTO",
+            "hint": "Su transacción se revertirá si el precio cambia desfavorablemente en más de este porcentaje."
         }
       },
       "about": {

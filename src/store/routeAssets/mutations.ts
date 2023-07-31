@@ -119,6 +119,9 @@ const mutations = defineMutations<RouteAssetsState>()({
   setPrimaryMarketsEnabledAssets(state, assets: PrimaryMarketsEnabledAssets): void {
     state.enabledAssets = Object.freeze({ ...assets });
   },
+  setSlippageTolerance(state, slippage: string): void {
+    state.processingState.slippageTolerance = slippage;
+  },
 });
 
 export default mutations;

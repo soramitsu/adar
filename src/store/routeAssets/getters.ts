@@ -130,9 +130,14 @@ const getters = defineGetters<RouteAssetsState>()({
         return new FPNumber(item.required).add(acc);
       }, FPNumber.ZERO);
       const adarFee = new FPNumber(adarFeeMultiplier).mul(totalAmount);
-      const priceImpact = new FPNumber(slippageMultiplier).mul(totalAmount);
+      const priceImpact = new FPNumber(getters.slippageTolerance).mul(totalAmount);
       return totalAmount.add(priceImpact).add(adarFee);
     },
+
+  slippageTolerance(...args): string {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.slippageTolerance;
+  },
 });
 
 export default getters;

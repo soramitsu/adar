@@ -392,7 +392,9 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     };
   });
 
-  const maxInputAmount = inputTokenAmount.add(inputTokenAmount.mul(new FPNumber(slippageMultiplier))).toCodecString();
+  const maxInputAmount = inputTokenAmount
+    .add(inputTokenAmount.mul(new FPNumber(getters.slippageTolerance)))
+    .toCodecString();
   const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
     try {

@@ -1,5 +1,7 @@
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 
+import { slippageMultiplier } from '@/modules/ADAR/consts';
+
 import { SwapTransferBatchStatus } from './types';
 
 import type { RouteAssetsState } from './types';
@@ -21,6 +23,7 @@ function initialState(): RouteAssetsState {
       datetime: undefined,
       txInfo: undefined,
       status: SwapTransferBatchStatus.INITIAL,
+      slippageTolerance: slippageMultiplier,
     },
   };
 }
