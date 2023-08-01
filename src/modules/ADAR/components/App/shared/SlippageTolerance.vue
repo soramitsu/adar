@@ -4,8 +4,8 @@
       <s-collapse-item>
         <template #title>
           <info-line
-            :label="t('adar.routeAssets.slippageTolerance.title')"
-            :label-tooltip="t('adar.routeAssets.slippageTolerance.hint')"
+            :label="t('dexSettings.slippageTolerance')"
+            :label-tooltip="t('dexSettings.slippageToleranceHint')"
             :value="customSlippageTolerance"
           />
         </template>

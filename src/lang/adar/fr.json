@@ -159,10 +159,6 @@
           "failed": "échec",
           "addressValid": "adresse valide",
           "addressInvalid": "adresse invalide"
-        },
-        "slippageTolerance": {
-            "title": "TOLÉRANCE DIFFERENCE DE PRIX",
-            "hint": "Votre transaction sera annulée si le prix change défavorablement de plus de ce pourcentage."
         }
       },
       "about": {
