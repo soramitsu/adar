@@ -865,7 +865,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Achtung",
-        "info": "Dein XOR Saldo beträgt nach dieser Transaktion weniger als {fee} XOR. Du kannst die Netzwerkgebühr für eine andere Transaktion nicht mehr bezahlen.",
+        "info": "Ihr {symbol} -Guthaben wird nach dieser Transaktion weniger als {fee} {symbol} betragen. Sie können die Netzwerkgebühr für eine weitere Transaktion nicht bezahlen.",
         "payoff": "Du musst die Bridge verwenden, um XOR von anderen Netzwerken zu erhalten, XOR von einem anderen {Sora}-Konto gesendet zu bekommen oder einen anderen Token, der sich bereits auf deinem Konto befindet, in XOR einzutauschen.",
         "button": "Ja, ich verstehe das Risiko"
     },
@@ -1213,5 +1213,13 @@
         "x1Btn": "Kaufen Sie XOR mit Karte",
         "errorMessage": "Entschuldigung für die Unannehmlichkeiten. Wir arbeiten fleißig daran, dieses Problem zu lösen. Bitte versuchen Sie es später noch einmal."
     },
-    "acceptOnScrollText": "Scrollen Sie, um zu akzeptieren"
+    "acceptOnScrollText": "Scrollen Sie, um zu akzeptieren",
+    "browserPermission": {
+        "title": "Erlauben Sie den Kamerazugriff in den Browsereinstellungen",
+        "desc": "Um die Authentizität von Dokumenten sicherzustellen und die Benutzeridentität für die KYC-Überprüfung zu validieren, ist Zugriff auf die Kamera Ihres Geräts erforderlich.",
+        "disclaimer": "Für die Dokumentenerfassung in Echtzeit ist ein Kamerazugriff erforderlich, um Betrug zu verhindern.",
+        "btnGoToSettings": "Gehe zu den Einstellungen",
+        "btnAllow": "Erlauben den Zugriff"
+    },
+    "continueText": "Weitermachen"
 }

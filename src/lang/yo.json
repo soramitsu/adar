@@ -865,7 +865,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Ifarabalẹ",
-        "info": "Iwọntunwọnsi XOR rẹ yoo kere si {fee} XOR lẹhin iṣowo yii. Iwọ kii yoo ni anfani lati sanwo fun ọya nẹtiwọki fun iṣowo miiran.",
+        "info": "Iwọntunwọnsi {symbol} rẹ yoo kere ju {fee} {symbol} lẹhin iṣowo yii. Iwọ kii yoo ni anfani lati sanwo fun ọya nẹtiwọki fun iṣowo miiran.",
         "payoff": "Iwọ yoo ni lati lo Afara lati gba XOR lati awọn nẹtiwọọki miiran, firanṣẹ XOR lati akọọlẹ {Sora} miiran, tabi paarọ eyikeyi ami-ami miiran tẹlẹ ninu akọọlẹ rẹ sinu XOR.",
         "button": "Bẹẹni, Mo loye ewu naa"
     },
@@ -1213,5 +1213,13 @@
         "x1Btn": "Ra XOR pẹlu kaadi",
         "errorMessage": "Aforiji fun ohun airọrun. A n ṣiṣẹ takuntakun lati yanju eyi. Jọwọ, gbiyanju lẹẹkansi nigbamii."
     },
-    "acceptOnScrollText": "Yi lọ lati gba"
+    "acceptOnScrollText": "Yi lọ lati gba",
+    "browserPermission": {
+        "title": "Gba wiwọle kamẹra laaye ni awọn eto ẹrọ aṣawakiri",
+        "desc": "Lati rii daju pe ododo ti awọn iwe aṣẹ ati lati fọwọsi idanimọ olumulo fun ijẹrisi KYC, iraye si kamẹra ẹrọ rẹ nilo.",
+        "disclaimer": "Wiwọle kamẹra nilo fun gbigba iwe akoko gidi lati ṣe idiwọ jibiti.",
+        "btnGoToSettings": "Lọ si awọn eto",
+        "btnAllow": "Gba wiwọle laaye"
+    },
+    "continueText": "Tesiwaju"
 }

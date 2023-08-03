@@ -865,7 +865,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Pažnja",
-        "info": "Vaš XOR saldo bit će manji od {fee} XOR nakon ove transakcije. Nećete moći platiti mrežnu naknadu za drugu transakciju.",
+        "info": "Vaš saldo {symbol} bit će manji od {fee} {symbol} nakon ove transakcije. Nećete moći platiti mrežnu naknadu za drugu transakciju.",
         "payoff": "Morali biste koristiti Most za dobivanje XOR-a s drugih mreža, slanje XOR-a s drugog {Sora} računa ili zamjenu bilo kojeg drugog tokena koji je već na vašem računu u XOR.",
         "button": "Da, razumijem rizik"
     },
@@ -1213,5 +1213,13 @@
         "x1Btn": "Kupite XOR karticom",
         "errorMessage": "Ispričavamo se zbog neugodnosti. Marljivo radimo na rješavanju ovoga. Molimo pokušajte ponovo kasnije."
     },
-    "acceptOnScrollText": "Pomaknite se za prihvaćanje"
+    "acceptOnScrollText": "Pomaknite se za prihvaćanje",
+    "browserPermission": {
+        "title": "Dopustite pristup kameri u postavkama preglednika",
+        "desc": "Kako biste osigurali autentičnost dokumenata i potvrdili korisnički identitet za KYC provjeru, potreban je pristup kameri vašeg uređaja.",
+        "disclaimer": "Potreban je pristup kameri za snimanje dokumenata u stvarnom vremenu kako bi se spriječila prijevara.",
+        "btnGoToSettings": "Idite na postavke",
+        "btnAllow": "Dopusti pristup"
+    },
+    "continueText": "Nastaviti"
 }

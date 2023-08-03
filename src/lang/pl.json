@@ -865,7 +865,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Uwaga",
-        "info": "Po tej transakcji Twoje saldo w walucie XOR będzie mniejsze niż {fee} XOR. Nie będziesz w stanie uiścić opłaty sieciowej za kolejną transakcję.",
+        "info": "Twoje saldo {symbol} będzie mniejsze niż {fee} {symbol} po tej transakcji. Nie będziesz w stanie opłacić opłaty sieciowej za kolejną transakcję.",
         "payoff": "Będziesz musiał użyć mostu, aby uzyskać XOR z innych sieci, wysłać XOR z innego konta sieci {Sora} lub zamienić dowolny token, znajdujący się już na Twoim koncie, na XOR.",
         "button": "Tak, rozumiem ryzyko."
     },
@@ -1213,5 +1213,13 @@
         "x1Btn": "Kup XOR z kartą",
         "errorMessage": "Przepraszam za utrudnienia. Intensywnie pracujemy nad rozwiązaniem tego problemu. Spróbuj ponownie później."
     },
-    "acceptOnScrollText": "Przewiń, aby zaakceptować"
+    "acceptOnScrollText": "Przewiń, aby zaakceptować",
+    "browserPermission": {
+        "title": "Zezwól na dostęp do aparatu w ustawieniach przeglądarki",
+        "desc": "Aby zapewnić autentyczność dokumentów i zweryfikować tożsamość użytkownika na potrzeby weryfikacji KYC, wymagany jest dostęp do aparatu urządzenia.",
+        "disclaimer": "Dostęp do aparatu jest wymagany do przechwytywania dokumentów w czasie rzeczywistym w celu zapobiegania oszustwom.",
+        "btnGoToSettings": "Przejdź do ustawień",
+        "btnAllow": "Umożliwić dostęp"
+    },
+    "continueText": "Kontynuować"
 }
