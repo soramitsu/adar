@@ -106,11 +106,15 @@ const getters = defineGetters<RouteAssetsState>()({
         return {
           recipientsNumber: assetArray.length,
           asset: assetArray[0].asset,
-          usd: sumBy(assetArray, (item: Recipient) => Number(item.usd)),
-          total: sumBy(assetArray, (item: Recipient) => Number(item.amount)),
-          required: sumBy(assetArray, (item: Recipient) =>
-            new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).toNumber()
-          ),
+          usd: assetArray.reduce((acc, item) => {
+            return new FPNumber(item.usd).add(acc);
+          }, FPNumber.ZERO),
+          total: assetArray.reduce((acc, item) => {
+            return new FPNumber(item.amount || 0).add(acc);
+          }, FPNumber.ZERO),
+          required: assetArray.reduce((acc, item) => {
+            return new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc);
+          }, FPNumber.ZERO),
           totalTransactions: assetArray.length,
         };
       });
@@ -126,9 +130,14 @@ const getters = defineGetters<RouteAssetsState>()({
         return new FPNumber(item.required).add(acc);
       }, FPNumber.ZERO);
       const adarFee = new FPNumber(adarFeeMultiplier).mul(totalAmount);
-      const priceImpact = new FPNumber(slippageMultiplier).mul(totalAmount);
+      const priceImpact = new FPNumber(getters.slippageTolerance).mul(totalAmount);
       return totalAmount.add(priceImpact).add(adarFee);
     },
+
+  slippageTolerance(...args): string {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.slippageTolerance;
+  },
 });
 
 export default getters;

@@ -110,6 +110,12 @@
             </div>
           </div>
         </template>
+        <s-divider />
+        <slippage-tolerance
+          :slippages="slippages"
+          :slippageTolerance="currentSlippage"
+          @onSlippageChanged="updatePriceImpact"
+        />
         <s-divider v-if="!noIssues" />
         <div class="buttons-container">
           <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
@@ -160,9 +166,10 @@ import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
-import { AdarComponents, adarFee, slippageMultiplier } from '@/modules/ADAR/consts';
+import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTolerance.vue';
+import { AdarComponents, adarFee } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { action, getter, state } from '@/store/decorators';
+import { action, getter, mutation, state } from '@/store/decorators';
 import type { PresetSwapData, Recipient, SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
 import { getAssetBalance } from '@/utils';
 
@@ -174,6 +181,7 @@ import WarningMessage from '../WarningMessage.vue';
     SwapDialog: adarLazyComponent(AdarComponents.RouteAssetsSwapDialog),
     WarningMessage,
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
+    SlippageTolerance,
   },
 })
 export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
@@ -186,6 +194,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @action.routeAssets.runAssetsRouting private runAssetsRouting!: any;
   @state.wallet.settings.networkFees private networkFees!: NetworkFeesObject;
+  @mutation.routeAssets.setSlippageTolerance private setSlippageTolerance!: (slippage: string) => void;
   @getter.assets.xor xor!: Nullable<AccountAsset>;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
@@ -193,6 +202,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
+  @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -200,6 +210,18 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   onInputAssetSelected(asset) {
     this.setInputToken(asset);
     this.showSelectInputAssetDialog = false;
+  }
+
+  updatePriceImpact(slippage: string) {
+    this.setSlippageTolerance(new FPNumber(slippage).div(FPNumber.HUNDRED).toString());
+  }
+
+  get slippages() {
+    return ['1', '3', '5'];
+  }
+
+  get currentSlippage() {
+    return new FPNumber(this.slippageMultiplier).mul(FPNumber.HUNDRED).toString();
   }
 
   get isInputAssetXor() {
@@ -229,7 +251,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get priceImpactMultiplier() {
-    return new FPNumber(slippageMultiplier);
+    return new FPNumber(this.slippageMultiplier);
   }
 
   get priceImpactPercent() {
