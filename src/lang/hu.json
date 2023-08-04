@@ -865,7 +865,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Figyelem",
-        "info": "Az XOR egyenlege a tranzakció után kevesebb lesz, mint {fee} XOR. Nem tudja fizetni a hálózati díjat egy másik tranzakcióért.",
+        "info": "A tranzakciót követően az Ön {symbol} egyenlege kevesebb lesz, mint {fee} {symbol} . Egy másik tranzakció esetén nem tudja fizetni a hálózati díjat.",
         "payoff": "A Híd segítségével XOR-t kell kapnia más hálózatokról, XOR-t kell küldenie egy másik {Sora}-fiókból, vagy bármely más, már a fiókjában lévő tokent XOR-ba kell cserélnie.",
         "button": "Igen, megértem a kockázatot"
     },
@@ -1213,5 +1213,13 @@
         "x1Btn": "Vásároljon XOR-t kártyával",
         "errorMessage": "Elnézést a kellemetlenségért. Szorgalmasan dolgozunk ennek megoldásán. Kérlek, próbáld újra később."
     },
-    "acceptOnScrollText": "Görgessen az elfogadáshoz"
+    "acceptOnScrollText": "Görgessen az elfogadáshoz",
+    "browserPermission": {
+        "title": "A kamera hozzáférésének engedélyezése a böngésző beállításaiban",
+        "desc": "A dokumentumok hitelességének biztosításához és a felhasználói személyazonosság érvényesítéséhez a KYC-ellenőrzéshez hozzáférésre van szükség az eszköz kamerájához.",
+        "disclaimer": "A valós idejű dokumentumrögzítéshez kamera-hozzáférés szükséges a csalás megelőzése érdekében.",
+        "btnGoToSettings": "Menj a beállításokhoz",
+        "btnAllow": "Hozzáférést enged"
+    },
+    "continueText": "Folytatni"
 }

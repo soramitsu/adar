@@ -866,7 +866,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Attention",
-        "info": "Votre solde XOR sera inférieur à {fee} XOR après cette transaction. Vous ne pourrez pas payer les frais de réseau pour une autre transaction.",
+        "info": "Votre solde {symbol} sera inférieur à {fee} {symbol} après cette transaction. Vous ne pourrez pas payer les frais de réseau pour une autre transaction.",
         "payoff": "Vous devrez utiliser le pont pour obtenir XOR d'autres réseaux, recevoir XOR d'un autre compte {Sora} ou échanger tout autre jeton déjà présent dans votre compte en XOR.",
         "button": "Oui, je comprends le risque"
     },
@@ -1214,5 +1214,13 @@
         "x1Btn": "Acheter XOR avec carte",
         "errorMessage": "Mes excuses pour le derangement. Nous travaillons avec diligence pour résoudre ce problème. Veuillez réessayer plus tard."
     },
-    "acceptOnScrollText": "Faites défiler pour accepter"
+    "acceptOnScrollText": "Faites défiler pour accepter",
+    "browserPermission": {
+        "title": "Autoriser l'accès à la caméra dans les paramètres du navigateur",
+        "desc": "Pour garantir l'authenticité des documents et valider l'identité de l'utilisateur pour la vérification KYC, l'accès à l'appareil photo de votre appareil est requis.",
+        "disclaimer": "L'accès à la caméra est requis pour la capture de documents en temps réel afin de prévenir la fraude.",
+        "btnGoToSettings": "Aller aux paramètres",
+        "btnAllow": "Permettre l'accès"
+    },
+    "continueText": "Continuer"
 }

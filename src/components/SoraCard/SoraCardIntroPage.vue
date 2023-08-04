@@ -56,8 +56,9 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/math';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import { Component, Mixins, Watch } from 'vue-property-decorator';
+import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { PageNames, Components } from '@/consts';
@@ -145,7 +146,14 @@ export default class SoraCardIntroPage extends Mixins(mixins.LoadingMixin, Trans
 
   private bridgeTokens(): void {
     if (!this.isEuroBalanceEnough) {
-      router.push({ name: PageNames.Bridge, params: { xorToDeposit: this.xorToDeposit.toString() } });
+      router.push({
+        name: PageNames.Bridge,
+        params: {
+          address: XOR.address,
+          amount: this.xorToDeposit.toString(),
+          isIncoming: 'true',
+        },
+      });
     }
   }
 
@@ -268,8 +276,8 @@ export default class SoraCardIntroPage extends Mixins(mixins.LoadingMixin, Trans
   }
 
   &__image {
-    margin-top: -56px;
-    height: 311px;
+    margin-top: -48px;
+    height: 262px;
   }
 
   &__balance-indicator {
