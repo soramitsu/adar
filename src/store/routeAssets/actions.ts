@@ -195,6 +195,48 @@ const actions = defineActions({
     });
   },
 
+  // async repeatTransaction(context, id): Promise<void> {
+  //   const { getters, commit, rootCommit } = routeAssetsActionContext(context);
+  //   const inputAsset = getters.inputToken;
+  //   const recipient = getters.recipients.find((recipient) => recipient.id === id);
+  //   if (!recipient) {
+  //     return Promise.reject(new Error('Cant find transaction by this Id'));
+  //   }
+  //   commit.setRecipientStatus({
+  //     id: recipient.id,
+  //     status: RecipientStatus.PENDING,
+  //   });
+  //   const transferParams = getTransferParams(context, inputAsset, recipient);
+  //   if (!transferParams) return Promise.reject(new Error('Cant find transaction by this Id'));
+  //   const action = transferParams.action;
+  //   try {
+  //     if (!action) throw new Error('Cant get transfer params');
+  //     const time = Date.now();
+  //     await action()
+  //       .then(async () => {
+  //         const lastTx = await getLastTransaction(time);
+  //         rootCommit.wallet.transactions.addActiveTx(lastTx.id as string);
+  //         commit.setRecipientTxId({
+  //           id: recipient.id,
+  //           txId: lastTx.id,
+  //         });
+  //       })
+  //       .catch(() => {
+  //         commit.setRecipientStatus({
+  //           id: recipient.id,
+  //           status: RecipientStatus.FAILED,
+  //         });
+  //         return Promise.reject(new Error('Transaction failed'));
+  //       });
+  //   } catch (e) {
+  //     commit.setRecipientStatus({
+  //       id: recipient.id,
+  //       status: RecipientStatus.FAILED,
+  //     });
+  //     return Promise.reject(new Error('Transaction failed'));
+  //   }
+  // },
+
   async repeatTransaction(context, id): Promise<void> {
     const { getters, commit, rootCommit } = routeAssetsActionContext(context);
     const inputAsset = getters.inputToken;
@@ -206,35 +248,9 @@ const actions = defineActions({
       id: recipient.id,
       status: RecipientStatus.PENDING,
     });
-    const transferParams = getTransferParams(context, inputAsset, recipient);
-    if (!transferParams) return Promise.reject(new Error('Cant find transaction by this Id'));
-    const action = transferParams.action;
-    try {
-      if (!action) throw new Error('Cant get transfer params');
-      const time = Date.now();
-      await action()
-        .then(async () => {
-          const lastTx = await getLastTransaction(time);
-          rootCommit.wallet.transactions.addActiveTx(lastTx.id as string);
-          commit.setRecipientTxId({
-            id: recipient.id,
-            txId: lastTx.id,
-          });
-        })
-        .catch(() => {
-          commit.setRecipientStatus({
-            id: recipient.id,
-            status: RecipientStatus.FAILED,
-          });
-          return Promise.reject(new Error('Transaction failed'));
-        });
-    } catch (e) {
-      commit.setRecipientStatus({
-        id: recipient.id,
-        status: RecipientStatus.FAILED,
-      });
-      return Promise.reject(new Error('Transaction failed'));
-    }
+
+    const recipientTransferParams = [getRecipientTransferParams(context, inputAsset, recipient)];
+    await executeBatchSwapAndSend(context, recipientTransferParams);
   },
 
   async runAssetsRouting(context): Promise<void> {
@@ -246,7 +262,7 @@ const actions = defineActions({
         id: recipient.id,
         status: RecipientStatus.PENDING,
       });
-      return getTransferParams(context, inputAsset, recipient);
+      return getRecipientTransferParams(context, inputAsset, recipient);
     });
 
     await executeBatchSwapAndSend(context, data);
@@ -268,17 +284,71 @@ const actions = defineActions({
   },
 });
 
-function getTransferParams(context, inputAsset, recipient) {
+// function getTransferParams(context, inputAsset, recipient) {
+//   const { rootState, commit } = routeAssetsActionContext(context);
+//   if (recipient.asset.address === inputAsset.address) {
+//     const priceObject = rootState.wallet.account.fiatPriceObject;
+//     const amount = recipient.amountInTokens
+//       ? new FPNumber(recipient.amount)
+//       : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
+//     const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
+//     commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
+//     return {
+//       action: async () => await api.transfer(recipient.asset, recipient.wallet, amount.toString()),
+//       recipient,
+//       swapAndSendData: {
+//         address: recipient.wallet,
+//         targetAmount: amount,
+//         asset: recipient.asset,
+//       },
+//     };
+//   } else {
+//     try {
+//       const swapData = getAmountAndDexId(context, inputAsset, recipient.asset, recipient.usd);
+//       if (!swapData) return null;
+
+//       const { amountFrom, amountTo, exchangeRate, bestDexId } = swapData;
+//       commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
+
+//       return {
+//         action: async () =>
+//           await api.swap.executeSwapAndSend(
+//             recipient.wallet,
+//             inputAsset,
+//             recipient.asset,
+//             amountFrom.toString(),
+//             amountTo.toString(),
+//             undefined,
+//             true,
+//             undefined,
+//             bestDexId as DexId
+//           ),
+//         swapAndSendData: {
+//           address: recipient.wallet,
+//           targetAmount: amountTo,
+//           amountFrom,
+//           asset: recipient.asset,
+//           dexId: bestDexId,
+//         },
+//         recipient,
+//         assetAddress: recipient.asset.address,
+//       };
+//     } catch (error: any) {
+//       throw new Error(error);
+//     }
+//   }
+// }
+
+function getRecipientTransferParams(context, inputAsset, recipient) {
   const { rootState, commit } = routeAssetsActionContext(context);
+  const priceObject = rootState.wallet.account.fiatPriceObject;
   if (recipient.asset.address === inputAsset.address) {
-    const priceObject = rootState.wallet.account.fiatPriceObject;
     const amount = recipient.amountInTokens
       ? new FPNumber(recipient.amount)
       : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
     const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
     commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
     return {
-      action: async () => await api.transfer(recipient.asset, recipient.wallet, amount.toString()),
       recipient,
       swapAndSendData: {
         address: recipient.wallet,
@@ -288,31 +358,18 @@ function getTransferParams(context, inputAsset, recipient) {
     };
   } else {
     try {
-      const swapData = getAmountAndDexId(context, inputAsset, recipient.asset, recipient.usd);
-      if (!swapData) return null;
+      const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
+      const amountTo = recipient.amountInTokens
+        ? new FPNumber(recipient.amount)
+        : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
 
-      const { amountFrom, amountTo, exchangeRate, bestDexId } = swapData;
       commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
 
       return {
-        action: async () =>
-          await api.swap.executeSwapAndSend(
-            recipient.wallet,
-            inputAsset,
-            recipient.asset,
-            amountFrom.toString(),
-            amountTo.toString(),
-            undefined,
-            true,
-            undefined,
-            bestDexId as DexId
-          ),
         swapAndSendData: {
           address: recipient.wallet,
           targetAmount: amountTo,
-          amountFrom,
           asset: recipient.asset,
-          dexId: bestDexId,
         },
         recipient,
         assetAddress: recipient.asset.address,
