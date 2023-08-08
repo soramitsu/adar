@@ -47,6 +47,8 @@ function createStage(title: string, componentName: string): Stage {
   };
 }
 
+export const inputTokenVariants = ['xor', 'val', 'pswap'];
+
 export const slippageMultiplier = '0.03';
 
 export const adarFee = '0.0025';

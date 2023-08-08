@@ -65,6 +65,18 @@ export type TransactionInfo = {
   blockNumber?: string;
 };
 
+export type MaxInputAmount = {
+  assetSymbol: string;
+  amount: FPNumber;
+  updateDate: Date;
+};
+
+export type MaxInputAmountInfo = {
+  totalAmount: FPNumber;
+  totalAmountWithFee: FPNumber;
+  asetSymbol: string;
+};
+
 export type ProcessingState = {
   currentStageIndex: number;
   inputToken: Asset;
@@ -73,6 +85,7 @@ export type ProcessingState = {
   datetime?: Date;
   status: SwapTransferBatchStatus;
   slippageTolerance: string;
+  maxInputAmount: MaxInputAmount;
 };
 
 export type Stage = {

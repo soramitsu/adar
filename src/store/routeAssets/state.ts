@@ -1,3 +1,4 @@
+import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 
 import { slippageMultiplier } from '@/modules/ADAR/consts';
@@ -24,6 +25,11 @@ function initialState(): RouteAssetsState {
       txInfo: undefined,
       status: SwapTransferBatchStatus.INITIAL,
       slippageTolerance: slippageMultiplier,
+      maxInputAmount: {
+        assetSymbol: XOR.symbol,
+        amount: FPNumber.ZERO,
+        updateDate: new Date(),
+      },
     },
   };
 }
