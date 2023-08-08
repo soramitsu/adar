@@ -183,7 +183,7 @@ const actions = defineActions({
   },
 
   updateTokenAmounts(context): void {
-    const { state, rootState, getters, commit, dispatch } = routeAssetsActionContext(context);
+    const { rootState, getters, commit, dispatch } = routeAssetsActionContext(context);
     const priceObject = rootState.wallet.account.fiatPriceObject;
     const recipients = getters.recipients;
     recipients.forEach((recipient) => {
