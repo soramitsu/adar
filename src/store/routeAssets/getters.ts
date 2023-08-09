@@ -10,6 +10,7 @@ import { routeAssetsGetterContext } from '@/store/routeAssets';
 import { getAssetUSDPrice } from './utils';
 
 import type {
+  MaxInputAmountInfo,
   Recipient,
   RouteAssetsState,
   RouteAssetsSubscription,
@@ -137,6 +138,18 @@ const getters = defineGetters<RouteAssetsState>()({
   slippageTolerance(...args): string {
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.slippageTolerance;
+  },
+  maxInputAmount(...args): MaxInputAmountInfo {
+    const { state, getters } = routeAssetsGetterContext(args);
+    const maxInputAmount = state.processingState.maxInputAmount;
+    const totalAmount = maxInputAmount.amount;
+    const adarFee = new FPNumber(adarFeeMultiplier).mul(maxInputAmount.amount);
+    const priceImpact = new FPNumber(getters.slippageTolerance).mul(maxInputAmount.amount);
+    return {
+      totalAmount: maxInputAmount.amount,
+      totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
+      asetSymbol: maxInputAmount.assetSymbol,
+    };
   },
 });
 

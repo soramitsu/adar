@@ -170,7 +170,12 @@ import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTole
 import { AdarComponents, adarFee } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { action, getter, mutation, state } from '@/store/decorators';
-import type { PresetSwapData, Recipient, SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
+import type {
+  MaxInputAmountInfo,
+  PresetSwapData,
+  Recipient,
+  SummaryAssetRecipientsInfo,
+} from '@/store/routeAssets/types';
 import { getAssetBalance } from '@/utils';
 
 import WarningMessage from '../WarningMessage.vue';
@@ -203,6 +208,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
+  @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -237,9 +243,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get estimatedAmount() {
-    return this.recipientsData.reduce((acc, item) => {
-      return new FPNumber(item.required).add(acc);
-    }, FPNumber.ZERO);
+    return this.maxInputAmount.totalAmount;
   }
 
   get adarFeeMultiplier() {
@@ -273,7 +277,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get estimatedAmountWithFees() {
-    return this.isInputAssetXor ? this.overallEstimatedTokens().add(this.networkFee) : this.overallEstimatedTokens();
+    return this.isInputAssetXor
+      ? this.maxInputAmount.totalAmountWithFee.add(this.networkFee)
+      : this.maxInputAmount.totalAmountWithFee;
   }
 
   get totalTokensAvailable() {

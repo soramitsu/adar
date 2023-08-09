@@ -48,7 +48,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { action, getter } from '@/store/decorators';
-import { Recipient, SwapTransferBatchStatus } from '@/store/routeAssets/types';
+import { MaxInputAmountInfo, Recipient, SwapTransferBatchStatus } from '@/store/routeAssets/types';
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -62,6 +62,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
+  @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
 
   get continueButtonDisabled() {
     return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
@@ -72,7 +73,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get tokensEstimate() {
-    return this.overallEstimatedTokens()?.toLocaleString();
+    return this.maxInputAmount.totalAmountWithFee?.toLocaleString();
   }
 
   get iconName() {
