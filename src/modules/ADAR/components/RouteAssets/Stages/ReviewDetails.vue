@@ -219,15 +219,15 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   updatePriceImpact(slippage: string) {
-    this.setSlippageTolerance(new FPNumber(slippage).div(FPNumber.HUNDRED).toString());
+    this.setSlippageTolerance(slippage);
   }
 
   get slippages() {
-    return ['1', '3', '5'];
+    return ['1', '2', '3'];
   }
 
   get currentSlippage() {
-    return new FPNumber(this.slippageMultiplier).mul(FPNumber.HUNDRED).toString();
+    return this.slippageMultiplier;
   }
 
   get isInputAssetXor() {
@@ -247,19 +247,19 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get adarFeeMultiplier() {
-    return new FPNumber(adarFee);
+    return new FPNumber(adarFee).div(FPNumber.HUNDRED);
   }
 
   get adarFeePercent() {
-    return this.adarFeeMultiplier.mul(FPNumber.HUNDRED).toString();
+    return this.adarFeeMultiplier.mul(FPNumber.HUNDRED).toLocaleString();
   }
 
   get priceImpactMultiplier() {
-    return new FPNumber(this.slippageMultiplier);
+    return new FPNumber(this.slippageMultiplier).div(FPNumber.HUNDRED);
   }
 
   get priceImpactPercent() {
-    return this.priceImpactMultiplier.mul(FPNumber.HUNDRED).toString();
+    return new FPNumber(this.slippageMultiplier).toLocaleString();
   }
 
   get networkFee() {

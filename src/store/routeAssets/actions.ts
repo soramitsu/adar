@@ -368,7 +368,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   });
 
   const maxInputAmount = inputTokenAmount
-    .add(inputTokenAmount.mul(new FPNumber(getters.slippageTolerance)))
+    .add(inputTokenAmount.mul(new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED)))
     .toCodecString();
   const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
