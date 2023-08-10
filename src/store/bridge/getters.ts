@@ -9,7 +9,8 @@ import { evmBridgeApi } from '@/utils/bridge/evm/api';
 import { subBridgeApi } from '@/utils/bridge/sub/api';
 
 import type { BridgeState } from './types';
-import type { IBridgeTransaction, CodecString, RegisteredAccountAsset } from '@sora-substrate/util';
+import type { IBridgeTransaction, CodecString } from '@sora-substrate/util';
+import type { RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const getters = defineGetters<BridgeState>()({
   asset(...args): Nullable<RegisteredAccountAsset> {
@@ -90,14 +91,15 @@ const getters = defineGetters<BridgeState>()({
     const { getters, rootState } = bridgeGetterContext(args);
     return rootState.wallet.settings.networkFees[getters.operation] ?? ZeroStringValue;
   },
-  evmNetworkFee(...args): CodecString {
+  // fee for transaction execution
+  externalNetworkFee(...args): CodecString {
     const { state, getters } = bridgeGetterContext(args);
 
     if (getters.isEthBridge) {
-      return state.evmNetworkFee;
+      return state.externalNetworkFee;
     } else {
       // In direction SORA -> EVM evm network fee is 0
-      return !state.isSoraToEvm ? state.evmNetworkFee : ZeroStringValue;
+      return !state.isSoraToEvm ? state.externalNetworkFee : ZeroStringValue;
     }
   },
   history(...args): Record<string, IBridgeTransaction> {

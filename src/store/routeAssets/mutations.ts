@@ -1,3 +1,4 @@
+import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { defineMutations } from 'direct-vuex';
 
@@ -118,6 +119,16 @@ const mutations = defineMutations<RouteAssetsState>()({
   },
   setPrimaryMarketsEnabledAssets(state, assets: PrimaryMarketsEnabledAssets): void {
     state.enabledAssets = Object.freeze({ ...assets });
+  },
+  setSlippageTolerance(state, slippage: string): void {
+    state.processingState.slippageTolerance = slippage;
+  },
+  updateMaxInputAmount(state, { amount, assetSymbol }: { amount: FPNumber; assetSymbol: string }): void {
+    state.processingState.maxInputAmount = {
+      amount,
+      assetSymbol,
+      updateDate: new Date(),
+    };
   },
 });
 

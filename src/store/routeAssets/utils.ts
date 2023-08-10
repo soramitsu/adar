@@ -29,12 +29,15 @@ export default {
     return asset;
   },
 
-  usd(usd: Nullable<number>) {
-    return usd && !isNaN(usd);
+  usd(usd: FPNumber | string) {
+    const testUsd = new FPNumber(usd);
+    return testUsd && !testUsd.isNaN();
   },
 
-  amount(amount: Nullable<number>) {
-    return amount && !isNaN(amount) && Number.isFinite(amount);
+  amount(amount?: FPNumber | string) {
+    if (!amount) return false;
+    const testAmount = new FPNumber(amount);
+    return !testAmount.isNaN() && testAmount.isFinity();
   },
 };
 

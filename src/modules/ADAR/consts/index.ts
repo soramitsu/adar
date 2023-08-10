@@ -47,6 +47,8 @@ function createStage(title: string, componentName: string): Stage {
   };
 }
 
-export const slippageMultiplier = '0.03';
+export const inputTokenVariants = ['xor', 'val', 'pswap'];
 
-export const adarFee = '0.0025';
+export const slippageMultiplier = '2'; // price impact - percent of total amount
+
+export const adarFee = '0.25'; // adar fee - percent of total amount

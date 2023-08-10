@@ -39,7 +39,13 @@
           </div>
         </s-form-item>
         <s-form-item v-if="!amountInTokens" prop="usd">
-          <s-input :placeholder="'USD'" :value="model.usd" @input="onUsdChanged($event)" />
+          <s-float-input
+            has-locale-string
+            :placeholder="`${t('adar.routeAssets.usd')}`"
+            :value="model.usd"
+            :delimiters="delimiters"
+            @input="onUsdChanged($event)"
+          />
           <div class="error-message" :class="!usdError ? 'error-message_valid' : 'error-message_invalid'">
             <div>
               {{
@@ -56,7 +62,13 @@
           </div>
         </s-form-item>
         <s-form-item v-else prop="amount">
-          <s-input :placeholder="'amount'" :value="model.amount" @input="onAmountChanged($event)" />
+          <s-float-input
+            has-locale-string
+            :placeholder="`${t('adar.routeAssets.dialogs.fixIssuesDialog.amount')}`"
+            :value="model.amount"
+            :delimiters="delimiters"
+            @input="onAmountChanged($event)"
+          />
           <div class="error-message" :class="!amountError ? 'error-message_valid' : 'error-message_invalid'">
             <div>
               {{
@@ -128,9 +140,9 @@ const initModel: any = {
   name: '',
   wallet: '',
   asset: XOR,
-  amount: 0,
+  amount: '0',
   id: '',
-  usd: 0,
+  usd: '0',
 };
 @Component({
   components: {
@@ -150,6 +162,8 @@ export default class FixIssuesDialog extends Mixins(
   @Prop() readonly recipient!: Recipient;
   @Prop() readonly currentIssueIdx!: number;
   @Prop() readonly totalIssuesCount!: number;
+
+  readonly delimiters = FPNumber.DELIMITERS_CONFIG;
 
   model: any = { ...initModel };
   resetState(): void {
@@ -194,7 +208,7 @@ export default class FixIssuesDialog extends Mixins(
 
   get assetUSDPrice() {
     if (!this.model.asset?.address) return 0;
-    return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, 18)
+    return FPNumber.fromCodecValue(this.fiatPriceObject[this.model.asset.address] ?? 0, this.model.asset.decimals)
       .dp(8)
       .toString();
   }
@@ -204,13 +218,13 @@ export default class FixIssuesDialog extends Mixins(
   }
 
   onUsdChanged(newUsd) {
-    this.model.usd = Number(newUsd);
-    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice)).toNumber();
+    this.model.usd = newUsd;
+    this.model.amount = new FPNumber(this.model.usd).div(new FPNumber(this.assetUSDPrice)).toString();
   }
 
   onAmountChanged(newAmount) {
-    this.model.amount = Number(newAmount);
-    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice)).toNumber();
+    this.model.amount = newAmount;
+    this.model.usd = new FPNumber(newAmount).mul(new FPNumber(this.assetUSDPrice)).toString();
   }
 
   onDeleteClick() {
@@ -221,20 +235,22 @@ export default class FixIssuesDialog extends Mixins(
     this.editRecipient({
       name: this.model.name,
       wallet: this.model.wallet,
-      usd: this.model.usd,
+      usd: new FPNumber(this.model.usd),
       id: this.recipient.id,
       asset: this.model.asset,
-      amount: this.model.amount,
+      amount: new FPNumber(this.model.amount),
+    });
+    this.$nextTick(() => {
+      this.reloadRecipient();
     });
   }
 
-  @Watch('recipient', { immediate: true, deep: true })
-  onRecipientChanged(newVal) {
-    if (newVal) {
-      Object.assign(this.model, this.recipient);
-    } else {
-      this.resetState();
-    }
+  reloadRecipient() {
+    Object.assign(this.model, this.recipient);
+  }
+
+  mounted() {
+    this.reloadRecipient();
   }
 }
 </script>

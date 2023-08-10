@@ -175,7 +175,9 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   }
 
   get incorrectRecipients() {
-    return this.recipients.filter((recipient) => !this.validateRecipient(recipient));
+    return this.recipients
+      .filter((recipient) => !this.validateRecipient(recipient))
+      .map((item) => ({ ...item, amount: item.amount?.toString(), usd: item.usd.toString() }));
   }
 
   get incorrectRecipientsLength() {

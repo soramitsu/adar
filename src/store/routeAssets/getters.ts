@@ -1,15 +1,16 @@
 import { FPNumber } from '@sora-substrate/util/build';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineGetters } from 'direct-vuex';
-import { groupBy, sumBy } from 'lodash';
+import { groupBy } from 'lodash';
 import { Subscription } from 'rxjs';
 
-import { Stages, slippageMultiplier, adarFee as adarFeeMultiplier } from '@/modules/ADAR/consts';
+import { Stages, adarFee as adarFeeMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsGetterContext } from '@/store/routeAssets';
 
 import { getAssetUSDPrice } from './utils';
 
 import type {
+  MaxInputAmountInfo,
   Recipient,
   RouteAssetsState,
   RouteAssetsSubscription,
@@ -106,11 +107,15 @@ const getters = defineGetters<RouteAssetsState>()({
         return {
           recipientsNumber: assetArray.length,
           asset: assetArray[0].asset,
-          usd: sumBy(assetArray, (item: Recipient) => Number(item.usd)),
-          total: sumBy(assetArray, (item: Recipient) => Number(item.amount)),
-          required: sumBy(assetArray, (item: Recipient) =>
-            new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).toNumber()
-          ),
+          usd: assetArray.reduce((acc, item) => {
+            return new FPNumber(item.usd).add(acc);
+          }, FPNumber.ZERO),
+          total: assetArray.reduce((acc, item) => {
+            return new FPNumber(item.amount || 0).add(acc);
+          }, FPNumber.ZERO),
+          required: assetArray.reduce((acc, item) => {
+            return new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc);
+          }, FPNumber.ZERO),
           totalTransactions: assetArray.length,
         };
       });
@@ -125,10 +130,27 @@ const getters = defineGetters<RouteAssetsState>()({
       const totalAmount = summaryData.reduce((acc, item) => {
         return new FPNumber(item.required).add(acc);
       }, FPNumber.ZERO);
-      const adarFee = new FPNumber(adarFeeMultiplier).mul(totalAmount);
-      const priceImpact = new FPNumber(slippageMultiplier).mul(totalAmount);
+      const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(totalAmount);
+      const priceImpact = new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED).mul(totalAmount);
       return totalAmount.add(priceImpact).add(adarFee);
     },
+
+  slippageTolerance(...args): string {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.slippageTolerance;
+  },
+  maxInputAmount(...args): MaxInputAmountInfo {
+    const { state, getters } = routeAssetsGetterContext(args);
+    const maxInputAmount = state.processingState.maxInputAmount;
+    const totalAmount = maxInputAmount.amount;
+    const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(maxInputAmount.amount);
+    const priceImpact = new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED).mul(maxInputAmount.amount);
+    return {
+      totalAmount: maxInputAmount.amount,
+      totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
+      asetSymbol: maxInputAmount.assetSymbol,
+    };
+  },
 });
 
 export default getters;

@@ -9,10 +9,9 @@ import { DexId } from '@sora-substrate/util/build/dex/consts';
 import { Messages } from '@sora-substrate/util/build/logger';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
-import { findLast, groupBy, sumBy } from 'lodash';
+import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
 
-import { slippageMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsActionContext } from '@/store/routeAssets';
 import type { DexQuoteData } from '@/store/swap/types';
 import { delay } from '@/utils';
@@ -68,11 +67,11 @@ const actions = defineActions({
             const csvAmount = row.data[2]?.replace(/,/g, '');
             const asset = findAsset(row.data[3]);
             const amount = amountInTokens
-              ? Number(csvAmount)
-              : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject)).toNumber();
+              ? new FPNumber(csvAmount)
+              : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject));
             const usd = amountInTokens
-              ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject)).toNumber()
-              : Number(csvAmount);
+              ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject))
+              : new FPNumber(csvAmount);
             data.push({
               name: row.data[0],
               wallet: row.data[1],
@@ -154,6 +153,7 @@ const actions = defineActions({
         });
       commit.addSubscribeObjectToSubscription({ reservesSubscribe, tokenAddress });
     });
+    dispatch.updateTokenAmounts();
   },
 
   async setSubscriptionPayload(context, { data, inputAssetId, outputAssetId }): Promise<void> {
@@ -180,19 +180,19 @@ const actions = defineActions({
     );
 
     commit.addPathsAndPayloadToSubscription({ outputAssetId, paths, payload, dexId, liquiditySources });
-    dispatch.updateTokenAmounts();
   },
 
   updateTokenAmounts(context): void {
-    const { state, rootState, getters, commit } = routeAssetsActionContext(context);
+    const { rootState, getters, commit, dispatch } = routeAssetsActionContext(context);
     const priceObject = rootState.wallet.account.fiatPriceObject;
     const recipients = getters.recipients;
     recipients.forEach((recipient) => {
       if (!recipient.amountInTokens) {
-        const amount = new FPNumber(recipient.usd).div(getAssetUSDPrice(recipient.asset, priceObject)).toNumber();
+        const amount = recipient.usd.div(getAssetUSDPrice(recipient.asset, priceObject));
         commit.setRecipientTokenAmount({ id: recipient.id, amount });
       }
     });
+    dispatch.updateMaxInputAmount();
   },
 
   async repeatTransaction(context, id): Promise<void> {
@@ -206,35 +206,9 @@ const actions = defineActions({
       id: recipient.id,
       status: RecipientStatus.PENDING,
     });
-    const transferParams = getTransferParams(context, inputAsset, recipient);
-    if (!transferParams) return Promise.reject(new Error('Cant find transaction by this Id'));
-    const action = transferParams.action;
-    try {
-      if (!action) throw new Error('Cant get transfer params');
-      const time = Date.now();
-      await action()
-        .then(async () => {
-          const lastTx = await getLastTransaction(time);
-          rootCommit.wallet.transactions.addActiveTx(lastTx.id as string);
-          commit.setRecipientTxId({
-            id: recipient.id,
-            txId: lastTx.id,
-          });
-        })
-        .catch(() => {
-          commit.setRecipientStatus({
-            id: recipient.id,
-            status: RecipientStatus.FAILED,
-          });
-          return Promise.reject(new Error('Transaction failed'));
-        });
-    } catch (e) {
-      commit.setRecipientStatus({
-        id: recipient.id,
-        status: RecipientStatus.FAILED,
-      });
-      return Promise.reject(new Error('Transaction failed'));
-    }
+
+    const recipientTransferParams = [getRecipientTransferParams(context, inputAsset, recipient)];
+    await executeBatchSwapAndSend(context, recipientTransferParams);
   },
 
   async runAssetsRouting(context): Promise<void> {
@@ -246,7 +220,7 @@ const actions = defineActions({
         id: recipient.id,
         status: RecipientStatus.PENDING,
       });
-      return getTransferParams(context, inputAsset, recipient);
+      return getRecipientTransferParams(context, inputAsset, recipient);
     });
 
     await executeBatchSwapAndSend(context, data);
@@ -266,19 +240,33 @@ const actions = defineActions({
     const apiInstanceAtBlock = await api.api.at(blockId);
     return (await apiInstanceAtBlock.query.system.number()).toString();
   },
+
+  updateMaxInputAmount(context, asset?: Asset | AccountAsset): void {
+    const { commit, getters } = routeAssetsActionContext(context);
+    const inputAmountAsset = asset || getters.inputToken;
+    const recipientsData = getters.recipientsGroupedByToken(inputAmountAsset);
+    try {
+      const totalAmount = recipientsData.reduce((acc, item) => {
+        const { amountFrom } = getAmountAndDexId(context, inputAmountAsset, item.asset, item.usd.toString());
+        return acc.add(amountFrom);
+      }, FPNumber.ZERO);
+      commit.updateMaxInputAmount({ amount: totalAmount, assetSymbol: inputAmountAsset.symbol.toLowerCase() });
+    } catch (e) {
+      console.log('dexes are not ready');
+    }
+  },
 });
 
-function getTransferParams(context, inputAsset, recipient) {
+function getRecipientTransferParams(context, inputAsset, recipient) {
   const { rootState, commit } = routeAssetsActionContext(context);
+  const priceObject = rootState.wallet.account.fiatPriceObject;
   if (recipient.asset.address === inputAsset.address) {
-    const priceObject = rootState.wallet.account.fiatPriceObject;
     const amount = recipient.amountInTokens
       ? new FPNumber(recipient.amount)
       : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
     const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
     commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
     return {
-      action: async () => await api.transfer(recipient.asset, recipient.wallet, amount.toString()),
       recipient,
       swapAndSendData: {
         address: recipient.wallet,
@@ -288,31 +276,18 @@ function getTransferParams(context, inputAsset, recipient) {
     };
   } else {
     try {
-      const swapData = getAmountAndDexId(context, inputAsset, recipient.asset, recipient.usd);
-      if (!swapData) return null;
+      const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
+      const amountTo = recipient.amountInTokens
+        ? new FPNumber(recipient.amount)
+        : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
 
-      const { amountFrom, amountTo, exchangeRate, bestDexId } = swapData;
       commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
 
       return {
-        action: async () =>
-          await api.swap.executeSwapAndSend(
-            recipient.wallet,
-            inputAsset,
-            recipient.asset,
-            amountFrom.toString(),
-            amountTo.toString(),
-            undefined,
-            true,
-            undefined,
-            bestDexId as DexId
-          ),
         swapAndSendData: {
           address: recipient.wallet,
           targetAmount: amountTo,
-          amountFrom,
           asset: recipient.asset,
-          dexId: bestDexId,
         },
         recipient,
         assetAddress: recipient.asset.address,
@@ -392,7 +367,9 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     };
   });
 
-  const maxInputAmount = inputTokenAmount.add(inputTokenAmount.mul(new FPNumber(slippageMultiplier))).toCodecString();
+  const maxInputAmount = inputTokenAmount
+    .add(inputTokenAmount.mul(new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED)))
+    .toCodecString();
   const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
     try {

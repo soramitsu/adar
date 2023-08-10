@@ -19,7 +19,7 @@
               }}
             </div>
             <div class="field__value pointer">
-              <div>{{ asset.estimateNumber }}</div>
+              <div>{{ asset.estimateAmount }}</div>
               <div>
                 <token-logo class="token-logo" :token="asset.asset" />
               </div>
@@ -73,6 +73,7 @@ import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
+import { inputTokenVariants } from '@/modules/ADAR/consts';
 import { getter, state } from '@/store/decorators';
 import { SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
 @Component({
@@ -96,36 +97,18 @@ export default class SelectInputAssetDialog extends Mixins(
   ) => SummaryAssetRecipientsInfo[];
 
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
-  get fileElement() {
-    return (this as any).$refs.file;
-  }
-
-  availableAssets = ['xor', 'val', 'pswap'];
 
   get assetList(): Array<AccountAsset> {
-    return this.accountAssets.filter((item) => this.availableAssets.includes(item.symbol.toLowerCase()));
-  }
-
-  get valEstimate() {
-    const val = this.assetList.find((item) => item.symbol.toLowerCase() === 'val');
-    return this.overallEstimatedTokens(val)?.toLocaleString();
-  }
-
-  get xorEstimate() {
-    const xor = this.assetList.find((item) => item.symbol.toLowerCase() === 'xor');
-    return this.overallEstimatedTokens(xor)?.toLocaleString();
-  }
-
-  get pswapEstimate() {
-    const pswap = this.assetList.find((item) => item.symbol.toLowerCase() === 'pswap');
-    return this.overallEstimatedTokens(pswap)?.toLocaleString();
+    return this.accountAssets.filter((item) => inputTokenVariants.includes(item.symbol.toLowerCase()));
   }
 
   get tokensEstimate() {
-    return this.availableAssets.map((symbol) => {
+    return inputTokenVariants.map((symbol) => {
+      const asset = this.assetList.find((item) => item.symbol.toLowerCase() === symbol) as AccountAsset;
+      const estimateAmount = this.overallEstimatedTokens(asset)?.toLocaleString();
       return {
-        asset: this.assetList.find((item) => item.symbol.toLowerCase() === symbol) as AccountAsset,
-        estimateNumber: this[`${symbol}Estimate`],
+        asset,
+        estimateAmount,
       };
     });
   }

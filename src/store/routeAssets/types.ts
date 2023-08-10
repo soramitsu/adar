@@ -1,3 +1,4 @@
+import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { Subscription } from 'rxjs';
 
@@ -13,9 +14,9 @@ import type {
 export type Recipient = {
   name: string;
   wallet: string;
-  usd: number;
+  usd: FPNumber;
   asset: Asset;
-  amount?: number;
+  amount?: FPNumber;
   status: string;
   id: string;
   isCompleted?: boolean;
@@ -64,6 +65,18 @@ export type TransactionInfo = {
   blockNumber?: string;
 };
 
+export type MaxInputAmount = {
+  assetSymbol: string;
+  amount: FPNumber;
+  updateDate: Date;
+};
+
+export type MaxInputAmountInfo = {
+  totalAmount: FPNumber;
+  totalAmountWithFee: FPNumber;
+  asetSymbol: string;
+};
+
 export type ProcessingState = {
   currentStageIndex: number;
   inputToken: Asset;
@@ -71,6 +84,8 @@ export type ProcessingState = {
   txInfo?: TransactionInfo;
   datetime?: Date;
   status: SwapTransferBatchStatus;
+  slippageTolerance: string;
+  maxInputAmount: MaxInputAmount;
 };
 
 export type Stage = {
@@ -96,8 +111,8 @@ export type PresetSwapData = {
 export type SummaryAssetRecipientsInfo = {
   recipientsNumber: number;
   asset: Asset | AccountAsset;
-  usd: number;
-  total: number;
-  required: number;
+  usd: FPNumber;
+  total: FPNumber;
+  required: FPNumber;
   totalTransactions: number;
 };

@@ -487,7 +487,8 @@
         "transactionSubmitted": "Transaction submitted",
         "transactionMessage": "{firstToken} and {secondToken}",
         "ok": "OK",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "lossWarning": "You are going to lose {value}% on your trade. We've detected a liquidity provision issue. This may lead to significant losses during token swaps. Please ensure there is adequate liquidity for your desired swap pair."
     },
     "swap": {
         "connectWallet": "@:connectWalletText",
@@ -869,7 +870,7 @@
     },
     "confirmNextTxFailure": {
         "header": "Attention",
-        "info": "Your XOR balance will be less than {fee} XOR after this transaction. You won’t be able to pay for the network fee for another transaction.",
+        "info": "Your {symbol} balance will be less than {fee} {symbol} after this transaction. You won’t be able to pay for the network fee for another transaction.",
         "payoff": "You would have to use the Bridge to get XOR from other networks, get sent XOR from another {Sora} account, or swap any other token already in your account into XOR.",
         "button": "Yes, I understand the risk"
     },
@@ -1362,5 +1363,38 @@
         "x1Btn": "Buy XOR with card",
         "errorMessage": "Apologies for the inconvenience. We're working diligently to resolve this. Please, try again later."
     },
-    "acceptOnScrollText": "Scroll to accept"
+    "acceptOnScrollText": "Scroll to accept",
+    "addressBook": {
+        "myExtAccounts": "My extension accounts",
+        "myBook": "My Book",
+        "searchPlaceholder": "Search by address, name or identity",
+        "noFoundRecords": "No records found",
+        "noContacts": "You don’t have any contacts added yet",
+        "addContact": "Add contact",
+        "dialogTitle": "Your contacts",
+        "identity": "On-chain identity",
+        "none": "None",
+        "detected": "New address detected",
+        "save": "Save as contact",
+        "tooltip": "Collect address book by providing name and address to keep your contacts organized and up-to-date",
+        "notSoraAddress": "This address will be saved as SORA address below. Make sure the recipient can access the SORA chain:",
+        "options": {
+            "send": "Send tokens",
+            "edit": "Edit contact",
+            "delete": "Delete"
+        },
+        "btn": {
+            "enterName": "Enter name",
+            "present": "Already present",
+            "saveChanges": "Save changes"
+        }
+    },
+    "browserPermission": {
+        "title": "Allow camera access in browser settings",
+        "desc": "To ensure the authenticity of documents and validate user identity for KYC verification, access to your device's camera is required.",
+        "disclaimer": "Camera access is required for real-time document capture to prevent fraud.",
+        "btnGoToSettings": "Go to settings",
+        "btnAllow": "Allow access"
+    },
+    "continueText": "Continue"
 }
