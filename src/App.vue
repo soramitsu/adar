@@ -39,7 +39,7 @@
       {{ t('browserNotificationDialog.pointer') }}
     </notification-enabling-page>
     <alerts />
-    <confirm-dialog />
+    <confirm-dialog :class="googleDialogZIndex" />
   </s-design-system-provider>
 </template>
 
@@ -60,6 +60,7 @@ import router, { goTo, lazyComponent } from '@/router';
 import { action, getter, mutation, state } from '@/store/decorators';
 import { preloadFontFace, updateDocumentTitle } from '@/utils';
 
+import { AdarPageNames } from './modules/ADAR/consts';
 import { RecipientStatus, SwapTransferBatchStatus, TransactionInfo } from './store/routeAssets/types';
 
 import type { FeatureFlags } from './store/settings/types';
@@ -351,6 +352,10 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   @mutation.routeAssets.setTxInfo private setTxInfo!: (txInfo: TransactionInfo) => void;
   @mutation.routeAssets.setTxStatus private setTxStatus!: (status: SwapTransferBatchStatus) => void;
   @action.routeAssets.getBlockNumber private getBlockNumber!: (blockId: string) => Promise<string>;
+
+  get googleDialogZIndex(): string {
+    return this.$route.name === AdarPageNames.RouteAssets ? 'google-dialog-z-index' : '';
+  }
 
   async handleChangeTransactionADAR(value: Nullable<HistoryItem>, oldValue: Nullable<HistoryItem>): Promise<void> {
     if (
@@ -772,5 +777,9 @@ $sora-logo-width: 173.7px;
     height: $sora-logo-height;
     @include focus-outline;
   }
+}
+
+.google-dialog-z-index {
+  z-index: 3001 !important;
 }
 </style>
