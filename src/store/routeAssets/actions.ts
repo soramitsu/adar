@@ -334,7 +334,7 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
 // ______________________________________________________________________
 
 async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
-  const { commit, getters, rootCommit, rootState } = routeAssetsActionContext(context);
+  const { commit, getters, rootCommit, rootState, rootDispatch } = routeAssetsActionContext(context);
   const inputAsset = getters.inputToken;
   const newData = data.map((item) => {
     const targetAmount = item.swapAndSendData.targetAmount.toCodecString();
@@ -373,7 +373,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
     try {
-      // const { params, options } = tx;
+      await rootDispatch.wallet.transactions.beforeTransactionSign();
       const time = Date.now();
       await api
         .submitExtrinsic(
