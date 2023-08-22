@@ -359,7 +359,6 @@ export default class Bridge extends Mixins(
   @state.bridge.isSoraToEvm isSoraToEvm!: boolean;
   @state.assets.registeredAssetsFetching registeredAssetsFetching!: boolean;
 
-  @getter.bridge.asset asset!: Nullable<RegisteredAccountAsset>;
   @getter.bridge.isRegisteredAsset isRegisteredAsset!: boolean;
   @getter.bridge.operation private operation!: Operation;
   @getter.settings.nodeIsConnected nodeIsConnected!: boolean;
@@ -432,7 +431,7 @@ export default class Bridge extends Mixins(
 
     if (this.assetLockedBalance && this.isSoraToEvm) {
       const fpBalance = this.getFPNumber(maxBalance, this.asset.decimals);
-      const fpLocked = this.getFPNumberFromCodec(this.assetLockedBalance, this.asset.decimals);
+      const fpLocked = this.getFPNumberFromCodec(this.assetLockedBalance, this.asset.externalDecimals);
 
       if (FPNumber.gt(fpBalance, fpLocked)) return fpLocked.toString();
     }

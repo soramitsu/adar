@@ -222,7 +222,6 @@ export default class BridgeTransaction extends Mixins(
   @state.bridge.inProgressIds private inProgressIds!: Record<string, boolean>;
   @state.router.prev private prevRoute!: Nullable<PageNames>;
 
-  @getter.bridge.asset asset!: Nullable<RegisteredAccountAsset>;
   @getter.bridge.historyItem private historyItem!: Nullable<IBridgeTransaction>;
   @getter.web3.externalAccount private externalAccount!: string;
 
@@ -321,7 +320,7 @@ export default class BridgeTransaction extends Mixins(
   }
 
   get txExternalNetworkFeeFormatted(): string {
-    return this.formatCodecNumber(this.txExternalNetworkFee, this.asset?.externalDecimals);
+    return this.formatCodecNumber(this.txExternalNetworkFee, this.nativeTokenDecimals);
   }
 
   get txSoraHash(): string {
@@ -452,9 +451,8 @@ export default class BridgeTransaction extends Mixins(
   get isInsufficientLiquidity(): boolean {
     if (!(this.asset && this.assetLockedBalance && this.isSoraToEvm)) return false;
 
-    const decimals = this.asset.decimals;
-    const fpAmount = new FPNumber(this.amount, decimals);
-    const fpLocked = FPNumber.fromCodecValue(this.assetLockedBalance, decimals);
+    const fpAmount = new FPNumber(this.amount, this.asset.decimals);
+    const fpLocked = FPNumber.fromCodecValue(this.assetLockedBalance, this.asset.externalDecimals);
 
     return FPNumber.gt(fpAmount, fpLocked);
   }
