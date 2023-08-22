@@ -15,7 +15,7 @@
           <div class="field">
             <div class="field__label">
               {{
-                t('adar.routeAssets.dialogs.selectInputAssetDialog.estimatedToken', { assetName: asset.asset.symbol })
+                t('adar.routeAssets.dialogs.selectInputAssetDialog.estimatedToken', { assetName: getAssetName(asset) })
               }}
             </div>
             <div class="field__value pointer">
@@ -71,10 +71,12 @@
 import { FPNumber } from '@sora-substrate/util/build';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
+import { WhitelistIdsBySymbol } from '@soramitsu/soraneo-wallet-web/lib/types/common';
 import { Component, Mixins } from 'vue-property-decorator';
 
+import SelectAssetMixin from '@/components/mixins/SelectAssetMixin';
 import { inputTokenVariants } from '@/modules/ADAR/consts';
-import { getter, state } from '@/store/decorators';
+import { getter } from '@/store/decorators';
 import { SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
 @Component({
   components: {
@@ -88,9 +90,10 @@ import { SummaryAssetRecipientsInfo } from '@/store/routeAssets/types';
 export default class SelectInputAssetDialog extends Mixins(
   mixins.TransactionMixin,
   mixins.DialogMixin,
-  mixins.FormattedAmountMixin
+  mixins.FormattedAmountMixin,
+  SelectAssetMixin
 ) {
-  @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
+  @getter.wallet.account.whitelistIdsBySymbol private whitelistIdsBySymbol!: WhitelistIdsBySymbol;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
@@ -99,12 +102,12 @@ export default class SelectInputAssetDialog extends Mixins(
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
 
   get assetList(): Array<AccountAsset> {
-    return this.accountAssets.filter((item) => inputTokenVariants.includes(item.symbol.toLowerCase()));
+    const assetsAddresses = inputTokenVariants.map((symbol) => this.whitelistIdsBySymbol[symbol.toUpperCase()]);
+    return this.getAssetsWithBalances(assetsAddresses);
   }
 
   get tokensEstimate() {
-    return inputTokenVariants.map((symbol) => {
-      const asset = this.assetList.find((item) => item.symbol.toLowerCase() === symbol) as AccountAsset;
+    return this.assetList.map((asset) => {
       const estimateAmount = this.overallEstimatedTokens(asset)?.toLocaleString();
       return {
         asset,
@@ -119,6 +122,10 @@ export default class SelectInputAssetDialog extends Mixins(
 
   getBalance(asset: AccountAsset): string {
     return `${this.formatCodecNumber(asset.balance.transferable, asset.decimals)}`;
+  }
+
+  getAssetName(asset): string {
+    return asset.asset?.symbol;
   }
 
   onSelected(asset) {
