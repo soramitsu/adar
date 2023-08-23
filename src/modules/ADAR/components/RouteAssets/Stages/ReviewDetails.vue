@@ -116,7 +116,6 @@
           :slippageTolerance="currentSlippage"
           @onSlippageChanged="updatePriceImpact"
         />
-        <s-divider v-if="!noIssues" />
         <div class="buttons-container">
           <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
             {{ t('adar.routeAssets.continue') }}

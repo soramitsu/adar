@@ -259,7 +259,6 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
   }
 
   &--settings-panel {
-    box-shadow: $app-controls-shadow;
     filter: $app-controls-filter;
     border-radius: var(--s-border-radius-small);
 

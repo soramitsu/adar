@@ -25,6 +25,7 @@ function initialState(): RouteAssetsState {
       txInfo: undefined,
       status: SwapTransferBatchStatus.INITIAL,
       slippageTolerance: slippageMultiplier,
+      pricesAreUpdated: true,
       maxInputAmount: {
         assetSymbol: XOR.symbol,
         amount: FPNumber.ZERO,

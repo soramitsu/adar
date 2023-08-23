@@ -159,7 +159,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   get totalAmount() {
-    return this.maxInputAmount.totalAmountWithFee;
+    return this.maxInputAmount.totalAmountWithFee.dp(4);
   }
 
   get totalUSD() {
