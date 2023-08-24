@@ -237,7 +237,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     });
   }
 
-  downloadCSV() {
+  downloadCSV(fileName: string) {
     const { txId, blockId, from, blockNumber } = this.batchTxInfo;
     const datetime = this.batchTxDatetime;
     const csvContent =
@@ -253,13 +253,13 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `ADAR-${new Date().toLocaleDateString('en-GB')}.csv`);
+    link.setAttribute('download', `${fileName}.csv`);
     document.body.appendChild(link); // Required for FF
 
     link.click();
   }
 
-  downloadPDF() {
+  downloadPDF(fileName: string) {
     const doc = new JsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' });
     const { txId, blockId, from, blockNumber } = this.batchTxInfo;
     const datetime = this.batchTxDatetime;
@@ -331,7 +331,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
       },
       // includeHiddenHtml: true
     });
-    doc.save(`ADAR-${new Date().toLocaleDateString('en-GB')}.pdf`);
+    doc.save(`${fileName}.pdf`);
   }
 }
 </script>
