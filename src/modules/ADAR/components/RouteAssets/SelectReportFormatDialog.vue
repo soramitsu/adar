@@ -42,7 +42,7 @@ export default class SelectReportFormatDialog extends Mixins(mixins.TransactionM
     return this.inputFile?.name.split('.csv')[0];
   }
 
-  readonly initialFileName = `ADAR-${new Date().toLocaleDateString('en-GB')}`;
+  readonly initialFileName = `ADAR-${this.formatDate(new Date().getTime(), 'D_MMM_YY')}`;
 
   reportFileName = this.initialFileName;
 
@@ -92,6 +92,7 @@ export default class SelectReportFormatDialog extends Mixins(mixins.TransactionM
     margin-top: $inner-spacing-mini;
     display: flex;
     gap: 8px;
+    font-size: var(--s-font-size-mini);
     > span {
       cursor: pointer;
       opacity: 0.7;
