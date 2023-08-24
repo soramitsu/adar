@@ -183,7 +183,9 @@ const actions = defineActions({
   },
 
   updateTokenAmounts(context): void {
-    const { rootState, getters, commit, dispatch } = routeAssetsActionContext(context);
+    const { rootState, getters, commit, dispatch, state } = routeAssetsActionContext(context);
+    const pricesAreUpdated = state.processingState.pricesAreUpdated;
+    if (!pricesAreUpdated) return;
     const priceObject = rootState.wallet.account.fiatPriceObject;
     const recipients = getters.recipients;
     recipients.forEach((recipient) => {
@@ -335,6 +337,7 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
 
 async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
   const { commit, getters, rootCommit, rootState, rootDispatch } = routeAssetsActionContext(context);
+  commit.setPricesAreUpdated(false);
   const inputAsset = getters.inputToken;
   const newData = data.map((item) => {
     const targetAmount = item.swapAndSendData.targetAmount.toCodecString();
@@ -402,6 +405,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
         })
         .catch((err) => {
           console.dir(err);
+          commit.setPricesAreUpdated(true);
           commit.setTxStatus(SwapTransferBatchStatus.FAILED);
           swapTransferData.forEach((swapTransferItem) => {
             swapTransferItem.receivers.forEach((receiver) => {
@@ -414,6 +418,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
         });
     } catch (err) {
       console.dir(err);
+      commit.setPricesAreUpdated(true);
       commit.setTxStatus(SwapTransferBatchStatus.FAILED);
       swapTransferData.forEach((swapTransferItem) => {
         swapTransferItem.receivers.forEach((receiver) => {

@@ -352,6 +352,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   @mutation.routeAssets.setTxInfo private setTxInfo!: (txInfo: TransactionInfo) => void;
   @mutation.routeAssets.setTxStatus private setTxStatus!: (status: SwapTransferBatchStatus) => void;
   @action.routeAssets.getBlockNumber private getBlockNumber!: (blockId: string) => Promise<string>;
+  @mutation.routeAssets.setPricesAreUpdated private setPricesAreUpdated!: (value: boolean) => void;
 
   get googleDialogZIndex(): string {
     return this.$route.name === AdarPageNames.RouteAssets ? 'google-dialog-z-index' : '';
@@ -381,6 +382,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
 
     if (value.status === TransactionStatus.Error) {
       this.setTxStatus(SwapTransferBatchStatus.FAILED);
+      this.setPricesAreUpdated(true);
       recipients.forEach((reciever) => {
         this.setRecipientStatus({
           id: reciever.id,
@@ -426,6 +428,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
     if (!value || ![Operation.SwapAndSend, Operation.Transfer].includes(value.type)) return;
     const recipients = this.recipients.filter((item) => item.txId === value.id);
     this.setTxStatus(SwapTransferBatchStatus.FAILED);
+    this.setPricesAreUpdated(true);
     recipients.forEach((reciever) => {
       this.setRecipientStatus({
         id: reciever.id,
@@ -722,6 +725,8 @@ $sora-logo-width: 173.7px;
 
   &-content {
     flex: 1;
+    margin: $inner-spacing-big auto 0;
+    width: 100%;
 
     .app-disclaimer-container {
       margin-left: auto;
