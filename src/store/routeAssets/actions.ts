@@ -386,7 +386,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
             symbol: inputAsset.symbol,
             assetAddress: inputAsset.address,
             to: api.account.pair.address,
-            type: Operation.SwapAndSend,
+            type: Operation.SwapTransferBatch,
           }
         )
         .then(async () => {
