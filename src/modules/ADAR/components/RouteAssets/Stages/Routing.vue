@@ -55,8 +55,7 @@ import { MaxInputAmountInfo, Recipient, SwapTransferBatchStatus } from '@/store/
   },
 })
 export default class RoutingAssets extends Mixins(TranslationMixin) {
-  @action.routeAssets.processingNextStage nextStage!: any;
-  @getter.routeAssets.recipients private recipients!: Array<Recipient>;
+  @action.routeAssets.processingNextStage nextStage!: () => void;
   @getter.routeAssets.recipientsTokens recipientsTokens!: Asset[];
   @getter.routeAssets.inputToken inputToken!: Asset;
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
@@ -73,7 +72,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get tokensEstimate() {
-    return this.maxInputAmount.totalAmountWithFee?.toLocaleString();
+    return this.maxInputAmount.totalAmountWithFee?.dp(4).toLocaleString();
   }
 
   get iconName() {

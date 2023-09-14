@@ -86,6 +86,7 @@ export type ProcessingState = {
   status: SwapTransferBatchStatus;
   slippageTolerance: string;
   maxInputAmount: MaxInputAmount;
+  pricesAreUpdated: boolean;
 };
 
 export type Stage = {
