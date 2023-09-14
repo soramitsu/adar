@@ -1,10 +1,3 @@
-// RECIPIENT_NAME;WALLET_ADDRESS;AMOUNT;TARGET_TOKEN;IS_AMOUNT_IN_TOKENS					
-// RECIPIENT_NAME - Name					
-// WALLET_ADDRESS - SORA network wallet address					
-// AMOUNT - Amount to be received recipient should receive. Amounts can be expressed either in Dollars or in target tokens. If you want the recipient to receive tokens equivalent to the specified Dollar value, leave IS_AMOUNT_IN_TOKENS parameter empty. If you want to send a specific number of tokens to the recipient, set IS_AMOUNT_IN_TOKENS parameter to true.					
-// TARGET_TOKEN - The token that the recipient will receive (eg XOR, XSTUSD, etc)					
-// IS_AMOUNT_IN_TOKENS - optional parameter, if true - the AMOUNT parameter becomes the value of tokens sent					
-// Example - in the first row, the recipient will get 2000 XOR					
-// Example - in the second row, the recipient will get $3000 worth of PSWAP tokens					
-Melanie Wilson;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;2000;XOR;true					
-Charles Scott;cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;3000;PSWAP					
+// RECIPIENT_NAME // Name of the recipient;// WALLET_ADDRESS // wallet address in SORA network;// AMOUNT // Amount to be received recipient should receive. Amounts can be expressed either in Dollars or in target tokens. If you want the recipient to receive tokens equivalent to the specified Dollar value, leave IS_AMOUNT_IN_TOKENS parameter empty. If you want to send a specific number of tokens to the recipient, set IS_AMOUNT_IN_TOKENS parameter to true.;// TARGET_TOKEN // The token that the recipient will receive (eg XOR, XSTUSD, etc);// IS_AMOUNT_IN_TOKENS // optional parameter, if true - the AMOUNT parameter becomes the value of tokens sent
+Melanie Wilson (the recipient will get 2000 XOR);5FcNgN7kg1C7sZZpiQ2GB1PZvD5JchNVKK6EqtUqJtmjrKJJ;2000;XOR;TRUE
+Charles Scott (the recipient will get $3000 worth of PSWAP tokens);cnWX1RR9W3iZXtrL5W6WjJoDsWWZHLDCDCMkmWyirHAZJyVu8;3000;PSWAP;
