@@ -76,7 +76,7 @@
             :isError="!noIssues"
           />
         </div>
-        <template v-if="!noIssues">
+        <template v-if="!showAmountRequiredField">
           <s-divider />
           <div class="field">
             <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.remainingAmount') }}</div>
@@ -162,7 +162,6 @@ import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-subst
 import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTolerance.vue';
@@ -234,7 +233,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get noIssues() {
-    return this.remainingAmountRequired.toNumber() <= 0;
+    return this.showAmountRequiredField && !this.showXorRequiredField;
+  }
+
+  get showAmountRequiredField() {
+    return FPNumber.isLessThanOrEqualTo(this.remainingAmountRequired, FPNumber.ZERO);
   }
 
   get usdToBeRouted() {
