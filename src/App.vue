@@ -387,7 +387,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
       ![TransactionStatus.InBlock, TransactionStatus.Finalized, TransactionStatus.Error].includes(
         value.status as TransactionStatus
       ) ||
-      ![Operation.SwapAndSend, Operation.Transfer].includes(value.type)
+      ![Operation.SwapTransferBatch].includes(value.type)
     ) {
       return;
     }
@@ -447,7 +447,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
 
   @Watch('invalidTransaction', { deep: true, immediate: true })
   private handleInvalidTransaction(value: HistoryItem): void {
-    if (!value || ![Operation.SwapAndSend, Operation.Transfer].includes(value.type)) return;
+    if (!value || ![Operation.SwapTransferBatch].includes(value.type)) return;
     const recipients = this.recipients.filter((item) => item.txId === value.id);
     this.setTxStatus(SwapTransferBatchStatus.FAILED);
     this.setPricesAreUpdated(true);
