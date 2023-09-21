@@ -2,14 +2,7 @@ import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { Subscription } from 'rxjs';
 
-import type { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
-import type {
-  LPRewardsInfo,
-  SwapQuote,
-  QuotePaths,
-  QuotePayload,
-  PrimaryMarketsEnabledAssets,
-} from '@sora-substrate/liquidity-proxy/build/types';
+import type { SwapQuote, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
 
 export type Recipient = {
   name: string;

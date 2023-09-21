@@ -2,35 +2,10 @@
   <header class="header">
     <s-button class="app-menu-button" type="action" primary icon="basic-more-horizontal-24" @click="toggleMenu" />
     <app-logo-button class="app-logo--header" responsive :theme="libraryTheme" @click="goTo(PageNames.Swap)" />
-    <!-- <div
-      v-if="moonpayEnabled"
-      class="app-controls app-controls--moonpay s-flex"
-      :class="{ 'app-controls--moonpay--dark': themeIsDark }"
-    > -->
-    <!-- <s-button
-        type="tertiary"
-        size="medium"
-        icon="various-atom-24"
-        class="moonpay-button moonpay-button--buy"
-        @click="openMoonpayDialog"
-      >
-        <span class="moonpay-button-text">{{ t('moonpay.buttons.buy') }}</span>
-      </s-button>
-    </div>
-    <div class="app-controls s-flex">
-      <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
-      <app-header-menu />
-    </div>
-      <moonpay-history-button v-if="isLoggedIn" class="moonpay-button moonpay-button--history" /> -->
-    <!-- </div> -->
     <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex route-assets-navigation" />
     <div class="s-flex app-controls">
       <balance-widget class="app-controls s-flex balance-widget" />
       <div class="app-controls app-controls--settings-panel s-flex without-moonpay">
-        <!-- <market-maker-countdown /> -->
-        <!-- <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
-        <token-logo class="node-control__logo token-logo" v-bind="nodeLogo" />
-      </s-button> -->
         <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
         <app-header-menu />
       </div>
@@ -50,7 +25,7 @@ import { PageNames, Components, BreakpointClass } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent, goTo } from '@/router';
-import { getter, mutation, state } from '@/store/decorators';
+import { getter, state } from '@/store/decorators';
 
 import AppAccountButton from './AppAccountButton.vue';
 import AppHeaderMenu from './AppHeaderMenu.vue';
