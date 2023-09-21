@@ -452,7 +452,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   const { swapQuote } = subscription;
   const {
     dexId,
-    result: { amount, amountWithoutImpact, fee, rewards, route },
+    result: { amount },
   } = swapQuote(
     assetFrom.address,
     assetTo.address,
