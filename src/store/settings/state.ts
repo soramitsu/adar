@@ -1,4 +1,4 @@
-import { DefaultMarketAlgorithm, DefaultSlippageTolerance, MarketAlgorithms } from '@/consts';
+import { BreakpointClass, DefaultMarketAlgorithm, DefaultSlippageTolerance, MarketAlgorithms } from '@/consts';
 import { getLocale } from '@/lang';
 import storage, { settingsStorage } from '@/utils/storage';
 
@@ -39,6 +39,8 @@ function initialState(): SettingsState {
     blockNumberUpdates: undefined,
     internetConnection: undefined,
     internetConnectionSpeed: undefined,
+    screenBreakpointClass: BreakpointClass.LargeDesktop,
+    adsArray: [],
   };
 }
 

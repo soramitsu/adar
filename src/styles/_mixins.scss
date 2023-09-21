@@ -71,7 +71,7 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     &--footer {
       margin-top: $inner-spacing-tiny;
       margin-bottom: 0;
-      min-height: $inner-spacing-mini * 2.25;
+      min-height: $inner-spacing-mini * 2.625; // 21px
 
       .formatted-amount--fiat-value {
         flex-grow: 1;
@@ -479,6 +479,7 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     &__arrow {
       margin-right: 0;
       flex-shrink: 0;
+      position: relative;
     }
 
     &.is-active {
@@ -734,10 +735,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
       width: 100% !important; // overrides element-ui js style property
     }
 
-    .el-table__empty-text {
-      color: var(--s-color-base-content-tertiary); // TODO [1.4]: remove after fix in ui-lib
-    }
-
     .cell {
       word-break: normal;
     }
@@ -830,8 +827,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
 }
 
 @mixin app-status-item {
-  $disabled-class: 'default';
-
   align-items: center;
   margin-left: 5px;
   margin-right: 5px;
@@ -839,13 +834,12 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   padding-right: 5px;
   border-radius: 8px;
   height: $footer-height - 2px;
-  &:not(.#{$disabled-class}) {
-    &:hover {
-      opacity: 0.5;
-      cursor: pointer;
-    }
-    @include focus-outline;
+
+  &:hover {
+    opacity: 0.5;
+    cursor: pointer;
   }
+  @include focus-outline;
 }
 
 @mixin browser-notification-dialog {

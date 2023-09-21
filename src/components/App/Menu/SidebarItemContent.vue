@@ -2,10 +2,10 @@
   <component :is="tag" :class="classes" :tabindex="tabindex">
     <!-- TODO: [TECH] move from fonts provided values -->
     <div v-if="icon === 'sora-card'" class="icon-container">
-      <side-menu-card class="sora-card-sidebar-icon" />
+      <sora-card-icon class="sora-card-sidebar-icon" />
     </div>
     <div v-else-if="icon === 'adar-about'" class="icon-container">
-      <side-menu-adar-about class="sora-card-sidebar-icon" />
+      <adar-about-icon class="sora-card-sidebar-icon" />
     </div>
     <div v-else-if="icon" class="icon-container">
       <s-icon :name="icon" size="28" />
@@ -18,13 +18,16 @@
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import SideMenuAdarAbout from '@/assets/img/adar/sidebar.svg?inline';
-import SideMenuCard from '@/assets/img/sora-card/sidebar.svg?inline';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
+import AdarAboutIcon from '@/modules/ADAR/components/App/Menu/AdarAboutIcon.vue';
+
+import SoraCardIcon from './SoraCardIcon.vue';
 
 @Component({
   components: {
-    SideMenuCard,
+    SoraCardIcon,
     SideMenuAdarAbout,
+    AdarAboutIcon,
   },
 })
 export default class AppSidebarItemContent extends Mixins(TranslationMixin) {

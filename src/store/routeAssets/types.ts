@@ -2,14 +2,7 @@ import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { Subscription } from 'rxjs';
 
-import { DexQuoteData } from '../swap/types';
-
-import type { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
-import type {
-  QuotePaths,
-  QuotePayload,
-  PrimaryMarketsEnabledAssets,
-} from '@sora-substrate/liquidity-proxy/build/types';
+import type { SwapQuote, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
 
 export type Recipient = {
   name: string;
@@ -26,14 +19,11 @@ export type Recipient = {
 };
 
 export type RouteAssetsSubscription = {
-  liquidityReservesSubscription: Nullable<Subscription>;
-  payload: Nullable<QuotePayload>;
-  paths: Nullable<QuotePaths>;
-  liquiditySources: Nullable<LiquiditySourceTypes[]>;
+  isAvailable?: false;
+  liquiditySources?: [];
+  swapQuote?: SwapQuote;
   assetAddress: string;
-  dexId?: number;
-  selectedDexId?: number;
-  dexQuoteData?: Record<number, DexQuoteData>;
+  quoteSubscription?: Subscription;
 };
 
 export enum RecipientStatus {

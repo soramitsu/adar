@@ -28,27 +28,18 @@ const mutations = defineMutations<RouteAssetsState>()({
   addSubscription(state, subscription: RouteAssetsSubscription): void {
     state.subscriptions.push(subscription);
   },
-  addSubscribeObjectToSubscription(state, { reservesSubscribe, outputAssetId }) {
+  addSubscribeObjectToSubscription(state, { quoteSubscription, outputAssetId }) {
     const subscription = state.subscriptions.find((item) => item.assetAddress === outputAssetId);
     if (subscription) {
-      subscription.liquidityReservesSubscription = reservesSubscribe;
+      subscription.quoteSubscription = quoteSubscription;
     }
   },
-  addPathsAndPayloadToSubscription(state, { outputAssetId, paths, payload, dexId, liquiditySources }): void {
+  addSwapQuoteToSubscription(state, { outputAssetId, swapQuote, isAvailable, liquiditySources }): void {
     const subscription = state.subscriptions.find((item) => item.assetAddress === outputAssetId);
     if (subscription) {
-      subscription.paths = paths;
+      subscription.swapQuote = swapQuote;
       subscription.liquiditySources = liquiditySources;
-      subscription.payload = payload;
-      subscription.dexId = dexId;
-      subscription.dexQuoteData = {
-        ...subscription.dexQuoteData,
-        [dexId]: Object.freeze({
-          payload,
-          paths,
-          pairLiquiditySources: liquiditySources,
-        }),
-      };
+      subscription.isAvailable = isAvailable;
     }
   },
   setEnabledAssetsSubscription(state, subscription): void {
