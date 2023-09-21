@@ -2,7 +2,7 @@
 
 def pipeline = new org.js.AppPipeline(steps: this,
     dockerImageName: 'adar/web',
-    buildDockerImage: 'docker.soramitsu.co.jp/build-tools/node:14-ubuntu-extended',
+    buildDockerImage: 'build-tools/node:16-ubuntu',
     dockerRegistryCred: 'bot-adar-rw',
     // buildEnvironment: buildEnvironment,
     dockerImageTags: ['adar': 'latest', 'adar-dev': 'dev'],
