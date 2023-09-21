@@ -1,11 +1,9 @@
 /* eslint-disable no-console */
 import { assert } from '@polkadot/util';
-import { getPathsAndPairLiquiditySources } from '@sora-substrate/liquidity-proxy';
 import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
 import { NumberLike } from '@sora-substrate/math';
 import { FPNumber, Operation } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
-import { DexId } from '@sora-substrate/util/build/dex/consts';
 import { Messages } from '@sora-substrate/util/build/logger';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
@@ -13,13 +11,11 @@ import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
 
 import { routeAssetsActionContext } from '@/store/routeAssets';
-import type { DexQuoteData } from '@/store/swap/types';
 import { delay } from '@/utils';
 
-import { RouteAssetsSubscription, RecipientStatus, SwapTransferBatchStatus } from './types';
+import { RecipientStatus, SwapTransferBatchStatus } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
-import type { QuotePayload, SwapResult } from '@sora-substrate/liquidity-proxy/build/types';
 import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const actions = defineActions({
@@ -114,72 +110,40 @@ const actions = defineActions({
   },
 
   async subscribeOnReserves(context, tkn: Asset = XOR): Promise<void> {
-    const { commit, rootGetters, getters, dispatch } = routeAssetsActionContext(context);
-    const liquiditySources = rootGetters.swap.swapLiquiditySource;
+    const { commit, getters, dispatch } = routeAssetsActionContext(context);
     const sourceToken = getters.inputToken;
     const tokens = [...new Set<Asset>(getters.recipients.filter((item) => item.asset).map((item) => item.asset))]
       .map((item: Asset) => item?.address)
       .filter((item) => item !== sourceToken.address);
     if (!tokens || tokens.length < 1) return;
-    // const currentsPulls = [] as Array<RouteAssetsSubscription>;
 
     dispatch.cleanSwapReservesSubscription();
-    const enabledAssets = await api.swap.getPrimaryMarketsEnabledAssets();
-    commit.setPrimaryMarketsEnabledAssets(enabledAssets);
-    tokens.forEach((tokenAddress) => {
-      const subscription: RouteAssetsSubscription = {
-        liquidityReservesSubscription: null,
-        payload: null,
-        paths: null,
-        liquiditySources: null,
-        assetAddress: tokenAddress,
-      };
-      commit.addSubscription(subscription);
-      const reservesSubscribe = api.swap
-        .subscribeOnAllDexesReserves(
-          sourceToken.address,
-          tokenAddress,
-          enabledAssets,
-          liquiditySources as LiquiditySourceTypes
-        )
-        .subscribe((results) => {
-          results.forEach((result) =>
+    const tokensPromises = tokens.map((tokenAddress) => {
+      return new Promise<void>((resolve, reject) => {
+        api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
+          commit.addSubscription({ assetAddress: tokenAddress });
+          const quoteSubscription = observableQuote.subscribe((quoteData) => {
             dispatch.setSubscriptionPayload({
-              data: result,
-              inputAssetId: sourceToken.address,
+              data: quoteData,
               outputAssetId: tokenAddress,
-            })
-          );
+            });
+            resolve();
+          });
+          commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
         });
-      commit.addSubscribeObjectToSubscription({ reservesSubscribe, tokenAddress });
+      });
     });
-    dispatch.updateTokenAmounts();
+    Promise.allSettled(tokensPromises).then(() => {
+      dispatch.updateTokenAmounts();
+    });
   },
 
-  async setSubscriptionPayload(context, { data, inputAssetId, outputAssetId }): Promise<void> {
-    const { state, dispatch, commit } = routeAssetsActionContext(context);
+  async setSubscriptionPayload(context, { data, outputAssetId }): Promise<void> {
+    const { commit } = routeAssetsActionContext(context);
 
-    const { dexId, payload } = data;
-    // tbc & xst is enabled only on dex 0
-    if (!(inputAssetId && outputAssetId && payload)) {
-      return;
-    }
+    const { quote, isAvailable, liquiditySources } = data;
 
-    // tbc & xst is enabled only on dex 0
-    const enabledAssets = dexId === DexId.XOR ? state.enabledAssets : { tbc: [], xst: {}, lockedSources: [] };
-    const baseAssetId = api.dex.getBaseAssetId(dexId);
-    const syntheticBaseAssetId = api.dex.getSyntheticBaseAssetId(dexId);
-
-    const { paths, liquiditySources } = getPathsAndPairLiquiditySources(
-      inputAssetId,
-      outputAssetId,
-      payload,
-      enabledAssets,
-      baseAssetId,
-      syntheticBaseAssetId
-    );
-
-    commit.addPathsAndPayloadToSubscription({ outputAssetId, paths, payload, dexId, liquiditySources });
+    commit.addSwapQuoteToSubscription({ outputAssetId, swapQuote: quote, isAvailable, liquiditySources });
   },
 
   updateTokenAmounts(context): void {
@@ -232,7 +196,7 @@ const actions = defineActions({
     const { state, commit } = routeAssetsActionContext(context);
     const subscriptions = state.subscriptions;
     subscriptions.forEach((sub) => {
-      sub.liquidityReservesSubscription?.unsubscribe();
+      sub.quoteSubscription?.unsubscribe();
     });
     commit.setSubscriptions([]);
     commit.cleanEnabledAssetsSubscription();
@@ -482,54 +446,25 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   if (assetFrom.address === assetTo.address)
     return { amountFrom: tokenEquivalent, amountTo: tokenEquivalent, exchangeRate, bestDexId: 0 };
   const subscription = getters.subscriptions.find((sub) => sub.assetAddress === assetTo.address);
-  if (!subscription) {
+  if (!subscription?.swapQuote) {
     throw new Error('Subscription did not found');
   }
-  const { paths, payload, liquiditySources, dexQuoteData } = subscription;
-  const dexes = api.dex.dexList;
-  const enabledAssets = state.enabledAssets;
-  const results = dexes.reduce<{ [dexId: number]: SwapResult }>((buffer, { dexId }) => {
-    const swapResult = api.swap.getResult(
-      assetFrom,
-      assetTo,
-      tokenEquivalent.toString(),
-      true,
-      [rootGetters.swap.swapLiquiditySource].filter(Boolean) as Array<LiquiditySourceTypes>,
-      enabledAssets,
-      (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].paths,
-      (dexQuoteData as Record<DexId, DexQuoteData>)[dexId].payload as QuotePayload,
-      dexId as DexId
-    );
-
-    return { ...buffer, [dexId]: swapResult };
-  }, {});
-
-  let bestDexId: number = DexId.XOR;
-
-  for (const currentDexId in results) {
-    const currAmount = FPNumber.fromCodecValue(results[currentDexId].amount);
-    const bestAmount = FPNumber.fromCodecValue(results[bestDexId].amount);
-
-    if (currAmount.isZero()) continue;
-
-    if (
-      FPNumber.isLessThan(currAmount, bestAmount)
-      // &&
-      // this.isExchangeB
-      // ||
-      // (FPNumber.isLessThan(bestAmount, currAmount) && !this.isExchangeB)
-    ) {
-      bestDexId = +currentDexId;
-    }
-  }
-
-  const { amount, amountWithoutImpact, fee, rewards } = results[bestDexId];
+  const { swapQuote } = subscription;
+  const {
+    dexId,
+    result: { amount, amountWithoutImpact, fee, rewards, route },
+  } = swapQuote(
+    assetFrom.address,
+    assetTo.address,
+    tokenEquivalent.toString(),
+    true,
+    [rootGetters.swap.swapLiquiditySource].filter(Boolean) as Array<LiquiditySourceTypes>
+  );
   return {
     amountFrom: FPNumber.fromCodecValue(amount),
     amountTo: tokenEquivalent,
     exchangeRate,
-    bestDexId,
-    allDexes: results,
+    bestDexId: dexId,
   };
 }
 
