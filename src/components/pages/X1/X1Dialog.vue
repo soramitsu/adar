@@ -1,30 +1,15 @@
 <template>
   <dialog-base :visible.sync="isVisible" class="x1-dialog">
-    <div v-if="showTestEnvDisclaimer" class="disclaimer">
-      <div class="disclaimer-warning-icon">
-        <s-icon name="notifications-alert-triangle-24" size="42px" />
-      </div>
-      <div>
-        <p class="disclaimer__text">DO NOT ENTER YOUR REAL CARD NUMBER. This is a test environment.</p>
-        <p class="disclaimer__text">Please, use the following card details:</p>
-        <ul>
-          <li>Card number: 4012 0000 0006 0085</li>
-          <li>Card CVV: 123</li>
-          <li>Card expiration date: Input any date</li>
-          <li>Card owner name: Input any name & surname</li>
-        </ul>
-      </div>
-    </div>
     <div class="wrapper" v-loading="loadingX1">
       <div
         v-if="!showErrorInfoBanner"
         :id="widgetId"
         data-from-currency="EUR"
+        data-locale="en"
         :data-address="accountAddress"
         :data-from-amount="restEuroToDeposit"
         :data-hide-buy-more-button="true"
         :data-hide-try-again-button="false"
-        data-locale="en"
       />
       <div v-else class="x1-error-info-banner">
         <s-icon class="x1-error-info-banner__icon" name="basic-clear-X-24" size="64px" />
@@ -92,14 +77,6 @@ export default class X1Dialog extends Mixins(mixins.DialogMixin, mixins.LoadingM
     return this.X1Widget.widgetId;
   }
 
-  get isMainnet(): boolean {
-    return this.soraNetwork === WALLET_CONSTS.SoraNetwork.Prod;
-  }
-
-  get showTestEnvDisclaimer(): boolean {
-    return !this.isMainnet && !this.showErrorInfoBanner;
-  }
-
   async loadX1(): Promise<void> {
     try {
       await ScriptLoader.load(this.X1Widget.sdkUrl, false);
@@ -145,7 +122,7 @@ export default class X1Dialog extends Mixins(mixins.DialogMixin, mixins.LoadingM
   }
 
   ul {
-    margin-top: $basic-spacing / 2;
+    margin-top: $inner-spacing-mini;
   }
 }
 [design-system-theme='dark'] .disclaimer-warning-icon .s-icon-notifications-alert-triangle-24 {

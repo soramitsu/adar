@@ -18,16 +18,7 @@
       <p>{{ t('adar.routeAssets.stages.uploadTemplate.typesInfo') }}</p>
       <div>
         <label
-          class="
-            file-upload
-            s-typography-button--big
-            route-assets-upload-template__button
-            el-button el-tooltip
-            button
-            el-button--primary el-button--medium
-            neumorphic
-            s-medium s-border-radius-small s-primary
-          "
+          class="file-upload s-typography-button--big route-assets-upload-template__button el-button el-tooltip button el-button--primary el-button--medium neumorphic s-medium s-border-radius-small s-primary"
         >
           <input type="file" @change="onInputChanged" ref="file" aria-label="false" accept=".csv" />
           {{ t('adar.routeAssets.stages.uploadTemplate.uploadButtonTitle') }}
