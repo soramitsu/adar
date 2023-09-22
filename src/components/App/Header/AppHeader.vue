@@ -2,76 +2,46 @@
   <header class="header">
     <s-button class="app-menu-button" type="action" primary icon="basic-more-horizontal-24" @click="toggleMenu" />
     <app-logo-button class="app-logo--header" responsive :theme="libraryTheme" @click="goTo(PageNames.Swap)" />
-    <!-- <div
-      v-if="moonpayEnabled"
-      class="app-controls app-controls--moonpay s-flex"
-      :class="{ 'app-controls--moonpay--dark': themeIsDark }"
-    > -->
-    <!-- <s-button
-        type="tertiary"
-        size="medium"
-        icon="various-atom-24"
-        class="moonpay-button moonpay-button--buy"
-        @click="openMoonpayDialog"
-      >
-        <span class="moonpay-button-text">{{ t('moonpay.buttons.buy') }}</span>
-      </s-button>
-      <moonpay-history-button v-if="isLoggedIn" class="moonpay-button moonpay-button--history" /> -->
-    <!-- </div> -->
     <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex route-assets-navigation" />
     <div class="s-flex app-controls">
       <balance-widget class="app-controls s-flex balance-widget" />
-      <div
-        class="app-controls app-controls--settings-panel s-flex"
-        :class="{ 'without-moonpay': !areMoonpayButtonsVisible }"
-      >
-        <!-- <market-maker-countdown /> -->
-        <!-- <s-button type="action" class="node-control s-pressed" :tooltip="nodeTooltip" @click="openNodeSelectionDialog">
-        <token-logo class="node-control__logo token-logo" v-bind="nodeLogo" />
-      </s-button> -->
+      <div class="app-controls app-controls--settings-panel s-flex without-moonpay">
         <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
         <app-header-menu />
       </div>
     </div>
 
     <select-language-dialog />
-
-    <template v-if="moonpayEnabled">
-      <moonpay />
-      <moonpay-notification />
-      <moonpay-confirmation />
-    </template>
   </header>
 </template>
 
 <script lang="ts">
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { XOR, ETH } from '@sora-substrate/util/build/assets/consts';
 import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-import { PageNames, Components } from '@/consts';
+import { PageNames, Components, BreakpointClass } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent, goTo } from '@/router';
-import { getter, mutation } from '@/store/decorators';
+import { getter, state } from '@/store/decorators';
 
 import AppAccountButton from './AppAccountButton.vue';
 import AppHeaderMenu from './AppHeaderMenu.vue';
 import AppLogoButton from './AppLogoButton.vue';
+import AppMarketing from './AppMarketing.vue';
 
 import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 
 @Component({
   components: {
     AppAccountButton,
+    AppMarketing,
     AppHeaderMenu,
     AppLogoButton,
     SelectLanguageDialog: lazyComponent(Components.SelectLanguageDialog),
-    Moonpay: lazyComponent(Components.Moonpay),
-    MoonpayNotification: lazyComponent(Components.MoonpayNotification),
-    MoonpayHistoryButton: lazyComponent(Components.MoonpayHistoryButton),
-    MoonpayConfirmation: lazyComponent(Components.MoonpayConfirmation),
+    PairTokenLogo: lazyComponent(Components.PairTokenLogo),
     RouteAssetsNavigation: adarLazyComponent(AdarComponents.RouteAssetsNavigation),
     BalanceWidget: adarLazyComponent(AdarComponents.BalanceWidget),
     TokenLogo: components.TokenLogo,
@@ -80,16 +50,24 @@ import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 })
 export default class AppHeader extends Mixins(WalletConnectMixin) {
   readonly PageNames = PageNames;
+  readonly xor = XOR;
+  readonly eth = ETH;
 
   @Prop({ type: Boolean, default: false }) readonly loading!: boolean;
 
-  @getter.libraryTheme libraryTheme!: Theme;
-  @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
-  @getter.settings.moonpayEnabled moonpayEnabled!: boolean;
+  @state.settings.screenBreakpointClass private screenBreakpointClass!: BreakpointClass;
 
-  @mutation.moonpay.setDialogVisibility private setMoonpayVisibility!: (flag: boolean) => void;
+  @getter.libraryTheme libraryTheme!: Theme;
 
   goTo = goTo;
+
+  get isMobile(): boolean {
+    return this.screenBreakpointClass === BreakpointClass.Mobile;
+  }
+
+  get isAnyMobile(): boolean {
+    return this.isMobile || this.screenBreakpointClass === BreakpointClass.LargeMobile;
+  }
 
   get nodeLogo() {
     return {
@@ -102,16 +80,20 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
     return this.$route.path.includes('route-assets');
   }
 
-  get areMoonpayButtonsVisible(): boolean {
-    return this.moonpayEnabled && this.isLoggedIn;
+  get fiatBtnClass(): string[] {
+    const base = ['app-controls-fiat-btn', 'active'];
+
+    if (this.$route.name === PageNames.FiatDepositOptions) base.push('app-controls-fiat-btn--active', 's-pressed');
+
+    return base;
   }
 
-  async openMoonpayDialog(): Promise<void> {
-    if (!this.isSoraAccountConnected) {
-      return this.connectSoraWallet();
-    }
-    await this.connectEvmWallet();
-    this.setMoonpayVisibility(true);
+  get fiatBtnType(): string {
+    return this.isAnyMobile ? 'action' : 'tertiary';
+  }
+
+  get fiatBtnSize(): string {
+    return this.isAnyMobile ? 'mini' : 'small';
   }
 
   toggleMenu(): void {
@@ -121,43 +103,15 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
 </script>
 
 <style lang="scss">
-.settings-control:hover > span > .header-menu__button i {
-  color: var(--s-color-base-content-secondary);
+.app-controls-fiat-btn.app-controls-fiat-btn--active.neumorphic.active {
+  box-shadow: var(--s-shadow-element);
+  span {
+    color: var(--s-color-theme-accent);
+  }
 }
 
-.moonpay-button {
-  &.el-button.neumorphic.s-medium {
-    padding-left: 9px;
-    padding-right: 9px;
-  }
-
-  &--buy {
-    max-width: 114px;
-    // border-right: 1px solid var(--s-color-base-content-tertiary) !important;
-    margin-right: 1px;
-  }
-
-  &--history {
-    max-width: 134px;
-  }
-
-  &-text {
-    display: none;
-    white-space: normal;
-    text-align: left;
-
-    @include large-mobile {
-      display: inline-block;
-    }
-  }
-
-  & i + &-text {
-    padding-left: 6px;
-  }
-
-  &:not(.s-action).s-i-position-left > span > i[class^='s-icon-'] {
-    margin-right: 0;
-  }
+.settings-control:hover > span > .header-menu__button i {
+  color: var(--s-color-base-content-secondary);
 }
 </style>
 
@@ -227,19 +181,22 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     }
   }
 
+  &-fiat-btn.s-action .payment-icon {
+    margin: auto;
+    margin-top: 2px; // Only for action button
+  }
+
   .el-button {
     + .el-button {
       margin-left: 0;
     }
   }
 
-  &.without-moonpay {
-    margin-left: auto;
+  @include desktop {
+    // margin-left: auto;
   }
 
-  // margin-left: auto;
-
-  &--moonpay {
+  &--middle {
     margin-left: auto;
     box-shadow: $app-controls-shadow;
     filter: $app-controls-filter;
@@ -252,9 +209,13 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     @include desktop {
       position: absolute;
       top: 50%;
-      left: 50%;
+      left: 42.5%; // Because of marketing banner
       transform: translate(-50%, -50%);
       margin-right: 0;
+    }
+
+    @media (minmax(1220px, false)) {
+      left: 50%;
     }
   }
 
