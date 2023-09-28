@@ -38,7 +38,7 @@
         <span>{{ internetConnectionDesc }}</span>
       </template>
     </footer-popper>
-    <!-- <footer-popper
+    <footer-popper
       icon="software-cloud-24"
       panel-class="statistics"
       :panel-text="statisticsConnectionText"
@@ -50,7 +50,7 @@
         <span>{{ t('footer.statistics.label') }}</span>
         <span>{{ statisticsConnectionDesc }}</span>
       </template>
-    </footer-popper> -->
+    </footer-popper>
     <select-node-dialog />
     <no-internet-dialog />
     <statistics-dialog :visible.sync="showStatisticsDialog" />
