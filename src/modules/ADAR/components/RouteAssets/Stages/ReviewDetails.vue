@@ -111,6 +111,21 @@
           </div>
         </template>
         <s-divider />
+        <template v-if="outcomeAssetsAmountsList.length > 0">
+          <div class="transfer-assets-section">
+            <p class="transfer-assets-section__title">Available funds will be used</p>
+            <info-line
+              v-for="(tokenData, idx) in outcomeAssetsAmountsList"
+              :key="idx"
+              :asset-symbol="tokenData.asset.symbol"
+              :label="tokenData.asset.symbol"
+              :value="tokenData.totalAmount"
+              :fiat-value="tokenData.usd"
+              is-formatted
+            />
+          </div>
+          <s-divider />
+        </template>
         <slippage-tolerance
           :slippages="slippages"
           :slippageTolerance="currentSlippage"
@@ -185,6 +200,7 @@ import WarningMessage from '../WarningMessage.vue';
     WarningMessage,
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
     SlippageTolerance,
+    InfoLine: components.InfoLine,
   },
 })
 export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
@@ -207,6 +223,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
+  @getter.routeAssets.outcomeAssetsAmountsList outcomeAssetsAmountsList!: any;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -410,6 +427,19 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   .review-details-section {
     & > * {
       margin-bottom: $inner-spacing-medium;
+    }
+  }
+
+  .transfer-assets-section {
+    box-shadow: var(--s-shadow-element);
+    border-radius: 10px;
+    background: var(--s-color-utility-body);
+    padding: 16px;
+
+    &__title {
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-bottom: 12px;
     }
   }
 

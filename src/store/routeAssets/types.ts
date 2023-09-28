@@ -16,6 +16,7 @@ export type Recipient = {
   txId?: string;
   exchangeRate?: string;
   amountInTokens: boolean;
+  useTransfer: boolean;
 };
 
 export type RouteAssetsSubscription = {

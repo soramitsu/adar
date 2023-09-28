@@ -102,6 +102,18 @@
           </template>
         </s-table-column>
 
+        <!-- NOSWAP -->
+        <s-table-column>
+          <template #header>
+            <span>{{ 'Transfer' }}</span>
+          </template>
+          <template v-slot="{ row }">
+            <div>
+              <s-checkbox :size="'small'" :value="row.useExistingTokens" class="checkbox-no-actions"></s-checkbox>
+            </div>
+          </template>
+        </s-table-column>
+
         <!-- STATUS -->
         <s-table-column prop="status" class="status-property" width="158">
           <template #header>
@@ -351,6 +363,10 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 </style>
 
 <style scoped lang="scss">
+.checkbox-no-actions {
+  cursor: default;
+  pointer-events: none;
+}
 .container {
   max-width: none;
 }

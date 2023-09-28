@@ -104,18 +104,37 @@ const getters = defineGetters<RouteAssetsState>()({
           'symbol'
         )
       ).map((assetArray: Array<Recipient>) => {
+        const reduceData = assetArray.reduce(
+          (acc, item) => {
+            return {
+              usd: new FPNumber(item.usd).add(acc.usd),
+              total: new FPNumber(item.amount || 0).add(acc.total),
+              totalWithSwap: item.useTransfer
+                ? acc.totalWithSwap
+                : new FPNumber(item.amount || 0).add(acc.totalWithSwap),
+              totalWithUsingExistingTokens: item.useTransfer
+                ? new FPNumber(item.amount || 0).add(acc.totalWithUsingExistingTokens)
+                : acc.totalWithUsingExistingTokens,
+              required: new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc.required),
+            };
+          },
+          {
+            usd: FPNumber.ZERO,
+            total: FPNumber.ZERO,
+            totalWithSwap: FPNumber.ZERO,
+            totalWithUsingExistingTokens: FPNumber.ZERO,
+            required: FPNumber.ZERO,
+          }
+        );
+        const { usd, total, totalWithSwap, totalWithUsingExistingTokens, required } = reduceData;
         return {
           recipientsNumber: assetArray.length,
           asset: assetArray[0].asset,
-          usd: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.usd).add(acc);
-          }, FPNumber.ZERO),
-          total: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.amount || 0).add(acc);
-          }, FPNumber.ZERO),
-          required: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc);
-          }, FPNumber.ZERO),
+          usd,
+          total,
+          totalWithSwap,
+          totalWithUsingExistingTokens,
+          required,
           totalTransactions: assetArray.length,
         };
       });
@@ -150,6 +169,27 @@ const getters = defineGetters<RouteAssetsState>()({
       totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
       asetSymbol: maxInputAmount.assetSymbol,
     };
+  },
+  outcomeAssetsAmountsList(...args): any {
+    const { state, getters } = routeAssetsGetterContext(args);
+    const recipientsWithUsingExistingTokens = getters.recipients
+      .filter((item) => item.useTransfer)
+      .map((item) => ({ symbol: item.asset.symbol, ...item }));
+    return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
+      return {
+        asset: assetArray[0].asset,
+        usd: assetArray
+          .reduce((acc, item) => {
+            return new FPNumber(item.usd).add(acc);
+          }, FPNumber.ZERO)
+          .toLocaleString(),
+        totalAmount: assetArray
+          .reduce((acc, item) => {
+            return new FPNumber(item.amount || 0).add(acc);
+          }, FPNumber.ZERO)
+          .toLocaleString(),
+      };
+    });
   },
 });
 
