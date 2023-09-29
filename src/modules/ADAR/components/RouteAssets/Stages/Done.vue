@@ -163,7 +163,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   showSelectReportFormatDialog = false;
 
   get finalAmount() {
-    return this.txHistoryItem?.amount || '';
+    return this.txHistoryItem?.amount;
   }
 
   get finalAmountFormatted() {

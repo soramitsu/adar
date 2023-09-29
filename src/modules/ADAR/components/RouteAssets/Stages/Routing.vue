@@ -80,7 +80,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get finalAmount() {
-    return this.txHistoryItem?.amount || '';
+    return this.txHistoryItem?.amount;
   }
 
   get finalAmountFormatted() {
