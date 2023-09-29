@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isLoggedIn" class="balance-widget">
+  <div v-if="isLoggedIn && !shouldBalanceBeHidden" class="balance-widget">
     <div>{{ formattedBalance }}</div>
     <div>{{ tokenSymbol }}</div>
     <token-logo class="token-logo" :token="inputToken" size="small" />
@@ -24,6 +24,7 @@ export default class BalanceWidget extends Vue {
   @getter.routeAssets.inputToken inputToken!: Asset;
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
+  @state.wallet.settings.shouldBalanceBeHidden shouldBalanceBeHidden!: boolean;
 
   get tokenSymbol() {
     return this.inputToken.symbol;
