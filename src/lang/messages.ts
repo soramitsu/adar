@@ -395,6 +395,9 @@ export default {
     connectWallets: 'Connect wallets to view respective transaction history.',
     soraNetworkFee: '{Sora} Network Fee',
     ethereumNetworkFee: '{Ethereum} Network Fee',
+    externalTransferFee: '{network} {XCM} fee',
+    externalTransferFeeTooltip:
+      'To execute an incoming transaction, the {network} network deducts part of the funds from the transfer amount',
     tooltipValue: '@:comingSoonText',
     total: 'Total',
     viewHistory: 'View transactions history',
@@ -406,6 +409,8 @@ export default {
     copy: 'Copy network address',
     soraAddress: '{Sora} address',
     ethereumAddress: '{Ethereum} address',
+    limitMessage:
+      "Currently, there's a {type} {amount} {symbol} for bridging to ensure the stability and security of the {Sora} Network. We appreciate your understanding.",
   },
   selectRegisteredAsset: {
     title: 'Select a token',
@@ -858,4 +863,7 @@ export default {
     btnGoToSettings: 'Go to settings',
     btnAllow: 'Allow access',
   },
+  minAmountText: 'min. amount',
+  maxAmountText: 'max. amount',
+  exceededAmountText: '{amount} exceeded',
 };
