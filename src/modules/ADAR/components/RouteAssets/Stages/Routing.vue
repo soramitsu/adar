@@ -19,12 +19,15 @@
         </div>
       </div>
       <s-divider />
-      <div class="field">
+      <div v-if="finalAmount" class="field">
         <div class="field__label">{{ amountText }}</div>
         <div class="field__value">
-          {{ tokensEstimate }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
+          {{ finalAmountFormatted }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
           <span class="usd">{{ overallUSDNumber }}</span>
         </div>
+      </div>
+      <div v-else>
+        <spinner />
       </div>
     </div>
     <div v-if="!continueButtonDisabled" class="buttons-container">
@@ -47,11 +50,15 @@ import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
+import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { action, getter } from '@/store/decorators';
-import { MaxInputAmountInfo, Recipient, SwapTransferBatchStatus } from '@/store/routeAssets/types';
+import { MaxInputAmountInfo, SwapTransferBatchStatus } from '@/store/routeAssets/types';
+
+import type { HistoryItem } from '@sora-substrate/util';
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
+    Spinner,
   },
 })
 export default class RoutingAssets extends Mixins(TranslationMixin) {
@@ -62,6 +69,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
+  @getter.routeAssets.txHistoryItem txHistoryItem!: HistoryItem;
 
   get continueButtonDisabled() {
     return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
@@ -69,6 +77,14 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 
   onContinueClick() {
     this.nextStage();
+  }
+
+  get finalAmount() {
+    return this.txHistoryItem?.amount;
+  }
+
+  get finalAmountFormatted() {
+    return new FPNumber(this.finalAmount || 0).dp(4).toLocaleString();
   }
 
   get tokensEstimate() {
