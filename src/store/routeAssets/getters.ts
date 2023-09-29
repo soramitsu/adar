@@ -18,6 +18,7 @@ import type {
   SwapTransferBatchStatus,
   TransactionInfo,
 } from './types';
+import type { HistoryItem } from '@sora-substrate/util';
 import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const getters = defineGetters<RouteAssetsState>()({
@@ -82,6 +83,12 @@ const getters = defineGetters<RouteAssetsState>()({
   batchTxStatus(...args): SwapTransferBatchStatus {
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.status;
+  },
+  txHistoryItem(...args): Nullable<HistoryItem> {
+    const { state, rootState, getters } = routeAssetsGetterContext(args);
+    const txId = state.processingState.txInfo?.txId;
+    if (!txId) return null;
+    return rootState.wallet.transactions.history[txId];
   },
   overallUSDNumber(...args): string {
     const { state } = routeAssetsGetterContext(args);
