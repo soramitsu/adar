@@ -3,6 +3,7 @@ import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { Subscription } from 'rxjs';
 
 import type { SwapQuote, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
+import type { HistoryItem } from '@sora-substrate/util';
 
 export type Recipient = {
   name: string;
@@ -72,6 +73,7 @@ export type ProcessingState = {
   inputToken: Asset;
   tokensRouted?: Array<RoutedToken>;
   txInfo?: TransactionInfo;
+  txHistoryData?: HistoryItem;
   datetime?: Date;
   status: SwapTransferBatchStatus;
   slippageTolerance: string;

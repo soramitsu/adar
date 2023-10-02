@@ -69,7 +69,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
-  @getter.routeAssets.txHistoryItem txHistoryItem!: HistoryItem;
+  @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
 
   get continueButtonDisabled() {
     return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
@@ -80,7 +80,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get finalAmount() {
-    return this.txHistoryItem?.amount;
+    return this.txHistoryData?.amount;
   }
 
   get finalAmountFormatted() {

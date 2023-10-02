@@ -153,7 +153,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
-  @getter.routeAssets.txHistoryItem txHistoryItem!: HistoryItem;
+  @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
@@ -163,7 +163,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   showSelectReportFormatDialog = false;
 
   get finalAmount() {
-    return this.txHistoryItem?.amount;
+    return this.txHistoryData?.amount;
   }
 
   get finalAmountFormatted() {

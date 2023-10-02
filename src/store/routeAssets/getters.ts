@@ -84,11 +84,15 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.status;
   },
-  txHistoryItem(...args): Nullable<HistoryItem> {
-    const { state, rootState, getters } = routeAssetsGetterContext(args);
+  txHistoryStoreItem(...args): Nullable<HistoryItem> {
+    const { state, rootState } = routeAssetsGetterContext(args);
     const txId = state.processingState.txInfo?.txId;
     if (!txId) return null;
     return rootState.wallet.transactions.history[txId];
+  },
+  txHistoryData(...args): Nullable<HistoryItem> {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.txHistoryData;
   },
   overallUSDNumber(...args): string {
     const { state } = routeAssetsGetterContext(args);
