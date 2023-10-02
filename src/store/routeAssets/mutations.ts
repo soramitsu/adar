@@ -22,6 +22,7 @@ const mutations = defineMutations<RouteAssetsState>()({
     state.processingState.datetime = undefined;
     state.processingState.status = SwapTransferBatchStatus.INITIAL;
     state.processingState.pricesAreUpdated = true;
+    state.processingState.txHistoryData = undefined;
   },
   setSubscriptions(state, subscriptions: Array<RouteAssetsSubscription> = []): void {
     state.subscriptions = subscriptions;

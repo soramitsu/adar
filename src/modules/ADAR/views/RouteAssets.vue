@@ -75,6 +75,7 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
 
   @Watch('txHistoryStoreItem', { deep: true, immediate: true })
   private handleTxHistoryItem(value: HistoryItem): void {
+    if (!value) return;
     this.updateTxHistoryData(value);
   }
 }

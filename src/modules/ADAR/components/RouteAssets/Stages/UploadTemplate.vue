@@ -173,6 +173,7 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
 }
 
 .file-upload {
+  text-transform: uppercase;
   max-width: 300px;
   input {
     overflow: hidden;
