@@ -31,6 +31,7 @@ function initialState(): RouteAssetsState {
         amount: FPNumber.ZERO,
         updateDate: new Date(),
       },
+      txHistoryData: undefined,
     },
   };
 }

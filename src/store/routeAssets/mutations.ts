@@ -6,6 +6,7 @@ import { SwapTransferBatchStatus } from './types';
 
 import type { RouteAssetsState, Recipient, TransactionInfo, RouteAssetsSubscription } from './types';
 import type { PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
+import type { HistoryItem } from '@sora-substrate/util';
 
 const mutations = defineMutations<RouteAssetsState>()({
   setData(state, { file, recipients }: { file: File; recipients: Array<Recipient> }): void {
@@ -21,6 +22,7 @@ const mutations = defineMutations<RouteAssetsState>()({
     state.processingState.datetime = undefined;
     state.processingState.status = SwapTransferBatchStatus.INITIAL;
     state.processingState.pricesAreUpdated = true;
+    state.processingState.txHistoryData = undefined;
   },
   setSubscriptions(state, subscriptions: Array<RouteAssetsSubscription> = []): void {
     state.subscriptions = subscriptions;
@@ -124,6 +126,9 @@ const mutations = defineMutations<RouteAssetsState>()({
   },
   setPricesAreUpdated(state, value: boolean): void {
     state.processingState.pricesAreUpdated = value;
+  },
+  updateTxHistoryData(state, historyItem: HistoryItem): void {
+    state.processingState.txHistoryData = historyItem;
   },
 });
 

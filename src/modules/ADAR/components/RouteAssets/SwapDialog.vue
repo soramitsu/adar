@@ -48,9 +48,8 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
           const { assetFrom, assetTo, valueTo } = this.presetSwapData;
           const isAssetToXor = assetTo.symbol === XOR.symbol;
           const fieldToValue = isAssetToXor ? valueTo + this.networkSwapFee : valueTo;
+          await swapComponent.setData({ firstAddress: assetFrom.address, secondAddress: assetTo.address });
           swapComponent.handleInputFieldTo(`${this.roundNumber(fieldToValue)}`);
-          await swapComponent.setTokenFromAddress(assetFrom.address);
-          await swapComponent.setTokenToAddress(assetTo.address);
           swapComponent.handleFocusField(true);
         }
       });
