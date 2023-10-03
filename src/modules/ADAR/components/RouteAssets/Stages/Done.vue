@@ -16,11 +16,14 @@
           </div>
         </div>
         <s-divider />
-        <div class="field">
+        <div class="field" v-if="finalAmount">
           <div class="field__label">{{ t('adar.routeAssets.total') }}</div>
           <div class="field__value">
-            {{ totalAmount }} <span class="usd">{{ totalUSD }}</span>
+            {{ finalAmountFormatted }} <span class="usd">{{ totalUSD }}</span>
           </div>
+        </div>
+        <div v-else>
+          <spinner />
         </div>
         <s-divider />
         <div class="field" v-if="incompletedRecipientsLength > 0">
@@ -111,6 +114,7 @@ import { groupBy, sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
+import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { action, getter, state } from '@/store/decorators';
@@ -124,6 +128,8 @@ import {
 
 import WarningMessage from '../WarningMessage.vue';
 
+import type { HistoryItem } from '@sora-substrate/util';
+
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
@@ -131,6 +137,7 @@ import WarningMessage from '../WarningMessage.vue';
     FailedTransactionsDialog: adarLazyComponent(AdarComponents.RouteAssetsFailedTransactionsDialog),
     ConfirmFinishRoutingDialog: adarLazyComponent(AdarComponents.RouteAssetsConfirmFinishRoutingDialog),
     SelectReportFormatDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectReportFormatDialog),
+    Spinner,
   },
 })
 export default class RoutingCompleted extends Mixins(TranslationMixin) {
@@ -146,6 +153,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
+  @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
@@ -153,6 +161,14 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   showFailedTransactionsDialog = false;
   showFinishRoutingDialog = false;
   showSelectReportFormatDialog = false;
+
+  get finalAmount() {
+    return this.txHistoryData?.amount;
+  }
+
+  get finalAmountFormatted() {
+    return new FPNumber(this.finalAmount || 0).dp(4).toLocaleString();
+  }
 
   get incompletedRecipientsLength() {
     return this.incompletedRecipients.length;

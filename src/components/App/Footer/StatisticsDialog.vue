@@ -81,24 +81,24 @@ export default class StatisticsDialog extends Mixins(mixins.DialogMixin, Transla
           },
         ],
       },
-      {
-        key: 'chartsAndActivity',
-        title: 'footer.statistics.dialog.chartsAndActivity',
-        services: [
-          {
-            key: 'chartsAndActivitySubquery',
-            name: 'Subquery',
-            endpoint: this.subqueryEndpoint,
-            online: this.isSubqueryOnline,
-          },
-          {
-            key: 'chartsAndActivitySubsquid',
-            name: 'Subsquid',
-            endpoint: 'coming soon...',
-            online: false,
-          },
-        ],
-      },
+      // {
+      //   key: 'chartsAndActivity',
+      //   title: 'footer.statistics.dialog.chartsAndActivity',
+      //   services: [
+      //     {
+      //       key: 'chartsAndActivitySubquery',
+      //       name: 'Subquery',
+      //       endpoint: this.subqueryEndpoint,
+      //       online: this.isSubqueryOnline,
+      //     },
+      //     {
+      //       key: 'chartsAndActivitySubsquid',
+      //       name: 'Subsquid',
+      //       endpoint: 'coming soon...',
+      //       online: false,
+      //     },
+      //   ],
+      // },
     ];
   }
 

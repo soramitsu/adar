@@ -23,13 +23,6 @@ export const updateTransaction = (id: string, params = {}): void => {
   subBridgeApi.saveHistory(data);
 };
 
-export const getRelayChainBlockNumber = async (blockHash: string, api: ApiPromise): Promise<number> => {
-  const apiInstanceAtBlock = await api.at(blockHash);
-  const blockNumber = await apiInstanceAtBlock.query.parachainSystem.lastRelayChainBlockNumber();
-
-  return Number(blockNumber.toString());
-};
-
 export const getMessageAcceptedNonces = (events: Array<any>, api: ApiPromise): [number, number] => {
   const messageAcceptedEvent = events.find((e) =>
     api.events.substrateBridgeOutboundChannel.MessageAccepted.is(e.event)
@@ -78,7 +71,7 @@ export const isAssetAddedToChannel = (
 
   const { amount, assetId, recipient } = e.event.data[0].asTransfer;
   // address check
-  if (subBridgeApi.formatAddress(recipient.toString()) !== to) return false;
+  if (subBridgeApi.formatAddress(recipient.toString()) !== subBridgeApi.formatAddress(to)) return false;
   // asset check
   if (assetId.toString() !== asset.address) return false;
   // amount check

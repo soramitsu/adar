@@ -22,13 +22,15 @@
 
 <script lang="ts">
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { getter, action, mutation } from '@/store/decorators';
 import { FeatureFlags } from '@/store/settings/types';
+
+import type { HistoryItem } from '@sora-substrate/util';
 @Component({
   components: {
     Authorize: adarLazyComponent(AdarComponents.RouteAssetsAuthorize),
@@ -44,6 +46,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @action.routeAssets.subscribeOnReserves private subscribeOnReserves!: () => void;
   @action.routeAssets.cleanSwapReservesSubscription private cleanSwapReservesSubscription!: () => void;
   @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
+  @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
+  @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
@@ -67,6 +71,12 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
 
   get component() {
     return this.currentStageComponentName;
+  }
+
+  @Watch('txHistoryStoreItem', { deep: true, immediate: true })
+  private handleTxHistoryItem(value: HistoryItem): void {
+    if (!value) return;
+    this.updateTxHistoryData(value);
   }
 }
 </script>
