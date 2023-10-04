@@ -23,7 +23,7 @@
         <div class="field__label">{{ amountText }}</div>
         <div class="field__value">
           {{ finalAmountFormatted }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
-          <span class="usd">{{ overallUSDNumber }}</span>
+          <span class="usd">{{ totalUSD }}</span>
         </div>
       </div>
       <div v-else>
@@ -79,7 +79,13 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     this.nextStage();
   }
 
+  get totalUSD() {
+    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
+    return this.overallUSDNumber;
+  }
+
   get finalAmount() {
+    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.txHistoryData?.amount;
   }
 

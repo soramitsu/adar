@@ -123,6 +123,7 @@ import {
   Recipient,
   RecipientStatus,
   SummaryAssetRecipientsInfo,
+  SwapTransferBatchStatus,
   TransactionInfo,
 } from '@/store/routeAssets/types';
 
@@ -154,6 +155,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
+  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
@@ -163,6 +165,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   showSelectReportFormatDialog = false;
 
   get finalAmount() {
+    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.txHistoryData?.amount;
   }
 
@@ -179,6 +182,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   get totalUSD() {
+    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.overallUSDNumber;
   }
 
