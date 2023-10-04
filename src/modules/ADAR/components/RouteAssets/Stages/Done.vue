@@ -19,7 +19,7 @@
         <div class="field" v-if="finalAmount">
           <div class="field__label">{{ t('adar.routeAssets.total') }}</div>
           <div class="field__value">
-            {{ finalAmountFormatted }} <span v-if="finalAmount != '0'" class="usd">{{ totalUSD }}</span>
+            {{ finalAmountFormatted }} <span class="usd">{{ totalUSD }}</span>
           </div>
         </div>
         <div v-else>
@@ -182,6 +182,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   get totalUSD() {
+    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.overallUSDNumber;
   }
 
