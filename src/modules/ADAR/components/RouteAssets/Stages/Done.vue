@@ -19,7 +19,7 @@
         <div class="field" v-if="finalAmount">
           <div class="field__label">{{ t('adar.routeAssets.total') }}</div>
           <div class="field__value">
-            {{ finalAmountFormatted }} <span class="usd">{{ totalUSD }}</span>
+            {{ finalAmountFormatted }} <span v-if="finalAmount != '0'" class="usd">{{ totalUSD }}</span>
           </div>
         </div>
         <div v-else>
@@ -123,6 +123,7 @@ import {
   Recipient,
   RecipientStatus,
   SummaryAssetRecipientsInfo,
+  SwapTransferBatchStatus,
   TransactionInfo,
 } from '@/store/routeAssets/types';
 
@@ -154,6 +155,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
+  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
@@ -163,6 +165,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   showSelectReportFormatDialog = false;
 
   get finalAmount() {
+    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.txHistoryData?.amount;
   }
 
