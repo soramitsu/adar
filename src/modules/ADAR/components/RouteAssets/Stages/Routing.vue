@@ -19,7 +19,11 @@
         </div>
       </div>
       <s-divider />
-      <div v-if="finalAmount" class="field">
+      <div v-if="transactionFailed" class="error-message">
+        <s-icon class="icon-status" :name="'basic-clear-X-xs-24'" />
+        <div>{{ errorMessage }}</div>
+      </div>
+      <div v-else-if="finalAmount" class="field">
         <div class="field__label">{{ amountText }}</div>
         <div class="field__value">
           {{ finalAmountFormatted }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
@@ -51,6 +55,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
+import { getErrorMessage } from '@/modules/ADAR/utils';
 import { action, getter } from '@/store/decorators';
 import { MaxInputAmountInfo, SwapTransferBatchStatus } from '@/store/routeAssets/types';
 
@@ -79,13 +84,21 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     this.nextStage();
   }
 
+  get transactionFailed() {
+    return this.batchTxStatus === SwapTransferBatchStatus.FAILED;
+  }
+
+  get errorMessage() {
+    return getErrorMessage(this.txHistoryData.errorMessage) || '';
+  }
+
   get totalUSD() {
-    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
+    if (this.transactionFailed) return '0';
     return this.overallUSDNumber;
   }
 
   get finalAmount() {
-    if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
+    if (this.transactionFailed) return '0';
     return this.txHistoryData?.amount;
   }
 
@@ -236,6 +249,17 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   &::before {
     content: '~ $';
     display: inline;
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--s-color-status-error);
+  i {
+    font-size: 16px !important;
+    color: inherit;
   }
 }
 </style>
