@@ -102,18 +102,6 @@
           </template>
         </s-table-column>
 
-        <!-- NOSWAP -->
-        <s-table-column>
-          <template #header>
-            <span>{{ 'Transfer' }}</span>
-          </template>
-          <template v-slot="{ row }">
-            <div>
-              <s-checkbox :size="'small'" :value="row.useExistingTokens" class="checkbox-no-actions"></s-checkbox>
-            </div>
-          </template>
-        </s-table-column>
-
         <!-- STATUS -->
         <s-table-column prop="status" class="status-property" width="158">
           <template #header>
@@ -124,6 +112,18 @@
               <div :class="`status-property__label status-property__label_${getStatusClass(row)}`">
                 {{ getStatus(row) || 'valid' }}
               </div>
+            </div>
+          </template>
+        </s-table-column>
+
+        <!-- NOSWAP -->
+        <s-table-column>
+          <template #header>
+            <span>{{ 'Transfer' }}</span>
+          </template>
+          <template v-slot="{ row }">
+            <div>
+              <s-checkbox :size="'small'" :value="row.useExistingTokens" class="checkbox-no-actions"></s-checkbox>
             </div>
           </template>
         </s-table-column>
