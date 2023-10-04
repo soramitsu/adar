@@ -20,7 +20,7 @@
       </div>
       <s-divider />
       <div v-if="transactionFailed" class="error-message">
-        <s-icon class="icon-status" :name="'basic-clear-X-xs-24'" />
+        <s-icon class="icon-status" name="basic-clear-X-xs-24" />
         <div>{{ errorMessage }}</div>
       </div>
       <div v-else-if="finalAmount" class="field">
