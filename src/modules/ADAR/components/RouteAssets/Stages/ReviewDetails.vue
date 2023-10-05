@@ -69,14 +69,14 @@
           <warning-message
             class="warning-message"
             :text="
-              noIssues
+              !amountBalanceError
                 ? `${t('adar.routeAssets.stages.reviewDetails.okBalance')}`
                 : `${t('adar.routeAssets.stages.reviewDetails.badBalance')}`
             "
-            :isError="!noIssues"
+            :isError="amountBalanceError"
           />
         </div>
-        <template v-if="!showAmountRequiredField">
+        <template v-if="amountBalanceError">
           <s-divider />
           <div class="field">
             <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.remainingAmount') }}</div>
@@ -93,7 +93,7 @@
             </div>
           </div>
         </template>
-        <template v-if="showXorRequiredField">
+        <template v-if="xorFeeBalanceError">
           <s-divider />
           <div class="field">
             <div class="field__label">XOR fee required</div>
@@ -250,11 +250,15 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get noIssues() {
-    return this.showAmountRequiredField && !this.showXorRequiredField;
+    return !this.amountBalanceError && !this.xorFeeBalanceError;
   }
 
-  get showAmountRequiredField() {
+  get amountBalanceError() {
     return FPNumber.isLessThanOrEqualTo(this.remainingAmountRequired, FPNumber.ZERO);
+  }
+
+  get xorFeeBalanceError() {
+    return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
   }
 
   get usdToBeRouted() {
@@ -306,15 +310,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get remainingAmountRequired() {
-    return this.estimatedAmountWithFees.sub(this.fpBalance);
+    return this.fpBalance.sub(this.estimatedAmountWithFees);
   }
 
   get xorFeeRequired() {
     return this.networkFee.sub(this.xorBalance);
-  }
-
-  get showXorRequiredField() {
-    return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
   }
 
   get xorBalance() {
