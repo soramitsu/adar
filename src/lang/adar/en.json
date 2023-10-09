@@ -73,6 +73,7 @@
                     "badBalance": "insufficient funds",
                     "okBalance": "balance is ok",
                     "add": "add",
+                    "useTransferTitle": "Available funds will be used",
                     "routingDetails": {
                         "title": "Routing Details",
                         "amount": "Token amount required"

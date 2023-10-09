@@ -89,7 +89,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get errorMessage() {
-    return getErrorMessage(this.txHistoryData.errorMessage) || '';
+    return getErrorMessage(this.txHistoryData?.errorMessage) || '';
   }
 
   get totalUSD() {

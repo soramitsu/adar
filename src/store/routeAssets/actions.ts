@@ -313,7 +313,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       assetAddress: item.swapAndSendData.asset.address,
       recipientId: item.recipient.id,
       usd: item.recipient.usd,
-      useTransfer: item.recipient.useExistingTokens,
+      useTransfer: item.recipient.useTransfer,
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));

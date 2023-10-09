@@ -11,6 +11,7 @@ import { getAssetUSDPrice } from './utils';
 
 import type {
   MaxInputAmountInfo,
+  OutcomeAssetsAmount,
   Recipient,
   RouteAssetsState,
   RouteAssetsSubscription,
@@ -181,24 +182,29 @@ const getters = defineGetters<RouteAssetsState>()({
       asetSymbol: maxInputAmount.assetSymbol,
     };
   },
-  outcomeAssetsAmountsList(...args): any {
-    const { state, getters } = routeAssetsGetterContext(args);
+  outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
+    const { getters } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipients
       .filter((item) => item.useTransfer)
       .map((item) => ({ symbol: item.asset.symbol, ...item }));
     return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
+      const reduceData = assetArray.reduce(
+        (acc, item) => {
+          return {
+            usd: new FPNumber(item.usd).add(acc.usd),
+            totalAmount: new FPNumber(item.amount || 0).add(acc.totalAmount),
+          };
+        },
+        {
+          usd: FPNumber.ZERO,
+          totalAmount: FPNumber.ZERO,
+        }
+      );
+      const { usd, totalAmount } = reduceData;
       return {
         asset: assetArray[0].asset,
-        usd: assetArray
-          .reduce((acc, item) => {
-            return new FPNumber(item.usd).add(acc);
-          }, FPNumber.ZERO)
-          .toLocaleString(),
-        totalAmount: assetArray
-          .reduce((acc, item) => {
-            return new FPNumber(item.amount || 0).add(acc);
-          }, FPNumber.ZERO)
-          .toLocaleString(),
+        usd: usd.toLocaleString(),
+        totalAmount: totalAmount.toLocaleString(),
       };
     });
   },

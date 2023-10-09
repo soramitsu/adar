@@ -47,7 +47,7 @@ function createStage(title: string, componentName: string): Stage {
   };
 }
 
-export const inputTokenVariants = ['xor', 'val', 'pswap'];
+export const inputTokenVariants = ['xor', 'val', 'pswap', 'xstusd'];
 
 export const slippageMultiplier = '2'; // price impact - percent of total amount
 

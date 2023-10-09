@@ -119,11 +119,11 @@
         <!-- NOSWAP -->
         <s-table-column>
           <template #header>
-            <span>{{ 'Transfer' }}</span>
+            <span>{{ t('operations.Transfer') }}</span>
           </template>
           <template v-slot="{ row }">
             <div>
-              <s-checkbox :size="'small'" :value="row.useExistingTokens" class="checkbox-no-actions"></s-checkbox>
+              <s-checkbox :size="'small'" :value="row.useTransfer" class="checkbox-no-actions"></s-checkbox>
             </div>
           </template>
         </s-table-column>

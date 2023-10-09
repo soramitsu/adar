@@ -110,3 +110,9 @@ export type SummaryAssetRecipientsInfo = {
   required: FPNumber;
   totalTransactions: number;
 };
+
+export type OutcomeAssetsAmount = {
+  asset: Asset;
+  usd: string;
+  totalAmount: string;
+};
