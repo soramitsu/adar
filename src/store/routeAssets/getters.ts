@@ -120,12 +120,12 @@ const getters = defineGetters<RouteAssetsState>()({
           (acc, item) => {
             return {
               usd: new FPNumber(item.usd).add(acc.usd),
-              total: new FPNumber(item.amount || 0).add(acc.total),
+              total: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.total),
               totalWithSwap: item.useTransfer
                 ? acc.totalWithSwap
-                : new FPNumber(item.amount || 0).add(acc.totalWithSwap),
+                : (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithSwap),
               totalWithUsingExistingTokens: item.useTransfer
-                ? new FPNumber(item.amount || 0).add(acc.totalWithUsingExistingTokens)
+                ? (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithUsingExistingTokens)
                 : acc.totalWithUsingExistingTokens,
               required: new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc.required),
             };
@@ -192,7 +192,7 @@ const getters = defineGetters<RouteAssetsState>()({
         (acc, item) => {
           return {
             usd: new FPNumber(item.usd).add(acc.usd),
-            totalAmount: new FPNumber(item.amount || 0).add(acc.totalAmount),
+            totalAmount: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalAmount),
           };
         },
         {

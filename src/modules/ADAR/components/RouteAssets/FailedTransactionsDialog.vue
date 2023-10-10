@@ -111,7 +111,7 @@
             </template>
             <template v-slot="{ row }">
               <div>
-                <s-checkbox :size="'small'" :value="row.useTransfer" class="checkbox-no-actions"></s-checkbox>
+                <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" />
               </div>
             </template>
           </s-table-column>

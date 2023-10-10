@@ -59,8 +59,10 @@ const actions = defineActions({
         step: (row, parser) => {
           // console.log((row.meta.cursor / file.size) * 100);
           try {
-            const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
-            const useTransfer = row.data[5] ? row.data[5].trim().toLowerCase() === 'true' : false;
+            // const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
+            // const useTransfer = row.data[5] ? row.data[5].trim().toLowerCase() === 'true' : false;
+            const amountInTokens = row.data[4] ? JSON.parse(row.data[4]) : false;
+            const useTransfer = row.data[5] ? JSON.parse(row.data[5]) : false;
             const csvAmount = row.data[2]?.replace(/,/g, '');
             const asset = findAsset(row.data[3]);
             const amount = amountInTokens

@@ -111,7 +111,7 @@
           </div>
         </template>
         <s-divider />
-        <template v-if="outcomeAssetsAmountsListFiltered.length > 0">
+        <template v-if="outcomeAssetsAmountsListFiltered.length">
           <div class="transfer-assets-section" :class="{ 'transfer-assets-section_error': transferBalanceError }">
             <p class="transfer-assets-section__title">
               {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
