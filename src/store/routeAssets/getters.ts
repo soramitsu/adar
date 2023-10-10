@@ -11,6 +11,7 @@ import { getAssetUSDPrice } from './utils';
 
 import type {
   MaxInputAmountInfo,
+  OutcomeAssetsAmount,
   Recipient,
   RouteAssetsState,
   RouteAssetsSubscription,
@@ -115,18 +116,37 @@ const getters = defineGetters<RouteAssetsState>()({
           'symbol'
         )
       ).map((assetArray: Array<Recipient>) => {
+        const reduceData = assetArray.reduce(
+          (acc, item) => {
+            return {
+              usd: new FPNumber(item.usd).add(acc.usd),
+              total: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.total),
+              totalWithSwap: item.useTransfer
+                ? acc.totalWithSwap
+                : (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithSwap),
+              totalWithUsingExistingTokens: item.useTransfer
+                ? (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithUsingExistingTokens)
+                : acc.totalWithUsingExistingTokens,
+              required: new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc.required),
+            };
+          },
+          {
+            usd: FPNumber.ZERO,
+            total: FPNumber.ZERO,
+            totalWithSwap: FPNumber.ZERO,
+            totalWithUsingExistingTokens: FPNumber.ZERO,
+            required: FPNumber.ZERO,
+          }
+        );
+        const { usd, total, totalWithSwap, totalWithUsingExistingTokens, required } = reduceData;
         return {
           recipientsNumber: assetArray.length,
           asset: assetArray[0].asset,
-          usd: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.usd).add(acc);
-          }, FPNumber.ZERO),
-          total: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.amount || 0).add(acc);
-          }, FPNumber.ZERO),
-          required: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc);
-          }, FPNumber.ZERO),
+          usd,
+          total,
+          totalWithSwap,
+          totalWithUsingExistingTokens,
+          required,
           totalTransactions: assetArray.length,
         };
       });
@@ -161,6 +181,32 @@ const getters = defineGetters<RouteAssetsState>()({
       totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
       asetSymbol: maxInputAmount.assetSymbol,
     };
+  },
+  outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
+    const { getters } = routeAssetsGetterContext(args);
+    const recipientsWithUsingExistingTokens = getters.recipients
+      .filter((item) => item.useTransfer)
+      .map((item) => ({ symbol: item.asset.symbol, ...item }));
+    return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
+      const reduceData = assetArray.reduce(
+        (acc, item) => {
+          return {
+            usd: new FPNumber(item.usd).add(acc.usd),
+            totalAmount: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalAmount),
+          };
+        },
+        {
+          usd: FPNumber.ZERO,
+          totalAmount: FPNumber.ZERO,
+        }
+      );
+      const { usd, totalAmount } = reduceData;
+      return {
+        asset: assetArray[0].asset,
+        usd: usd.toLocaleString(),
+        totalAmount: totalAmount.toLocaleString(),
+      };
+    });
   },
 });
 

@@ -104,6 +104,18 @@
             </template>
           </s-table-column>
 
+          <!-- NOSWAP -->
+          <s-table-column>
+            <template #header>
+              <span>{{ t('operations.Transfer') }}</span>
+            </template>
+            <template v-slot="{ row }">
+              <div>
+                <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" />
+              </div>
+            </template>
+          </s-table-column>
+
           <!-- BUTTON -->
           <!-- <s-table-column>
             <template v-slot="{ row }">
@@ -424,5 +436,10 @@ export default class FailedTransactionsDialog extends Mixins(
 .rerun-button {
   box-shadow: none !important;
   cursor: pointer;
+}
+
+.checkbox-no-actions {
+  cursor: default;
+  pointer-events: none;
 }
 </style>

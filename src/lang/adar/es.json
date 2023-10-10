@@ -73,6 +73,7 @@
             "badBalance": "fondos insuficientes",
             "okBalance": "saldo es correcto",
             "add": "agregar",
+            "useTransferTitle": "Se utilizarán los fondos disponibles",
             "routingDetails": {
               "title": "Detalles de enrutamiento",
               "amount": "Cantidad de tokens requerida"

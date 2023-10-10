@@ -115,6 +115,18 @@
             </div>
           </template>
         </s-table-column>
+
+        <!-- NOSWAP -->
+        <s-table-column>
+          <template #header>
+            <span>{{ t('operations.Transfer') }}</span>
+          </template>
+          <template v-slot="{ row }">
+            <div>
+              <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" />
+            </div>
+          </template>
+        </s-table-column>
       </s-table>
       <s-pagination
         class="transactions-table-pagination"
@@ -351,6 +363,10 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 </style>
 
 <style scoped lang="scss">
+.checkbox-no-actions {
+  cursor: default;
+  pointer-events: none;
+}
 .container {
   max-width: none;
 }

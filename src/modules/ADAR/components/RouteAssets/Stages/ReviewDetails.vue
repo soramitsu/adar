@@ -111,6 +111,23 @@
           </div>
         </template>
         <s-divider />
+        <template v-if="outcomeAssetsAmountsListFiltered.length">
+          <div class="transfer-assets-section" :class="{ 'transfer-assets-section_error': transferBalanceError }">
+            <p class="transfer-assets-section__title">
+              {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
+            </p>
+            <info-line
+              v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered"
+              :key="idx"
+              :asset-symbol="tokenData.asset.symbol"
+              :label="tokenData.asset.symbol"
+              :value="tokenData.totalAmount"
+              :fiat-value="tokenData.usd"
+              is-formatted
+            />
+          </div>
+          <s-divider />
+        </template>
         <slippage-tolerance
           :slippages="slippages"
           :slippageTolerance="currentSlippage"
@@ -170,6 +187,7 @@ import { adarLazyComponent } from '@/modules/ADAR/router';
 import { action, getter, mutation, state } from '@/store/decorators';
 import type {
   MaxInputAmountInfo,
+  OutcomeAssetsAmount,
   PresetSwapData,
   Recipient,
   SummaryAssetRecipientsInfo,
@@ -185,6 +203,7 @@ import WarningMessage from '../WarningMessage.vue';
     WarningMessage,
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
     SlippageTolerance,
+    InfoLine: components.InfoLine,
   },
 })
 export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
@@ -207,6 +226,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
+  @getter.routeAssets.outcomeAssetsAmountsList outcomeAssetsAmountsList!: Array<OutcomeAssetsAmount>;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -224,6 +244,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return ['1', '2', '3'];
   }
 
+  get outcomeAssetsAmountsListFiltered() {
+    return this.outcomeAssetsAmountsList.filter((item) => item.asset.address !== this.inputToken.address);
+  }
+
   get currentSlippage() {
     return this.slippageMultiplier;
   }
@@ -233,15 +257,24 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get noIssues() {
-    return !this.amountBalanceError && !this.xorFeeBalanceError;
+    return !this.amountBalanceError && !this.xorFeeBalanceError && !this.transferBalanceError;
   }
 
   get amountBalanceError() {
-    return FPNumber.isLessThanOrEqualTo(this.remainingAmountRequired, FPNumber.ZERO);
+    return FPNumber.isGreaterThan(this.remainingAmountRequired, FPNumber.ZERO);
   }
 
   get xorFeeBalanceError() {
     return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
+  }
+
+  get transferBalanceError() {
+    return this.outcomeAssetsAmountsListFiltered.some((item) => {
+      const { asset, totalAmount } = item;
+      const userAssetBalanceString = getAssetBalance(this.accountAssets.find((item) => item.address === asset.address));
+      const userAssetBalance = FPNumber.fromCodecValue(userAssetBalanceString, asset.decimals);
+      return FPNumber.isLessThan(userAssetBalance, new FPNumber(totalAmount));
+    });
   }
 
   get usdToBeRouted() {
@@ -293,7 +326,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get remainingAmountRequired() {
-    return this.fpBalance.sub(this.estimatedAmountWithFees);
+    return this.estimatedAmountWithFees.sub(this.fpBalance);
   }
 
   get xorFeeRequired() {
@@ -410,6 +443,23 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   .review-details-section {
     & > * {
       margin-bottom: $inner-spacing-medium;
+    }
+  }
+
+  .transfer-assets-section {
+    box-shadow: var(--s-shadow-element);
+    border-radius: 10px;
+    background: var(--s-color-utility-body);
+    padding: 16px;
+
+    &__title {
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    &_error {
+      background: rgba(254, 83, 96, 0.09);
     }
   }
 
