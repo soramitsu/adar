@@ -167,10 +167,7 @@
       </div>
     </div>
     <swap-dialog :visible.sync="showSwapDialog" :presetSwapData="swapData"></swap-dialog>
-    <select-input-asset-dialog
-      :visible.sync="showSelectInputAssetDialog"
-      @onInputAssetSelected="onInputAssetSelected"
-    ></select-input-asset-dialog>
+    <select-token :visible.sync="showSelectInputAssetDialog" :connected="isLoggedIn" @select="onInputAssetSelected" />
   </div>
 </template>
 
@@ -181,9 +178,11 @@ import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
+import { Components } from '@/consts';
 import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTolerance.vue';
 import { AdarComponents, adarFee } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
+import { lazyComponent } from '@/router';
 import { action, getter, mutation, state } from '@/store/decorators';
 import type {
   MaxInputAmountInfo,
@@ -204,6 +203,7 @@ import WarningMessage from '../WarningMessage.vue';
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
     SlippageTolerance,
     InfoLine: components.InfoLine,
+    SelectToken: lazyComponent(Components.SelectToken),
   },
 })
 export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
@@ -227,6 +227,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.outcomeAssetsAmountsList outcomeAssetsAmountsList!: Array<OutcomeAssetsAmount>;
+  @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
