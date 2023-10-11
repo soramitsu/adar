@@ -150,15 +150,11 @@
         {{ t('adar.routeAssets.continue') }}
       </s-button>
     </div>
-    <select-input-asset-dialog
-      :visible.sync="showSelectInputAssetDialog"
-      @onInputAssetSelected="onInputAssetSelected"
-    ></select-input-asset-dialog>
+    <select-token :visible.sync="showSelectInputAssetDialog" :connected="isLoggedIn" @select="onInputAssetSelected" />
   </div>
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -177,6 +173,7 @@ import { copyToClipboard, formatAddress } from '@/utils';
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
     TokenLogo: components.TokenLogo,
     SearchInput: components.SearchInput,
+    SelectToken: lazyComponent(Components.SelectToken),
   },
 })
 export default class TransactionOverview extends Mixins(TranslationMixin, mixins.PaginationSearchMixin) {
