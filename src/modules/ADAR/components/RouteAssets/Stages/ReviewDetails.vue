@@ -112,8 +112,9 @@
         </template>
         <s-divider />
         <template v-if="outcomeAssetsAmountsListFiltered.length">
-          <div class="transfer-assets-section" :class="{ 'transfer-assets-section_error': transferBalanceError }">
+          <div class="transfer-assets-section">
             <p class="transfer-assets-section__title">
+              <s-icon v-if="transferBalanceErrors" class="icon-status" name="basic-clear-X-xs-24" />
               {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
             </p>
             <info-line
@@ -123,8 +124,19 @@
               :label="tokenData.asset.symbol"
               :value="tokenData.totalAmount"
               :fiat-value="tokenData.usd"
+              :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
               is-formatted
-            />
+            >
+              <template v-if="!isTransferAssetBalanceOk(tokenData)">
+                <s-button
+                  type="primary"
+                  class="s-typography-button--mini add-button"
+                  @click.stop="onTransferAddFundsClick(tokenData)"
+                >
+                  {{ t('adar.routeAssets.stages.reviewDetails.add') }}
+                </s-button>
+              </template>
+            </info-line>
           </div>
           <s-divider />
         </template>
@@ -258,7 +270,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get noIssues() {
-    return !this.amountBalanceError && !this.xorFeeBalanceError && !this.transferBalanceError;
+    return !this.amountBalanceError && !this.xorFeeBalanceError && !this.transferBalanceErrors;
   }
 
   get amountBalanceError() {
@@ -269,13 +281,17 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
   }
 
-  get transferBalanceError() {
+  get transferBalanceErrors() {
     return this.outcomeAssetsAmountsListFiltered.some((item) => {
       const { asset, totalAmount } = item;
-      const userAssetBalanceString = getAssetBalance(this.accountAssets.find((item) => item.address === asset.address));
-      const userAssetBalance = FPNumber.fromCodecValue(userAssetBalanceString, asset.decimals);
-      return FPNumber.isLessThan(userAssetBalance, new FPNumber(totalAmount));
+      return FPNumber.gt(this.tokenTransferAmountRequired(asset, totalAmount), FPNumber.ZERO);
     });
+  }
+
+  tokenTransferAmountRequired(asset: Asset, requiredValue: string) {
+    const userAssetBalanceString = this.getTokenBalance(asset);
+    const userAssetBalance = FPNumber.fromCodecValue(userAssetBalanceString, asset.decimals);
+    return new FPNumber(requiredValue).sub(userAssetBalance);
   }
 
   get usdToBeRouted() {
@@ -335,15 +351,12 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get xorBalance() {
-    const xor = this.accountAssets.find((item) => item.address === XOR.address);
-    return FPNumber.fromCodecValue(getAssetBalance(xor), xor?.decimals);
+    return FPNumber.fromCodecValue(this.getTokenBalance(XOR), XOR?.decimals);
   }
 
   get recipientsData() {
     return this.recipientsGroupedByToken();
   }
-
-  action: 'fee' | 'routing' = 'fee';
 
   get routingSwapData(): PresetSwapData {
     const isInputAssetXor = this.inputToken?.symbol === XOR?.symbol;
@@ -368,19 +381,31 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     };
   }
 
-  get swapData(): PresetSwapData {
-    return this.action === 'fee' ? this.xorFeeSwapData : this.routingSwapData;
-  }
+  swapData: Nullable<PresetSwapData> = null;
 
   onAddFundsClick(action: 'fee' | 'routing') {
-    this.action = action;
+    this.swapData = action === 'fee' ? this.xorFeeSwapData : this.routingSwapData;
     this.showSwapDialog = true;
   }
 
-  get fpBalance(): FPNumber {
-    if (!this.getTokenBalance) return FPNumber.ZERO;
+  onTransferAddFundsClick(tokenData: OutcomeAssetsAmount) {
+    const requiredAmount = this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount);
+    this.swapData = {
+      assetFrom: this.inputToken,
+      assetTo: tokenData.asset,
+      valueTo: requiredAmount.toNumber(),
+    };
+    this.showSwapDialog = true;
+  }
 
-    return FPNumber.fromCodecValue(this.getTokenBalance, this.decimals);
+  isTransferAssetBalanceOk(tokenData) {
+    return FPNumber.lt(this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount), FPNumber.ZERO);
+  }
+
+  get fpBalance(): FPNumber {
+    if (!this.getTokenBalance(this.inputToken)) return FPNumber.ZERO;
+
+    return FPNumber.fromCodecValue(this.getTokenBalance(this.inputToken), this.decimals);
   }
 
   get decimals(): number {
@@ -395,9 +420,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, asset.decimals);
   }
 
-  get getTokenBalance(): CodecString {
-    const asset = this.accountAssets.find((item) => item.address === this.inputToken.address);
-    return getAssetBalance(asset);
+  getTokenBalance(asset): CodecString {
+    const accountAsset = this.accountAssets.find((item) => item.address === asset.address);
+    return getAssetBalance(accountAsset);
   }
 
   formatNumberJs(num) {
@@ -459,8 +484,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
       margin-bottom: 12px;
     }
 
-    &_error {
-      background: rgba(254, 83, 96, 0.09);
+    &__asset-data {
+      &_error {
+        background: rgba(254, 83, 96, 0.15);
+        border-radius: 4px;
+      }
     }
   }
 
@@ -523,5 +551,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     width: 100%;
     margin: 16px 0 0 0;
   }
+}
+
+i.icon-status {
+  font-size: 16px !important;
+  color: var(--s-color-status-error);
 }
 </style>
