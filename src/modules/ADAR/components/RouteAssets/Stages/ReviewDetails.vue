@@ -124,6 +124,7 @@
               :label="tokenData.asset.symbol"
               :value="tokenData.totalAmount"
               :fiat-value="tokenData.usd"
+              class="transfer-assets-section__asset-data"
               :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
               is-formatted
             >
@@ -485,9 +486,16 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     }
 
     &__asset-data {
+      &.info-line {
+        padding-left: 12px;
+      }
       &_error {
         background: rgba(254, 83, 96, 0.15);
         border-radius: 4px;
+      }
+
+      button.el-button.neumorphic.s-primary.add-button {
+        box-shadow: none;
       }
     }
   }
