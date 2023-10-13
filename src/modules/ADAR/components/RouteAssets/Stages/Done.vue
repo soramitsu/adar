@@ -152,7 +152,6 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
-  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
