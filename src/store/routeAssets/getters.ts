@@ -120,32 +120,38 @@ const getters = defineGetters<RouteAssetsState>()({
           (acc, item) => {
             return {
               usd: new FPNumber(item.usd).add(acc.usd),
+              usdSwap: item.useTransfer ? acc.usdSwap : new FPNumber(item.usd).add(acc.usdSwap),
+              usdTransfer: item.useTransfer ? new FPNumber(item.usd).add(acc.usdTransfer) : acc.usdTransfer,
               total: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.total),
               totalWithSwap: item.useTransfer
                 ? acc.totalWithSwap
                 : (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithSwap),
-              totalWithUsingExistingTokens: item.useTransfer
-                ? (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithUsingExistingTokens)
-                : acc.totalWithUsingExistingTokens,
+              totalWithTransfer: item.useTransfer
+                ? (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithTransfer)
+                : acc.totalWithTransfer,
               required: new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc.required),
             };
           },
           {
             usd: FPNumber.ZERO,
+            usdSwap: FPNumber.ZERO,
+            usdTransfer: FPNumber.ZERO,
             total: FPNumber.ZERO,
             totalWithSwap: FPNumber.ZERO,
-            totalWithUsingExistingTokens: FPNumber.ZERO,
+            totalWithTransfer: FPNumber.ZERO,
             required: FPNumber.ZERO,
           }
         );
-        const { usd, total, totalWithSwap, totalWithUsingExistingTokens, required } = reduceData;
+        const { usd, total, totalWithSwap, totalWithTransfer, required, usdSwap, usdTransfer } = reduceData;
         return {
           recipientsNumber: assetArray.length,
           asset: assetArray[0].asset,
           usd,
+          usdSwap,
+          usdTransfer,
           total,
           totalWithSwap,
-          totalWithUsingExistingTokens,
+          totalWithTransfer,
           required,
           totalTransactions: assetArray.length,
         };
@@ -159,7 +165,7 @@ const getters = defineGetters<RouteAssetsState>()({
       const token = asset || getters.inputToken;
       const summaryData = getters.recipientsGroupedByToken(token);
       const totalAmount = summaryData.reduce((acc, item) => {
-        return new FPNumber(item.required).add(acc);
+        return new FPNumber(item.totalWithSwap).add(acc);
       }, FPNumber.ZERO);
       const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(totalAmount);
       const priceImpact = new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED).mul(totalAmount);

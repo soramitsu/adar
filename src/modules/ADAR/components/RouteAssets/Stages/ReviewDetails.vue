@@ -236,7 +236,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   ) => SummaryAssetRecipientsInfo[];
 
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
-  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.outcomeAssetsAmountsList outcomeAssetsAmountsList!: Array<OutcomeAssetsAmount>;
@@ -259,7 +258,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get outcomeAssetsAmountsListFiltered() {
-    return this.outcomeAssetsAmountsList.filter((item) => item.asset.address !== this.inputToken.address);
+    return this.outcomeAssetsAmountsList;
   }
 
   get currentSlippage() {

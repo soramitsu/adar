@@ -115,13 +115,16 @@ const actions = defineActions({
 
   async subscribeOnReserves(context, tkn: Asset = XOR): Promise<void> {
     const { commit, getters, dispatch } = routeAssetsActionContext(context);
+    dispatch.cleanSwapReservesSubscription();
     const sourceToken = getters.inputToken;
     const tokens = [...new Set<Asset>(getters.recipients.filter((item) => item.asset).map((item) => item.asset))]
       .map((item: Asset) => item?.address)
       .filter((item) => item !== sourceToken.address);
+    if (!tokens.length && getters.recipients.length) {
+      dispatch.updateTokenAmounts();
+    }
     if (!tokens || tokens.length < 1) return;
 
-    dispatch.cleanSwapReservesSubscription();
     const tokensPromises = tokens.map((tokenAddress) => {
       return new Promise<void>((resolve, reject) => {
         api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
@@ -217,12 +220,14 @@ const actions = defineActions({
     const recipientsData = getters.recipientsGroupedByToken(inputAmountAsset);
     try {
       const totalAmount = recipientsData.reduce((acc, item) => {
-        const { amountFrom } = getAmountAndDexId(context, inputAmountAsset, item.asset, item.usd.toString());
+        const { amountFrom } = getAmountAndDexId(context, inputAmountAsset, item.asset, item.usdSwap);
         return acc.add(amountFrom);
       }, FPNumber.ZERO);
       commit.updateMaxInputAmount({ amount: totalAmount, assetSymbol: inputAmountAsset.symbol.toLowerCase() });
     } catch (e) {
-      console.log('dexes are not ready');
+      console.groupCollapsed('Subscription Error');
+      console.dir(e);
+      console.groupEnd();
     }
   },
 });
@@ -333,7 +338,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       }
       return receiver.useTransfer ? sum : sum.add(new FPNumber(receiver.usd));
     }, FPNumber.ZERO);
-    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as Asset, approxSum.toString());
+    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as Asset, approxSum);
     inputTokenAmount = inputTokenAmount.add(dexIdData?.amountFrom);
     const dexId = dexIdData?.bestDexId;
     return {
@@ -448,7 +453,7 @@ function calcTxParams(
   };
 }
 
-function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: number | string) {
+function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: FPNumber) {
   const { rootState, getters, rootGetters, state } = routeAssetsActionContext(context);
   const fiatPriceObject = rootState.wallet.account.fiatPriceObject;
   const tokenEquivalent = getTokenEquivalent(fiatPriceObject, assetTo, usd);

@@ -106,7 +106,11 @@ export type SummaryAssetRecipientsInfo = {
   recipientsNumber: number;
   asset: Asset | AccountAsset;
   usd: FPNumber;
+  usdSwap: FPNumber;
+  usdTransfer: FPNumber;
   total: FPNumber;
+  totalWithSwap: FPNumber;
+  totalWithTransfer: FPNumber;
   required: FPNumber;
   totalTransactions: number;
 };
