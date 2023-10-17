@@ -246,10 +246,10 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         `${idx + 1}`,
         recipient.name.toString(),
         recipient.wallet.toString(),
-        recipient.usd.toFixed(2),
+        recipient.usd.dp(2).toLocaleString(),
         recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
-        (recipient.amount?.toFixed(4) || '').toString(),
+        recipient.amount?.dp(2).toLocaleString(),
         recipient.amountInTokens || recipient.useTransfer ? '-' : recipient.exchangeRate || '',
         recipient.status.toString(),
       ];
