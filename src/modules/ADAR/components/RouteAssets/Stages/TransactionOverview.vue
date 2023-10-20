@@ -123,12 +123,7 @@
           </template>
           <template v-slot="{ row }">
             <div>
-              <s-checkbox
-                @input="onUseTransferClick(row.id)"
-                size="small"
-                :value="row.useTransfer"
-                class="checkbox-no-actions"
-              />
+              <s-checkbox @input="onUseTransferClick(row.id)" size="small" :value="row.useTransfer" />
             </div>
           </template>
         </s-table-column>
