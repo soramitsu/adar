@@ -123,7 +123,7 @@
           </template>
           <template v-slot="{ row }">
             <div>
-              <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" />
+              <s-checkbox @input="onUseTransferClick(row.id)" size="small" :value="row.useTransfer" />
             </div>
           </template>
         </s-table-column>
@@ -164,7 +164,7 @@ import { Components, PageNames } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import router, { lazyComponent } from '@/router';
-import { action, getter } from '@/store/decorators';
+import { action, getter, mutation } from '@/store/decorators';
 import validate from '@/store/routeAssets/utils';
 import { copyToClipboard, formatAddress } from '@/utils';
 @Component({
@@ -183,6 +183,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   @action.routeAssets.processingPreviousStage previousStage!: any;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @mutation.routeAssets.toggleUseTransfer toggleUseTransfer!: (id: string) => void;
 
   showSelectInputAssetDialog = false;
 
@@ -204,6 +205,10 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   }
 
   pageAmount = 10;
+
+  onUseTransferClick(id: string) {
+    this.toggleUseTransfer(id);
+  }
 
   onContinueClick() {
     if (this.isLoggedIn) {
@@ -360,10 +365,6 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 </style>
 
 <style scoped lang="scss">
-.checkbox-no-actions {
-  cursor: default;
-  pointer-events: none;
-}
 .container {
   max-width: none;
 }
