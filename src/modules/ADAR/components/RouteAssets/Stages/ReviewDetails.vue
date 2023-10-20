@@ -111,6 +111,36 @@
           </div>
         </template>
         <s-divider />
+        <template v-if="outcomeAssetsAmountsListFiltered.length">
+          <div class="transfer-assets-section">
+            <p class="transfer-assets-section__title">
+              <s-icon v-if="transferBalanceErrors" class="icon-status" name="basic-clear-X-xs-24" />
+              {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
+            </p>
+            <info-line
+              v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered"
+              :key="idx"
+              :asset-symbol="tokenData.asset.symbol"
+              :label="tokenData.asset.symbol"
+              :value="tokenData.totalAmount"
+              :fiat-value="tokenData.usd"
+              class="transfer-assets-section__asset-data"
+              :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
+              is-formatted
+            >
+              <template v-if="!isTransferAssetBalanceOk(tokenData)">
+                <s-button
+                  type="primary"
+                  class="s-typography-button--mini add-button"
+                  @click.stop="onTransferAddFundsClick(tokenData)"
+                >
+                  {{ t('adar.routeAssets.stages.reviewDetails.add') }}
+                </s-button>
+              </template>
+            </info-line>
+          </div>
+          <s-divider />
+        </template>
         <slippage-tolerance
           :slippages="slippages"
           :slippageTolerance="currentSlippage"
@@ -150,10 +180,7 @@
       </div>
     </div>
     <swap-dialog :visible.sync="showSwapDialog" :presetSwapData="swapData"></swap-dialog>
-    <select-input-asset-dialog
-      :visible.sync="showSelectInputAssetDialog"
-      @onInputAssetSelected="onInputAssetSelected"
-    ></select-input-asset-dialog>
+    <select-token :visible.sync="showSelectInputAssetDialog" :connected="isLoggedIn" @select="onInputAssetSelected" />
   </div>
 </template>
 
@@ -164,12 +191,15 @@ import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
+import { Components } from '@/consts';
 import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTolerance.vue';
 import { AdarComponents, adarFee } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
+import { lazyComponent } from '@/router';
 import { action, getter, mutation, state } from '@/store/decorators';
 import type {
   MaxInputAmountInfo,
+  OutcomeAssetsAmount,
   PresetSwapData,
   Recipient,
   SummaryAssetRecipientsInfo,
@@ -185,6 +215,8 @@ import WarningMessage from '../WarningMessage.vue';
     WarningMessage,
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
     SlippageTolerance,
+    InfoLine: components.InfoLine,
+    SelectToken: lazyComponent(Components.SelectToken),
   },
 })
 export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
@@ -204,9 +236,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   ) => SummaryAssetRecipientsInfo[];
 
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
-  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
+  @getter.routeAssets.outcomeAssetsAmountsList outcomeAssetsAmountsList!: Array<OutcomeAssetsAmount>;
+  @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -224,6 +257,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return ['1', '2', '3'];
   }
 
+  get outcomeAssetsAmountsListFiltered() {
+    return this.outcomeAssetsAmountsList;
+  }
+
   get currentSlippage() {
     return this.slippageMultiplier;
   }
@@ -233,15 +270,28 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get noIssues() {
-    return !this.amountBalanceError && !this.xorFeeBalanceError;
+    return !this.amountBalanceError && !this.xorFeeBalanceError && !this.transferBalanceErrors;
   }
 
   get amountBalanceError() {
-    return FPNumber.isLessThanOrEqualTo(this.remainingAmountRequired, FPNumber.ZERO);
+    return FPNumber.isGreaterThan(this.remainingAmountRequired, FPNumber.ZERO);
   }
 
   get xorFeeBalanceError() {
     return FPNumber.isGreaterThan(this.networkFee, this.xorBalance) && !this.isInputAssetXor;
+  }
+
+  get transferBalanceErrors() {
+    return this.outcomeAssetsAmountsListFiltered.some((item) => {
+      const { asset, totalAmount } = item;
+      return FPNumber.gt(this.tokenTransferAmountRequired(asset, totalAmount), FPNumber.ZERO);
+    });
+  }
+
+  tokenTransferAmountRequired(asset: Asset, requiredValue: string) {
+    const userAssetBalanceString = this.getTokenBalance(asset);
+    const userAssetBalance = FPNumber.fromCodecValue(userAssetBalanceString, asset.decimals);
+    return new FPNumber(requiredValue).sub(userAssetBalance);
   }
 
   get usdToBeRouted() {
@@ -293,7 +343,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get remainingAmountRequired() {
-    return this.fpBalance.sub(this.estimatedAmountWithFees);
+    return this.estimatedAmountWithFees.sub(this.fpBalance);
   }
 
   get xorFeeRequired() {
@@ -301,15 +351,12 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   get xorBalance() {
-    const xor = this.accountAssets.find((item) => item.address === XOR.address);
-    return FPNumber.fromCodecValue(getAssetBalance(xor), xor?.decimals);
+    return FPNumber.fromCodecValue(this.getTokenBalance(XOR), XOR?.decimals);
   }
 
   get recipientsData() {
     return this.recipientsGroupedByToken();
   }
-
-  action: 'fee' | 'routing' = 'fee';
 
   get routingSwapData(): PresetSwapData {
     const isInputAssetXor = this.inputToken?.symbol === XOR?.symbol;
@@ -334,19 +381,31 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     };
   }
 
-  get swapData(): PresetSwapData {
-    return this.action === 'fee' ? this.xorFeeSwapData : this.routingSwapData;
-  }
+  swapData: Nullable<PresetSwapData> = null;
 
   onAddFundsClick(action: 'fee' | 'routing') {
-    this.action = action;
+    this.swapData = action === 'fee' ? this.xorFeeSwapData : this.routingSwapData;
     this.showSwapDialog = true;
   }
 
-  get fpBalance(): FPNumber {
-    if (!this.getTokenBalance) return FPNumber.ZERO;
+  onTransferAddFundsClick(tokenData: OutcomeAssetsAmount) {
+    const requiredAmount = this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount);
+    this.swapData = {
+      assetFrom: this.inputToken,
+      assetTo: tokenData.asset,
+      valueTo: requiredAmount.toNumber(),
+    };
+    this.showSwapDialog = true;
+  }
 
-    return FPNumber.fromCodecValue(this.getTokenBalance, this.decimals);
+  isTransferAssetBalanceOk(tokenData) {
+    return FPNumber.lt(this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount), FPNumber.ZERO);
+  }
+
+  get fpBalance(): FPNumber {
+    if (!this.getTokenBalance(this.inputToken)) return FPNumber.ZERO;
+
+    return FPNumber.fromCodecValue(this.getTokenBalance(this.inputToken), this.decimals);
   }
 
   get decimals(): number {
@@ -361,9 +420,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, asset.decimals);
   }
 
-  get getTokenBalance(): CodecString {
-    const asset = this.accountAssets.find((item) => item.address === this.inputToken.address);
-    return getAssetBalance(asset);
+  getTokenBalance(asset): CodecString {
+    const accountAsset = this.accountAssets.find((item) => item.address === asset.address);
+    return getAssetBalance(accountAsset);
   }
 
   formatNumberJs(num) {
@@ -410,6 +469,33 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   .review-details-section {
     & > * {
       margin-bottom: $inner-spacing-medium;
+    }
+  }
+
+  .transfer-assets-section {
+    box-shadow: var(--s-shadow-element);
+    border-radius: 10px;
+    background: var(--s-color-utility-body);
+    padding: 16px;
+
+    &__title {
+      font-weight: 500;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    &__asset-data {
+      &.info-line {
+        padding-left: 12px;
+      }
+      &_error {
+        background: rgba(254, 83, 96, 0.15);
+        border-radius: 4px;
+      }
+
+      button.el-button.neumorphic.s-primary.add-button {
+        box-shadow: none;
+      }
     }
   }
 
@@ -472,5 +558,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     width: 100%;
     margin: 16px 0 0 0;
   }
+}
+
+i.icon-status {
+  font-size: 16px !important;
+  color: var(--s-color-status-error);
 }
 </style>

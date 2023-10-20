@@ -59,7 +59,10 @@ const actions = defineActions({
         step: (row, parser) => {
           // console.log((row.meta.cursor / file.size) * 100);
           try {
-            const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
+            // const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
+            // const useTransfer = row.data[5] ? row.data[5].trim().toLowerCase() === 'true' : false;
+            const amountInTokens = row.data[4] ? JSON.parse(row.data[4]) : false;
+            const useTransfer = row.data[5] ? JSON.parse(row.data[5]) : false;
             const csvAmount = row.data[2]?.replace(/,/g, '');
             const asset = findAsset(row.data[3]);
             const amount = amountInTokens
@@ -80,6 +83,7 @@ const actions = defineActions({
               id: (crypto as any).randomUUID(),
               isCompleted: false,
               amountInTokens,
+              useTransfer,
             });
           } catch (error) {
             parser.abort();
@@ -111,13 +115,16 @@ const actions = defineActions({
 
   async subscribeOnReserves(context, tkn: Asset = XOR): Promise<void> {
     const { commit, getters, dispatch } = routeAssetsActionContext(context);
+    dispatch.cleanSwapReservesSubscription();
     const sourceToken = getters.inputToken;
     const tokens = [...new Set<Asset>(getters.recipients.filter((item) => item.asset).map((item) => item.asset))]
       .map((item: Asset) => item?.address)
       .filter((item) => item !== sourceToken.address);
+    if (!tokens.length && getters.recipients.length) {
+      dispatch.updateTokenAmounts();
+    }
     if (!tokens || tokens.length < 1) return;
 
-    dispatch.cleanSwapReservesSubscription();
     const tokensPromises = tokens.map((tokenAddress) => {
       return new Promise<void>((resolve, reject) => {
         api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
@@ -213,12 +220,14 @@ const actions = defineActions({
     const recipientsData = getters.recipientsGroupedByToken(inputAmountAsset);
     try {
       const totalAmount = recipientsData.reduce((acc, item) => {
-        const { amountFrom } = getAmountAndDexId(context, inputAmountAsset, item.asset, item.usd.toString());
+        const { amountFrom } = getAmountAndDexId(context, inputAmountAsset, item.asset, item.usdSwap);
         return acc.add(amountFrom);
       }, FPNumber.ZERO);
       commit.updateMaxInputAmount({ amount: totalAmount, assetSymbol: inputAmountAsset.symbol.toLowerCase() });
     } catch (e) {
-      console.log('dexes are not ready');
+      console.groupCollapsed('Subscription Error');
+      console.dir(e);
+      console.groupEnd();
     }
   },
 });
@@ -244,7 +253,7 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
     try {
       const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
       const amountTo = recipient.amountInTokens
-        ? new FPNumber(recipient.amount)
+        ? new FPNumber(recipient.amount, recipient.asset?.decimals)
         : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
 
       commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toFixed() });
@@ -311,6 +320,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       assetAddress: item.swapAndSendData.asset.address,
       recipientId: item.recipient.id,
       usd: item.recipient.usd,
+      useTransfer: item.recipient.useTransfer,
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
@@ -321,16 +331,21 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   let inputTokenAmount: FPNumber = FPNumber.ZERO;
   const swapTransferData = groupedData.map((entry) => {
     const [outcomeAssetId, receivers] = entry;
+    let outcomeAssetReuse = FPNumber.ZERO;
     const approxSum = receivers.reduce((sum, receiver) => {
-      return sum.add(new FPNumber(receiver.usd));
+      if (receiver.useTransfer) {
+        outcomeAssetReuse = outcomeAssetReuse.add(FPNumber.fromCodecValue(receiver.targetAmount));
+      }
+      return receiver.useTransfer ? sum : sum.add(new FPNumber(receiver.usd));
     }, FPNumber.ZERO);
-    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as Asset, approxSum.toString());
+    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as Asset, approxSum);
     inputTokenAmount = inputTokenAmount.add(dexIdData?.amountFrom);
     const dexId = dexIdData?.bestDexId;
     return {
       outcomeAssetId,
       receivers,
       dexId,
+      outcomeAssetReuse: outcomeAssetReuse.toCodecString(),
     };
   });
 
@@ -438,7 +453,7 @@ function calcTxParams(
   };
 }
 
-function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: number | string) {
+function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: FPNumber) {
   const { rootState, getters, rootGetters, state } = routeAssetsActionContext(context);
   const fiatPriceObject = rootState.wallet.account.fiatPriceObject;
   const tokenEquivalent = getTokenEquivalent(fiatPriceObject, assetTo, usd);

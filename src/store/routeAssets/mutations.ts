@@ -130,6 +130,11 @@ const mutations = defineMutations<RouteAssetsState>()({
   updateTxHistoryData(state, historyItem: HistoryItem): void {
     state.processingState.txHistoryData = historyItem;
   },
+  toggleUseTransfer(state, id): void {
+    const recipient = state.recipients.find((recipient) => recipient.id === id);
+    if (!recipient) return;
+    recipient.useTransfer = !recipient.useTransfer;
+  },
 });
 
 export default mutations;

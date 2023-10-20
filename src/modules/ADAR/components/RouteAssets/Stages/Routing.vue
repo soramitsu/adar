@@ -70,7 +70,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @action.routeAssets.processingNextStage nextStage!: () => void;
   @getter.routeAssets.recipientsTokens recipientsTokens!: Asset[];
   @getter.routeAssets.inputToken inputToken!: Asset;
-  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
@@ -89,7 +88,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   }
 
   get errorMessage() {
-    return getErrorMessage(this.txHistoryData.errorMessage) || '';
+    return getErrorMessage(this.txHistoryData?.errorMessage) ?? '';
   }
 
   get totalUSD() {

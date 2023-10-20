@@ -115,6 +115,18 @@
             </div>
           </template>
         </s-table-column>
+
+        <!-- NOSWAP -->
+        <s-table-column>
+          <template #header>
+            <span>{{ t('operations.Transfer') }}</span>
+          </template>
+          <template v-slot="{ row }">
+            <div>
+              <s-checkbox @input="onUseTransferClick(row.id)" size="small" :value="row.useTransfer" />
+            </div>
+          </template>
+        </s-table-column>
       </s-table>
       <s-pagination
         class="transactions-table-pagination"
@@ -138,15 +150,11 @@
         {{ t('adar.routeAssets.continue') }}
       </s-button>
     </div>
-    <select-input-asset-dialog
-      :visible.sync="showSelectInputAssetDialog"
-      @onInputAssetSelected="onInputAssetSelected"
-    ></select-input-asset-dialog>
+    <select-token :visible.sync="showSelectInputAssetDialog" :connected="isLoggedIn" @select="onInputAssetSelected" />
   </div>
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -156,7 +164,7 @@ import { Components, PageNames } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import router, { lazyComponent } from '@/router';
-import { action, getter } from '@/store/decorators';
+import { action, getter, mutation } from '@/store/decorators';
 import validate from '@/store/routeAssets/utils';
 import { copyToClipboard, formatAddress } from '@/utils';
 @Component({
@@ -165,6 +173,7 @@ import { copyToClipboard, formatAddress } from '@/utils';
     SelectInputAssetDialog: adarLazyComponent(AdarComponents.RouteAssetsSelectInputAssetDialog),
     TokenLogo: components.TokenLogo,
     SearchInput: components.SearchInput,
+    SelectToken: lazyComponent(Components.SelectToken),
   },
 })
 export default class TransactionOverview extends Mixins(TranslationMixin, mixins.PaginationSearchMixin) {
@@ -174,6 +183,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   @action.routeAssets.processingPreviousStage previousStage!: any;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @mutation.routeAssets.toggleUseTransfer toggleUseTransfer!: (id: string) => void;
 
   showSelectInputAssetDialog = false;
 
@@ -195,6 +205,10 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   }
 
   pageAmount = 10;
+
+  onUseTransferClick(id: string) {
+    this.toggleUseTransfer(id);
+  }
 
   onContinueClick() {
     if (this.isLoggedIn) {

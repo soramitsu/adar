@@ -73,6 +73,7 @@
             "badBalance": "fonds insuffisants",
             "okBalance": "solde correct",
             "add": "ajouter",
+            "useTransferTitle": "Les fonds disponibles seront utilisés",
             "routingDetails": {
               "title": "Détails de routage",
               "amount": "Montant de jetons requis"

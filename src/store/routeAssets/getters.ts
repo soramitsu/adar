@@ -11,6 +11,7 @@ import { getAssetUSDPrice } from './utils';
 
 import type {
   MaxInputAmountInfo,
+  OutcomeAssetsAmount,
   Recipient,
   RouteAssetsState,
   RouteAssetsSubscription,
@@ -115,18 +116,43 @@ const getters = defineGetters<RouteAssetsState>()({
           'symbol'
         )
       ).map((assetArray: Array<Recipient>) => {
+        const reduceData = assetArray.reduce(
+          (acc, item) => {
+            return {
+              usd: new FPNumber(item.usd).add(acc.usd),
+              usdSwap: item.useTransfer ? acc.usdSwap : new FPNumber(item.usd).add(acc.usdSwap),
+              usdTransfer: item.useTransfer ? new FPNumber(item.usd).add(acc.usdTransfer) : acc.usdTransfer,
+              total: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.total),
+              totalWithSwap: item.useTransfer
+                ? acc.totalWithSwap
+                : (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithSwap),
+              totalWithTransfer: item.useTransfer
+                ? (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithTransfer)
+                : acc.totalWithTransfer,
+              required: new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc.required),
+            };
+          },
+          {
+            usd: FPNumber.ZERO,
+            usdSwap: FPNumber.ZERO,
+            usdTransfer: FPNumber.ZERO,
+            total: FPNumber.ZERO,
+            totalWithSwap: FPNumber.ZERO,
+            totalWithTransfer: FPNumber.ZERO,
+            required: FPNumber.ZERO,
+          }
+        );
+        const { usd, total, totalWithSwap, totalWithTransfer, required, usdSwap, usdTransfer } = reduceData;
         return {
           recipientsNumber: assetArray.length,
           asset: assetArray[0].asset,
-          usd: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.usd).add(acc);
-          }, FPNumber.ZERO),
-          total: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.amount || 0).add(acc);
-          }, FPNumber.ZERO),
-          required: assetArray.reduce((acc, item) => {
-            return new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc);
-          }, FPNumber.ZERO),
+          usd,
+          usdSwap,
+          usdTransfer,
+          total,
+          totalWithSwap,
+          totalWithTransfer,
+          required,
           totalTransactions: assetArray.length,
         };
       });
@@ -139,7 +165,7 @@ const getters = defineGetters<RouteAssetsState>()({
       const token = asset || getters.inputToken;
       const summaryData = getters.recipientsGroupedByToken(token);
       const totalAmount = summaryData.reduce((acc, item) => {
-        return new FPNumber(item.required).add(acc);
+        return new FPNumber(item.totalWithSwap).add(acc);
       }, FPNumber.ZERO);
       const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(totalAmount);
       const priceImpact = new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED).mul(totalAmount);
@@ -161,6 +187,32 @@ const getters = defineGetters<RouteAssetsState>()({
       totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
       asetSymbol: maxInputAmount.assetSymbol,
     };
+  },
+  outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
+    const { getters } = routeAssetsGetterContext(args);
+    const recipientsWithUsingExistingTokens = getters.recipients
+      .filter((item) => item.useTransfer)
+      .map((item) => ({ symbol: item.asset.symbol, ...item }));
+    return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
+      const reduceData = assetArray.reduce(
+        (acc, item) => {
+          return {
+            usd: new FPNumber(item.usd).add(acc.usd),
+            totalAmount: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalAmount),
+          };
+        },
+        {
+          usd: FPNumber.ZERO,
+          totalAmount: FPNumber.ZERO,
+        }
+      );
+      const { usd, totalAmount } = reduceData;
+      return {
+        asset: assetArray[0].asset,
+        usd: usd.toLocaleString(),
+        totalAmount: totalAmount.toLocaleString(),
+      };
+    });
   },
 });
 

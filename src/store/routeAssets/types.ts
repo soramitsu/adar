@@ -17,6 +17,7 @@ export type Recipient = {
   txId?: string;
   exchangeRate?: string;
   amountInTokens: boolean;
+  useTransfer: boolean;
 };
 
 export type RouteAssetsSubscription = {
@@ -105,7 +106,17 @@ export type SummaryAssetRecipientsInfo = {
   recipientsNumber: number;
   asset: Asset | AccountAsset;
   usd: FPNumber;
+  usdSwap: FPNumber;
+  usdTransfer: FPNumber;
   total: FPNumber;
+  totalWithSwap: FPNumber;
+  totalWithTransfer: FPNumber;
   required: FPNumber;
   totalTransactions: number;
+};
+
+export type OutcomeAssetsAmount = {
+  asset: Asset;
+  usd: string;
+  totalAmount: string;
 };

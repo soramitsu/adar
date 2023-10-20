@@ -73,6 +73,7 @@
             "badBalance": "残高不足",
             "okBalance": "残高が十分",
             "add": "追加",
+            "useTransferTitle": "利用可能な資金が使用されます",
             "routingDetails": {
               "title": "ルーティング詳細",
               "amount": "必要なトークン量"

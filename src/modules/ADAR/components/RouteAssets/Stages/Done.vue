@@ -109,7 +109,7 @@ import { FPNumber } from '@sora-substrate/util/build';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { jsPDF as JsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import autoTable, { RowInput } from 'jspdf-autotable';
 import { groupBy, sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
@@ -152,7 +152,6 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
-  @getter.routeAssets.overallEstimatedTokens overallEstimatedTokens!: (asset?: AccountAsset) => FPNumber;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
@@ -247,11 +246,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         `${idx + 1}`,
         recipient.name.toString(),
         recipient.wallet.toString(),
-        recipient.usd.toFixed(2),
-        this.inputToken.symbol,
+        recipient.usd.dp(2).toLocaleString(),
+        recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
-        (recipient.amount?.toFixed(4) || '').toString(),
-        recipient.amountInTokens ? '-' : recipient.exchangeRate || '',
+        recipient.amount?.dp(4).toLocaleString(),
+        recipient.amountInTokens || recipient.useTransfer ? '-' : recipient.exchangeRate || '',
         recipient.status.toString(),
       ];
     });
@@ -291,7 +290,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     doc.text(`Datetime - ${datetime?.toUTCString()}`, 5, 25);
     autoTable(doc, {
       head: [this.headers],
-      body: this.reportData,
+      body: this.reportData as RowInput[],
       startY: 30,
       margin: { top: 5, left: 5, right: 5, bottom: 5 },
       styles: {

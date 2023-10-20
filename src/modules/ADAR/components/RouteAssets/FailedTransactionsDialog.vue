@@ -104,6 +104,18 @@
             </template>
           </s-table-column>
 
+          <!-- NOSWAP -->
+          <s-table-column>
+            <template #header>
+              <span>{{ t('operations.Transfer') }}</span>
+            </template>
+            <template v-slot="{ row }">
+              <div>
+                <s-checkbox @input="onUseTransferClick(row.id)" size="small" :value="row.useTransfer" />
+              </div>
+            </template>
+          </s-table-column>
+
           <!-- BUTTON -->
           <!-- <s-table-column>
             <template v-slot="{ row }">
@@ -146,7 +158,7 @@ import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
-import { action, getter } from '@/store/decorators';
+import { action, getter, mutation } from '@/store/decorators';
 import { Recipient, RecipientStatus } from '@/store/routeAssets/types';
 import { copyToClipboard, formatAddress } from '@/utils';
 
@@ -164,6 +176,7 @@ export default class FailedTransactionsDialog extends Mixins(
   @getter.routeAssets.incompletedRecipients private recipients!: Array<Recipient>;
   @action.routeAssets.repeatTransaction private repeatTransaction!: ({ inputAsset, id }) => Promise<void>;
   @action.routeAssets.runAssetsRouting runAssetsRouting!: () => Promise<void>;
+  @mutation.routeAssets.toggleUseTransfer toggleUseTransfer!: (id: string) => void;
 
   async handleCopyAddress(address): Promise<void> {
     try {
@@ -206,6 +219,10 @@ export default class FailedTransactionsDialog extends Mixins(
           title: '',
         });
       });
+  }
+
+  onUseTransferClick(id: string) {
+    this.toggleUseTransfer(id);
   }
 
   formatAddress(wallet) {
