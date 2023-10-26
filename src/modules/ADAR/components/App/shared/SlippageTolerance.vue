@@ -1,5 +1,5 @@
 <template>
-  <div class="slippage-tolerance" :class="computedClasses">
+  <div class="adar-slippage-tolerance" :class="computedClasses">
     <s-collapse @change="handleCollapseChange">
       <s-collapse-item>
         <template #title>
@@ -9,13 +9,13 @@
             :value="customSlippageTolerance"
           />
         </template>
-        <div class="slippage-tolerance s-flex">
-          <div class="slippage-tolerance-default">
+        <div class="adar-slippage-tolerance s-flex">
+          <div class="adar-slippage-tolerance-default">
             <settings-tabs :value="slippageTolerance" :tabs="SlippageToleranceTabs" @input="selectTab" />
           </div>
-          <div class="slippage-tolerance-custom">
+          <div class="adar-slippage-tolerance-custom">
             <s-float-input
-              class="slippage-tolerance-custom_input"
+              class="adar-slippage-tolerance-custom_input"
               size="small"
               :decimals="2"
               has-locale-string
@@ -133,10 +133,10 @@ export default class AdarSlippageTolerance extends Mixins(mixins.NumberFormatter
 </script>
 
 <style lang="scss">
-.slippage-tolerance .s-flex {
+.adar-slippage-tolerance .s-flex {
   margin-top: 0px !important;
 }
-.slippage-tolerance {
+.adar-slippage-tolerance {
   &-custom_input.s-input {
     @include focus-outline($focusWithin: true, $withOffset: true);
     min-height: var(--s-size-small);
@@ -185,6 +185,7 @@ export default class AdarSlippageTolerance extends Mixins(mixins.NumberFormatter
 
   .el-collapse-item__header {
     height: 36px;
+    position: relative;
   }
 
   .el-collapse-item__content {
@@ -213,7 +214,7 @@ export default class AdarSlippageTolerance extends Mixins(mixins.NumberFormatter
 </style>
 
 <style lang="scss" scoped>
-.slippage-tolerance {
+.adar-slippage-tolerance {
   width: 100%;
   flex-wrap: wrap;
   align-items: flex-end;

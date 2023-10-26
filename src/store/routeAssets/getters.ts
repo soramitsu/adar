@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { Stages, adarFee as adarFeeMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsGetterContext } from '@/store/routeAssets';
+import { getAssetBalance } from '@/utils';
 
 import { getAssetUSDPrice } from './utils';
 
@@ -189,7 +190,7 @@ const getters = defineGetters<RouteAssetsState>()({
     };
   },
   outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
-    const { getters } = routeAssetsGetterContext(args);
+    const { getters, rootState } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipients
       .filter((item) => item.useTransfer)
       .map((item) => ({ symbol: item.asset.symbol, ...item }));
@@ -206,11 +207,21 @@ const getters = defineGetters<RouteAssetsState>()({
           totalAmount: FPNumber.ZERO,
         }
       );
-      const { usd, totalAmount } = reduceData;
+      const { usd, totalAmount: amount } = reduceData;
+      const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
+      const asset = assetArray[0].asset;
+      const accountAsset = rootState.wallet.account.accountAssets.find((item) => item.address === asset.address);
+      const userBalance = FPNumber.fromCodecValue(getAssetBalance(accountAsset), accountAsset?.decimals);
+      const totalAmount = amount.add(adarFee);
+      const amountRequired = totalAmount.sub(userBalance);
       return {
-        asset: assetArray[0].asset,
-        usd: usd.toLocaleString(),
-        totalAmount: totalAmount.toLocaleString(),
+        asset,
+        usd: usd,
+        amount: totalAmount,
+        adarFee: adarFee,
+        totalAmount: totalAmount.add(adarFee),
+        amountRequired: amountRequired,
+        userBalance: userBalance,
       };
     });
   },

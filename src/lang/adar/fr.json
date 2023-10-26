@@ -77,6 +77,12 @@
             "routingDetails": {
               "title": "Détails de routage",
               "amount": "Montant de jetons requis"
+            },
+            "swapless": {
+              "balance": "solde",
+              "adarFee": "frais ADAR",
+              "amount": "montant",
+              "required": "tokens requis"
             }
           },
           "routing": {

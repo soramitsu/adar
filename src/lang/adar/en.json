@@ -77,6 +77,12 @@
                     "routingDetails": {
                         "title": "Routing Details",
                         "amount": "Token amount required"
+                    },
+                    "swapless": {
+                        "balance": "balance",
+                        "adarFee": "adar fee",
+                        "amount": "amount",
+                        "required": "tokens required"
                     }
 
                 },
