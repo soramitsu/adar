@@ -21,13 +21,14 @@
 </template>
 
 <script lang="ts">
-import { mixins } from '@soramitsu/soraneo-wallet-web';
+import { mixins, api } from '@soramitsu/soraneo-wallet-web';
+import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { getter, action, mutation } from '@/store/decorators';
+import { getter, action, mutation, state } from '@/store/decorators';
 import { FeatureFlags } from '@/store/settings/types';
 
 import type { HistoryItem } from '@sora-substrate/util';
@@ -48,6 +49,13 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
+  @action.wallet.transactions.getExternalHistory private getExternalHistory!: (
+    args?: ExternalHistoryParams
+  ) => Promise<void>;
+
+  @mutation.wallet.transactions.getHistory private getHistory!: FnWithoutArgs;
+  @state.wallet.transactions.history private historyObject!: any;
+  @state.wallet.account.address private address!: string;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
@@ -62,6 +70,7 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     this.withApi(async () => {
       this.subscribeOnReserves();
       this.setFeatureFlags({ charts: false, moonpay: false });
+      this.getHistory();
     });
   }
 
@@ -71,6 +80,11 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
 
   get component() {
     return this.currentStageComponentName;
+  }
+
+  get userTxs() {
+    // return this.historyObject.values()
+    return (Object.values(this.historyObject) as any).filter((tx) => tx.from === this.address);
   }
 
   @Watch('txHistoryStoreItem', { deep: true, immediate: true })
