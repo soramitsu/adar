@@ -227,7 +227,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   getRecipientTransferAmount(address: string) {
-    const formattedAddress = address.slice(0, 2) === 'cn' ? address : api.formatAddress(address);
+    const formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
     return new FPNumber(this.txHistoryDataTransfers.find((item) => item.to === formattedAddress)?.amount ?? '0')
       .dp(4)
       .toLocaleString();
