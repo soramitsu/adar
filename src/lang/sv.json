@@ -305,7 +305,8 @@
         "viewIn": "Visa i {explorer}",
         "referrer": "Referrer",
         "referral": "Hänvisning",
-        "adarTxDetailsTitle": "Transaktionsdetaljer"
+        "adarTxDetailsTitle": "Transaktionsdetaljer",
+        "comment": "Kommentar"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Ändra nätverk i {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Kopiera nätverksadress",
         "soraAddress": "{Sora} adress",
         "ethereumAddress": "{Ethereum} adress",
-        "limitMessage": "För närvarande finns det en {type} {amount} {symbol} för överbryggning för att säkerställa stabiliteten och säkerheten i {Sora} -nätverket. Vi uppskattar din förståelse."
+        "limitMessage": "För närvarande finns det en {type} {amount} {symbol} för överbryggning för att säkerställa stabiliteten och säkerheten i {Sora} -nätverket. Vi uppskattar din förståelse.",
+        "externalTransferFee": "{network} {XCM} avgift",
+        "externalTransferFeeTooltip": "När du skickar en bryggtransaktion till {network} -nätverket tas en mindre avgift från beloppet du överför"
     },
     "selectRegisteredAsset": {
         "title": "Välj en token",
@@ -1179,8 +1182,8 @@
             "action": "Välj tjänster",
             "dialog": {
                 "title": "{Sora} Val av nätverkstjänst",
-                "fiat": "Fiat värden",
-                "chartsAndActivity": "Diagram och aktivitet"
+                "indexer": "Indexerare",
+                "useCeres": "Använd {Ceres} för fiat-värden"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Skriv namn",
             "present": "Redan närvarande",
             "saveChanges": "Spara ändringar"
-        }
+        },
+        "input": "Ange adress eller välj kontakt",
+        "selectContact": "Välj kontakt"
     },
     "browserPermission": {
         "title": "Tillåt kameraåtkomst i webbläsarinställningarna",

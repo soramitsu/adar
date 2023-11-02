@@ -16,7 +16,7 @@ function initialState(): RouteAssetsState {
     enabledAssets: {
       tbc: [],
       xst: {},
-      lockedSources: [],
+      // lockedSources: [],
     },
     processingState: {
       currentStageIndex: 0,

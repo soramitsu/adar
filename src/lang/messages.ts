@@ -29,6 +29,7 @@ export default {
   selectNodeConnected: 'Connected to: {chain}',
   connectWalletTextTooltip: 'Connect to {Sora} Network with {PolkadotJs}',
   selectNodeText: 'Select node',
+  selectIndexerText: 'Select indexer',
   bridgeText: 'Bridge',
   acceptText: 'Accept & Hide',
   continueText: 'Continue',
@@ -204,6 +205,17 @@ export default {
       incorrectProtocol: 'Address should starts from ws:// or wss://',
       incorrectAddress: 'Incorrect address',
     },
+  },
+  selectIndexerDialog: {
+    title: '{Sora} Network indexer selection',
+    addIndexer: 'Add custom indexer',
+    updateIndexer: 'Update indexer',
+    customIndexer: 'Custom indexer',
+    howToSetupOwnIndexer: 'How to setup your own {Sora} indexer',
+    select: 'Select',
+    connected: 'Connected',
+    selectIndexerForEnvironment: 'Select a indexer for {environment} environment:',
+    indexerTitle: '{chain} hosted by {name}',
   },
   selectLanguageDialog: {
     title: 'Language',
@@ -397,7 +409,7 @@ export default {
     ethereumNetworkFee: '{Ethereum} Network Fee',
     externalTransferFee: '{network} {XCM} fee',
     externalTransferFeeTooltip:
-      'To execute an incoming transaction, the {network} network deducts part of the funds from the transfer amount',
+      'When you send a bridge transaction to the {network} network, a minor fee is taken from the amount you are trasferring',
     tooltipValue: '@:comingSoonText',
     total: 'Total',
     viewHistory: 'View transactions history',
@@ -573,7 +585,9 @@ export default {
     assetId: 'Asset ID',
   },
   explore: {
-    showOnlyMyPositions: 'Show only my positions',
+    showOnly: 'Show only {entities}',
+    myPositions: 'my positions',
+    synthetics: 'synthetic tokens',
   },
   dexSettings: {
     title: 'Transaction settings',

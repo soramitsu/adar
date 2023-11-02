@@ -305,7 +305,8 @@
         "viewIn": "Zobrazit v {explorer}",
         "referrer": "Doporučitel",
         "referral": "Doporučení",
-        "adarTxDetailsTitle": "Podrobnosti transakce"
+        "adarTxDetailsTitle": "Podrobnosti transakce",
+        "comment": "Komentář"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Změnit síť v {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Zkopírujte síťovou adresu",
         "soraAddress": "{Sora} adresa",
         "ethereumAddress": "{Ethereum} adresa",
-        "limitMessage": "V současné době existuje {type} {amount} {symbol} pro přemostění, aby byla zajištěna stabilita a bezpečnost sítě {Sora}. Děkujeme za pochopení."
+        "limitMessage": "V současné době existuje {type} {amount} {symbol} pro přemostění, aby byla zajištěna stabilita a bezpečnost sítě {Sora}. Děkujeme za pochopení.",
+        "externalTransferFee": "{network} poplatek {XCM}",
+        "externalTransferFeeTooltip": "Když odešlete překlenovací transakci do sítě {network} , z částky, kterou převádíte, se strhne menší poplatek"
     },
     "selectRegisteredAsset": {
         "title": "Vyberte token",
@@ -1179,8 +1182,8 @@
             "action": "Vyberte služby",
             "dialog": {
                 "title": "{Sora} Výběr síťové služby",
-                "fiat": "Hodnoty Fiat",
-                "chartsAndActivity": "Grafy a aktivity"
+                "indexer": "Indexer",
+                "useCeres": "Pro hodnoty fiat použijte {Ceres}"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Napište jméno",
             "present": "Již přítomný",
             "saveChanges": "Uložit změny"
-        }
+        },
+        "input": "Zadejte adresu nebo vyberte kontakt",
+        "selectContact": "Vyberte kontakt"
     },
     "browserPermission": {
         "title": "Povolit přístup k fotoaparátu v nastavení prohlížeče",

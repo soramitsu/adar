@@ -125,10 +125,13 @@ const actions = defineActions({
     }
     if (!tokens || tokens.length < 1) return;
 
+    api.swap.update();
+
     const tokensPromises = tokens.map((tokenAddress) => {
       return new Promise<void>((resolve, reject) => {
-        api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
-          commit.addSubscription({ assetAddress: tokenAddress });
+        const observableQuote = api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress);
+        commit.addSubscription({ assetAddress: tokenAddress });
+        if (observableQuote) {
           const quoteSubscription = observableQuote.subscribe((quoteData) => {
             dispatch.setSubscriptionPayload({
               data: quoteData,
@@ -137,7 +140,18 @@ const actions = defineActions({
             resolve();
           });
           commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
-        });
+        }
+        // api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
+        //   commit.addSubscription({ assetAddress: tokenAddress });
+        //   const quoteSubscription = observableQuote.subscribe((quoteData) => {
+        //     dispatch.setSubscriptionPayload({
+        //       data: quoteData,
+        //       outputAssetId: tokenAddress,
+        //     });
+        //     resolve();
+        //   });
+        //   commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
+        // });
       });
     });
     Promise.allSettled(tokensPromises).then(() => {
