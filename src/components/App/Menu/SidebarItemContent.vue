@@ -96,4 +96,13 @@ $icon-size: 42px;
     box-shadow: none;
   }
 }
+.sora-card-sidebar-icon {
+  display: block;
+  margin: auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.el-menu-item:not(.is-active):not(.is-disabled):focus .sora-card-sidebar-icon path {
+  fill: var(--s-color-base-content-secondary) !important; // focus state of sora card item
+}
 </style>
