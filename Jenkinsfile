@@ -24,6 +24,7 @@ def pipeline = new org.js.AppPipeline(steps: this,
     secretScannerExclusion: 'Jenkinsfile-UCAN|.*env.json\$|.*env-stage.json\$',
     sonarSrcPath: 'src',
     sonarTestsPath: 'tests',
-    dojoProductType: 'Dev'
+    dojoProductType: 'Dev',
+    movingFiles: [ "*":"./", ".well-known/":"./"]
 )
 pipeline.runPipeline()
