@@ -109,6 +109,14 @@
                 "passed": "承認済み",
                 "failed": "失敗"
               }
+            },
+            "report": {
+              "exchangeRate": "為替レート",
+              "transactionId": "取引 ID",
+              "blockNumber": "ブロック番号",
+              "blockId": "ブロック ID",
+              "senderWallet": "送信者ウォレット",
+              "datetime": "日付と時刻"
             }
           }
         },

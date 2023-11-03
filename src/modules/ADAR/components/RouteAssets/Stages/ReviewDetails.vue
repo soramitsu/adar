@@ -122,8 +122,8 @@
               :key="idx"
               :asset-symbol="tokenData.asset.symbol"
               :label="tokenData.asset.symbol"
-              :value="tokenData.totalAmount"
-              :fiat-value="tokenData.usd"
+              :value="tokenData.totalAmount.toLocaleString()"
+              :fiat-value="tokenData.usd.dp(2).toLocaleString()"
               class="transfer-assets-section__asset-data"
               :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
               is-formatted
@@ -288,10 +288,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     });
   }
 
-  tokenTransferAmountRequired(asset: Asset, requiredValue: string) {
+  tokenTransferAmountRequired(asset: Asset, requiredValue: FPNumber) {
     const userAssetBalanceString = this.getTokenBalance(asset);
     const userAssetBalance = FPNumber.fromCodecValue(userAssetBalanceString, asset.decimals);
-    return new FPNumber(requiredValue).sub(userAssetBalance);
+    return requiredValue.sub(userAssetBalance);
   }
 
   get usdToBeRouted() {

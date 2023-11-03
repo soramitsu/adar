@@ -253,7 +253,7 @@ const routes: Array<RouteConfig> = [
   // },
   {
     path: '*',
-    redirect: '/swap',
+    redirect: '/route-assets',
   },
 ];
 

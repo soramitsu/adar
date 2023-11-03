@@ -117,6 +117,6 @@ export type SummaryAssetRecipientsInfo = {
 
 export type OutcomeAssetsAmount = {
   asset: Asset;
-  usd: string;
-  totalAmount: string;
+  usd: FPNumber;
+  totalAmount: FPNumber;
 };

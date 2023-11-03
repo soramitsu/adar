@@ -209,8 +209,8 @@ const getters = defineGetters<RouteAssetsState>()({
       const { usd, totalAmount } = reduceData;
       return {
         asset: assetArray[0].asset,
-        usd: usd.toLocaleString(),
-        totalAmount: totalAmount.toLocaleString(),
+        usd,
+        totalAmount,
       };
     });
   },

@@ -39,7 +39,12 @@
         </div>
       </div>
       <div class="buttons-container">
-        <s-button type="primary" class="s-typography-button--big" @click.stop="nextButtonAction">
+        <s-button
+          type="primary"
+          class="s-typography-button--big"
+          :disabled="nextButtonDisabled"
+          @click.stop="nextButtonAction"
+        >
           {{ nextButtonTitle }}
         </s-button>
         <s-button type="secondary" class="s-typography-button--big" @click.stop="cancelButtonAction">
@@ -97,6 +102,10 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
       { title: this.t('adar.routeAssets.stages.processTemplate.wallets'), status: this.walletsStatus },
       { title: this.t('adar.routeAssets.stages.processTemplate.amount'), status: this.amountsStatus },
     ];
+  }
+
+  get nextButtonDisabled() {
+    return !this.recipientsCount;
   }
 
   get recipientsStatus() {

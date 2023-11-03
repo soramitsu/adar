@@ -1,4 +1,5 @@
 import SButton from '@soramitsu/soramitsu-js-ui/lib/components/Button/SButton';
+import SButtonGroup from '@soramitsu/soramitsu-js-ui/lib/components/Button/SButtonGroup';
 import SCard from '@soramitsu/soramitsu-js-ui/lib/components/Card/SCard';
 import SCheckbox from '@soramitsu/soramitsu-js-ui/lib/components/Checkbox';
 import SCollapse from '@soramitsu/soramitsu-js-ui/lib/components/Collapse/SCollapse';
@@ -74,6 +75,7 @@ Vue.use(SRadio);
 Vue.use(SRadioGroup);
 Vue.use(SRow);
 Vue.use(SScrollbar);
+Vue.use(SButtonGroup);
 // Vue.use(SSkeleton);
 // Vue.use(SSkeletonItem);
 Vue.use(SSlider);
