@@ -305,7 +305,8 @@
         "viewIn": "Դիտել {explorer}- ում",
         "referrer": "Ուղղորդող",
         "referral": "Ուղղորդում",
-        "adarTxDetailsTitle": "գործարքի մանրամասներ"
+        "adarTxDetailsTitle": "գործարքի մանրամասներ",
+        "comment": "Մեկնաբանություն"
     },
     "appName": "{AppName} (Փոլքասվափ)",
     "changeNetworkText": "Փոխել ցանցը {Metamask}- ում",
@@ -545,7 +546,9 @@
         "copy": "Պատճենել ցանցի հասցեն",
         "soraAddress": "{Sora} հասցե",
         "ethereumAddress": "{Ethereum} հասցե",
-        "limitMessage": "Ներկայումս {Sora} ցանցի կայունությունն ու անվտանգությունն ապահովելու համար կամրջելու համար կա {type} {amount} {symbol} : Մենք գնահատում ենք ձեր ըմբռնումը:"
+        "limitMessage": "Ներկայումս {Sora} ցանցի կայունությունն ու անվտանգությունն ապահովելու համար կամրջելու համար կա {type} {amount} {symbol} : Մենք գնահատում ենք ձեր ըմբռնումը:",
+        "externalTransferFee": "{network} {XCM} վճար",
+        "externalTransferFeeTooltip": "Երբ դուք կամուրջ գործարք եք ուղարկում {network} ցանցին, ձեր փոխանցվող գումարից փոքր վճար է վերցվում"
     },
     "selectRegisteredAsset": {
         "title": "Ընտրեք տոկեն",
@@ -1179,8 +1182,8 @@
             "action": "Ընտրեք ծառայություններ",
             "dialog": {
                 "title": "{Sora} Ցանցային ծառայության ընտրություն",
-                "fiat": "Fiat արժեքները",
-                "chartsAndActivity": "Գծապատկերներ և գործունեություն"
+                "indexer": "Ինդեքսավորող",
+                "useCeres": "Ֆիատ արժեքների համար օգտագործեք {Ceres}"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Մուտքագրեք անունը",
             "present": "Արդեն ներկա",
             "saveChanges": "Պահպանել փոփոխությունները"
-        }
+        },
+        "input": "Մուտքագրեք հասցեն կամ ընտրեք կոնտակտ",
+        "selectContact": "Ընտրեք կոնտակտ"
     },
     "browserPermission": {
         "title": "Թույլատրել տեսախցիկի մուտքը դիտարկիչի կարգավորումներում",

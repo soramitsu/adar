@@ -92,7 +92,7 @@ function getNonWhitelistDivisibleAssets<T extends Asset | AccountAsset>(
   components: {
     DialogBase: components.DialogBase,
     SelectAssetList: lazyComponent(Components.SelectAssetList),
-    SyntheticSwitcher: lazyComponent(Components.SyntheticSwitcher),
+    SyntheticSwitcher: components.SyntheticSwitcher,
     TokenAddress: components.TokenAddress,
     SearchInput: components.SearchInput,
     AddAssetDetailsCard: components.AddAssetDetailsCard,
@@ -155,8 +155,10 @@ export default class SelectToken extends Mixins(TranslationMixin, SelectAssetMix
 
     const assetsAddresses = whiteList.map((asset) => asset.address);
     const excludeAddress = this.asset?.address;
+    const list = this.getAssetsWithBalances(assetsAddresses, excludeAddress);
+    const orderedList = [...list].sort(this.sortByBalance);
 
-    return this.getAssetsWithBalances(assetsAddresses, excludeAddress).sort(this.sortByBalance);
+    return orderedList;
   }
 
   get filteredWhitelistTokens(): Array<AccountAsset> {

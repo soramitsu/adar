@@ -305,7 +305,8 @@
         "viewIn": "Bekijk in {explorer}",
         "referrer": "Verwijzer",
         "referral": "Verwijzing",
-        "adarTxDetailsTitle": "Transactiegegevens"
+        "adarTxDetailsTitle": "Transactiegegevens",
+        "comment": "Opmerking"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Netwerk wijzigen in {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Netwerkadres kopiëren",
         "soraAddress": "{Sora} adres",
         "ethereumAddress": "{Ethereum} adres",
-        "limitMessage": "Momenteel is er een {type} {amount} {symbol} voor overbrugging om de stabiliteit en veiligheid van het {Sora}-netwerk te garanderen. We waarderen je begrip."
+        "limitMessage": "Momenteel is er een {type} {amount} {symbol} voor overbrugging om de stabiliteit en veiligheid van het {Sora}-netwerk te garanderen. We waarderen je begrip.",
+        "externalTransferFee": "{network} {XCM} kosten",
+        "externalTransferFeeTooltip": "Wanneer u een overbruggingstransactie naar het {network} -netwerk verzendt, wordt er een kleine vergoeding in rekening gebracht op het bedrag dat u overdraagt"
     },
     "selectRegisteredAsset": {
         "title": "Kies een token",
@@ -1179,8 +1182,8 @@
             "action": "Selecteer diensten",
             "dialog": {
                 "title": "{Sora} Netwerkserviceselectie",
-                "fiat": "Fiat-waarden",
-                "chartsAndActivity": "Grafieken & Activiteit"
+                "indexer": "Indexeerder",
+                "useCeres": "Gebruik {Ceres} voor fiatwaarden"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Voer naam in",
             "present": "Reeds aanwezig",
             "saveChanges": "Wijzigingen opslaan"
-        }
+        },
+        "input": "Voer adres in of selecteer contact",
+        "selectContact": "Selecteer contactpersoon"
     },
     "browserPermission": {
         "title": "Cameratoegang toestaan in browserinstellingen",

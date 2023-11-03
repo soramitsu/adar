@@ -305,7 +305,8 @@
         "viewIn": "Wo ni {explorer}",
         "referrer": "Atọkasi",
         "referral": "Ifiranṣẹ",
-        "adarTxDetailsTitle": "Àwọn àwọn èrò akójọ awoṣe"
+        "adarTxDetailsTitle": "Àwọn àwọn èrò akójọ awoṣe",
+        "comment": "Ọrọìwòye"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Yi nẹtiwọọki pada ni {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Daakọ adirẹsi nẹtiwọki",
         "soraAddress": "{Sora} adirẹsi",
         "ethereumAddress": "{Ethereum} adirẹsi",
-        "limitMessage": "Lọwọlọwọ, {type} {amount} {symbol} wa fun sisọpọ lati rii daju iduroṣinṣin ati aabo ti Nẹtiwọọki {Sora} . A dupe oye rẹ."
+        "limitMessage": "Lọwọlọwọ, {type} {amount} {symbol} wa fun sisọpọ lati rii daju iduroṣinṣin ati aabo ti Nẹtiwọọki {Sora} . A dupe oye rẹ.",
+        "externalTransferFee": "{network} {XCM} ọya",
+        "externalTransferFeeTooltip": "Nigbati o ba fi iṣowo afara ranṣẹ si netiwọki {network} , owo kekere kan yoo gba lati iye ti o n gbe"
     },
     "selectRegisteredAsset": {
         "title": "Yan Tokini kan",
@@ -1179,8 +1182,8 @@
             "action": "Yan awọn iṣẹ",
             "dialog": {
                 "title": "Aṣayan iṣẹ nẹtiwọki {Sora}",
-                "fiat": "Awọn iye Fiat",
-                "chartsAndActivity": "Awọn aworan atọka & Iṣẹ-ṣiṣe"
+                "indexer": "Atọka",
+                "useCeres": "Lo {Ceres} fun awọn iye fiat"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Tẹ orukọ sii",
             "present": "Ti wa tẹlẹ",
             "saveChanges": "Fi awọn ayipada pamọ"
-        }
+        },
+        "input": "Tẹ adirẹsi sii tabi yan olubasọrọ",
+        "selectContact": "Yan olubasọrọ"
     },
     "browserPermission": {
         "title": "Gba wiwọle kamẹra laaye ni awọn eto ẹrọ aṣawakiri",

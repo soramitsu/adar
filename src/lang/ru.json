@@ -305,7 +305,8 @@
         "viewIn": "Смотреть в {explorer}",
         "referrer": "Реферер",
         "referral": "Реферал",
-        "adarTxDetailsTitle": "Детали транзакции"
+        "adarTxDetailsTitle": "Детали транзакции",
+        "comment": "Комментарий"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Сменить сеть в {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Скопировать адрес сети",
         "soraAddress": "{Sora} адрес",
         "ethereumAddress": "{Ethereum} адрес",
-        "limitMessage": "В настоящее время существует {type} {amount} {symbol} для моста, обеспечивающая стабильность и безопасность сети {Sora}. Мы ценим ваше понимание."
+        "limitMessage": "В настоящее время существует {type} {amount} {symbol} для моста, обеспечивающая стабильность и безопасность сети {Sora}. Мы ценим ваше понимание.",
+        "externalTransferFee": "{network} комиссия {XCM}",
+        "externalTransferFeeTooltip": "Когда вы отправляете транзакцию моста в сеть {network}, из суммы перевода взимается небольшая комиссия."
     },
     "selectRegisteredAsset": {
         "title": "Выбрать токен",
@@ -1179,8 +1182,8 @@
             "action": "Выберите сервисы",
             "dialog": {
                 "title": "Выбор сервисов {Sora} сети",
-                "fiat": "Фиатные значения",
-                "chartsAndActivity": "Графики и активность"
+                "indexer": "Индексатор",
+                "useCeres": "Использовать {Ceres} для получения фиатных значений"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Введите имя",
             "present": "Уже присутствует",
             "saveChanges": "Сохранить изменения"
-        }
+        },
+        "input": "Введите адрес или выберите контакт",
+        "selectContact": "Выберите контакт"
     },
     "browserPermission": {
         "title": "Разрешите доступ к камере в настройках браузера",

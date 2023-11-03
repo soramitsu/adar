@@ -91,6 +91,8 @@ export const ObjectInit = () => null;
 
 export const ZeroStringValue = '0';
 
+export const ApproximateSign = '~';
+
 export const MetamaskCancellationCode = 4001;
 
 export const DefaultSlippageTolerance = '0.5';
@@ -157,10 +159,12 @@ export enum Components {
   SelectLanguageDialog = 'App/Settings/Language/SelectLanguageDialog',
   AppFooter = 'App/Footer/AppFooter',
   AppDisclaimer = 'App/Header/AppDisclaimer',
+  SelectIndexer = 'App/Footer/Indexer/SelectIndexer',
   StatisticsDialog = 'App/Footer/StatisticsDialog',
   SelectNodeDialog = 'App/Footer/SelectNodeDialog',
   SelectNode = 'App/Footer/Node/SelectNode',
   NodeInfo = 'App/Footer/Node/NodeInfo',
+  IndexerInfo = 'App/Footer/Indexer/IndexerInfo',
   // SORA Card
   Dashboard = 'pages/SoraCard/Dashboard/Dashboard',
   BalanceIndicator = 'pages/SoraCard/common/BalanceIndicator',
@@ -169,6 +173,7 @@ export enum Components {
   ConfirmationInfo = 'pages/SoraCard/ConfirmationInfo',
   TermsAndConditions = 'pages/SoraCard/steps/TermsAndConditions',
   ToSDialog = 'pages/SoraCard/steps/ToSDialog',
+  SelectCountryDialog = 'pages/SoraCard/steps/SelectCountryDialog',
   Phone = 'pages/SoraCard/steps/Phone',
   Email = 'pages/SoraCard/steps/Email',
   Payment = 'pages/SoraCard/steps/Payment',
@@ -216,7 +221,6 @@ export enum Components {
   WalletAboutNetworkDialog = 'pages/Wallet/AboutNetworkDialog',
   // Shared
   GenericPageHeader = 'shared/GenericPageHeader',
-  ExternalLink = 'shared/ExternalLink',
   TokensRow = 'shared/TokensRow',
   PairTokenLogo = 'shared/PairTokenLogo',
   PriceChange = 'shared/PriceChange',
@@ -224,14 +228,12 @@ export enum Components {
   TransactionDetails = 'shared/TransactionDetails',
   PoolInfo = 'shared/PoolInfo',
   Widget = 'shared/Widget',
-  SyntheticSwitcher = 'shared/SyntheticSwitcher',
   // Shared Buttons
   SortButton = 'shared/Button/SortButton',
   SvgIconButton = 'shared/Button/SvgIconButton/SvgIconButton',
   // Shared Input
   TokenInput = 'shared/Input/TokenInput',
   TokenSelectButton = 'shared/Input/TokenSelectButton',
-  TokenSelectDropdown = 'shared/Input/TokenSelectDropdown', // Not used
   // Shared Dialogs
   ConfirmBridgeTransactionDialog = 'shared/Dialog/ConfirmBridgeTransaction',
   NetworkFeeWarningDialog = 'shared/Dialog/NetworkFeeWarning',
