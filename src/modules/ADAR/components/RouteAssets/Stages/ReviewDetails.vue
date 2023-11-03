@@ -46,6 +46,13 @@
         </div>
         <s-divider />
         <div class="field">
+          <div class="field__label">{{ t('swap.liquidityProviderFee') }}</div>
+          <div class="field__value">
+            {{ formatNumber(maxInputAmount.totalLiquidityProviderFee) }} <token-logo class="token-logo" :token="xor" />
+          </div>
+        </div>
+        <s-divider />
+        <div class="field">
           <div class="field__label">
             {{ t('adar.routeAssets.stages.reviewDetails.priceImpact', { priceImpact: priceImpactPercent }) }}
           </div>

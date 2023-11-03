@@ -233,11 +233,26 @@ const actions = defineActions({
     const inputAmountAsset = asset || getters.inputToken;
     const recipientsData = getters.recipientsGroupedByToken(inputAmountAsset);
     try {
-      const totalAmount = recipientsData.reduce((acc, item) => {
-        const { amountFrom } = getAmountAndDexId(context, inputAmountAsset, item.asset, item.usdSwap);
-        return acc.add(amountFrom);
-      }, FPNumber.ZERO);
-      commit.updateMaxInputAmount({ amount: totalAmount, assetSymbol: inputAmountAsset.symbol.toLowerCase() });
+      const totalAmountData = recipientsData.reduce(
+        (acc, item) => {
+          const { amountFrom, liquidityProviderFee } = getAmountAndDexId(
+            context,
+            inputAmountAsset,
+            item.asset,
+            item.usdSwap
+          );
+          return {
+            totalAmount: acc.totalAmount.add(amountFrom),
+            liquidityProviderFee: acc.liquidityProviderFee.add(liquidityProviderFee),
+          };
+        },
+        { totalAmount: FPNumber.ZERO, liquidityProviderFee: FPNumber.ZERO }
+      );
+      commit.updateMaxInputAmount({
+        amount: totalAmountData.totalAmount,
+        assetSymbol: inputAmountAsset.symbol.toLowerCase(),
+        totalLiquidityProviderFee: totalAmountData.liquidityProviderFee,
+      });
     } catch (e) {
       console.groupCollapsed('Subscription Error');
       console.dir(e);
@@ -473,7 +488,13 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   const tokenEquivalent = getTokenEquivalent(fiatPriceObject, assetTo, usd);
   const exchangeRate = getAssetUSDPrice(assetTo, fiatPriceObject);
   if (assetFrom.address === assetTo.address)
-    return { amountFrom: tokenEquivalent, amountTo: tokenEquivalent, exchangeRate, bestDexId: 0 };
+    return {
+      amountFrom: tokenEquivalent,
+      amountTo: tokenEquivalent,
+      liquidityProviderFee: FPNumber.ZERO,
+      exchangeRate,
+      bestDexId: 0,
+    };
   const subscription = getters.subscriptions.find((sub) => sub.assetAddress === assetTo.address);
   if (!subscription?.swapQuote) {
     throw new Error('Subscription did not found');
@@ -481,7 +502,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   const { swapQuote } = subscription;
   const {
     dexId,
-    result: { amount },
+    result: { amount, fee },
   } = swapQuote(
     assetFrom.address,
     assetTo.address,
@@ -492,6 +513,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   return {
     amountFrom: FPNumber.fromCodecValue(amount),
     amountTo: tokenEquivalent,
+    liquidityProviderFee: FPNumber.fromCodecValue(fee),
     exchangeRate,
     bestDexId: dexId,
   };

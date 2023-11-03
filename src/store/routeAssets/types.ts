@@ -61,11 +61,13 @@ export type MaxInputAmount = {
   assetSymbol: string;
   amount: FPNumber;
   updateDate: Date;
+  totalLiquidityProviderFee: FPNumber;
 };
 
 export type MaxInputAmountInfo = {
   totalAmount: FPNumber;
   totalAmountWithFee: FPNumber;
+  totalLiquidityProviderFee: FPNumber;
   asetSymbol: string;
 };
 
