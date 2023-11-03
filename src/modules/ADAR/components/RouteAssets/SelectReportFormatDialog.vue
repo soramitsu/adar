@@ -42,14 +42,20 @@ export default class SelectReportFormatDialog extends Mixins(mixins.TransactionM
     return this.inputFile?.name.split('.csv')[0];
   }
 
-  readonly initialFileName = `ADAR-${this.formatDate(new Date().getTime(), 'D_MMM_YY')}`;
+  readonly datetime = this.formatDate(new Date().getTime(), 'D-MMM-YYYY--HH-mm-ss');
+
+  readonly initialFileName = `ADAR--${this.datetime}`;
 
   reportFileName = this.initialFileName;
 
   options: string[] = [];
 
   mounted() {
-    this.options.push(this.initialFileName, `ADAR-${this.inputFileName}`);
+    this.options.push(
+      this.initialFileName,
+      `ADAR--${this.inputFileName}`,
+      `ADAR--${this.inputFileName}--${this.datetime}`
+    );
   }
 
   onPDFSelect() {
@@ -91,10 +97,12 @@ export default class SelectReportFormatDialog extends Mixins(mixins.TransactionM
   .options-container {
     margin-top: $inner-spacing-mini;
     display: flex;
+    flex-direction: column;
     gap: 8px;
     font-size: var(--s-font-size-mini);
     > span {
       cursor: pointer;
+      text-align: start;
       opacity: 0.7;
       &::before {
         content: '•';
