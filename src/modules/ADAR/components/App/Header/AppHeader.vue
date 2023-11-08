@@ -1,7 +1,12 @@
 <template>
   <header class="adar-header">
     <s-button class="app-menu-button" type="action" primary icon="basic-more-horizontal-24" @click="toggleMenu" />
-    <app-logo-button class="app-logo--header" responsive :theme="libraryTheme" @click="goTo(PageNames.Swap)" />
+    <app-logo-button
+      class="app-logo--header"
+      responsive
+      :theme="libraryTheme"
+      @click="goTo(AdarPageNames.RouteAssets)"
+    />
     <route-assets-navigation v-if="showRouteAssetsNavigation" class="s-flex route-assets-navigation" />
     <div class="s-flex">
       <balance-widget class="balance-widget" />
@@ -13,18 +18,15 @@
 </template>
 
 <script lang="ts">
-import { XOR, ETH } from '@sora-substrate/util/build/assets/consts';
-import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
-import AppAccountButton from '@/components/App/Header/AppAccountButton.vue';
 import AppLogoButton from '@/components/App/Header/AppLogoButton.vue';
 import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-import { PageNames, Components, BreakpointClass } from '@/consts';
-import { AdarComponents } from '@/modules/ADAR/consts';
+import { Components } from '@/consts';
+import { AdarComponents, AdarPageNames } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent, goTo } from '@/router';
-import { getter, state } from '@/store/decorators';
+import { getter } from '@/store/decorators';
 
 import AppHeaderMenu from './AppHeaderMenu.vue';
 
@@ -32,55 +34,24 @@ import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
 
 @Component({
   components: {
-    AppAccountButton,
     AppHeaderMenu,
     AppLogoButton,
     SelectLanguageDialog: lazyComponent(Components.SelectLanguageDialog),
-    PairTokenLogo: lazyComponent(Components.PairTokenLogo),
     RouteAssetsNavigation: adarLazyComponent(AdarComponents.RouteAssetsNavigation),
     BalanceWidget: adarLazyComponent(AdarComponents.BalanceWidget),
-    TokenLogo: components.TokenLogo,
-    WalletAvatar: components.WalletAvatar,
   },
 })
 export default class AppHeader extends Mixins(WalletConnectMixin) {
-  readonly PageNames = PageNames;
-  readonly xor = XOR;
-  readonly eth = ETH;
+  readonly AdarPageNames = AdarPageNames;
 
   @Prop({ type: Boolean, default: false }) readonly loading!: boolean;
-
-  @state.settings.screenBreakpointClass private screenBreakpointClass!: BreakpointClass;
 
   @getter.libraryTheme libraryTheme!: Theme;
 
   goTo = goTo;
 
-  get isMobile(): boolean {
-    return this.screenBreakpointClass === BreakpointClass.Mobile;
-  }
-
-  get isAnyMobile(): boolean {
-    return this.isMobile || this.screenBreakpointClass === BreakpointClass.LargeMobile;
-  }
-
-  get nodeLogo() {
-    return {
-      size: WALLET_CONSTS.LogoSize.MEDIUM,
-      tokenSymbol: XOR.symbol,
-    };
-  }
-
   get showRouteAssetsNavigation() {
     return this.$route.path.includes('route-assets');
-  }
-
-  get fiatBtnType(): string {
-    return this.isAnyMobile ? 'action' : 'tertiary';
-  }
-
-  get fiatBtnSize(): string {
-    return this.isAnyMobile ? 'mini' : 'small';
   }
 
   toggleMenu(): void {
