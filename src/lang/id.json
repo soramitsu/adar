@@ -305,7 +305,8 @@
         "viewIn": "Lihat di {explorer}",
         "referrer": "Perujuk",
         "referral": "Rujukan",
-        "adarTxDetailsTitle": "Rincian transaksi"
+        "adarTxDetailsTitle": "Rincian transaksi",
+        "comment": "Komentar"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Ubah jaringan di {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Salin alamat jaringan",
         "soraAddress": "{Sora} alamat",
         "ethereumAddress": "{Ethereum} alamat",
-        "limitMessage": "Saat ini, ada {type} {amount} {symbol} untuk menjembatani guna memastikan stabilitas dan keamanan Jaringan {Sora} . Kami menghargai pengertian Anda."
+        "limitMessage": "Saat ini, ada {type} {amount} {symbol} untuk menjembatani guna memastikan stabilitas dan keamanan Jaringan {Sora} . Kami menghargai pengertian Anda.",
+        "externalTransferFee": "biaya {network} {XCM}",
+        "externalTransferFeeTooltip": "Saat Anda mengirim transaksi jembatan ke jaringan {network} , sedikit biaya akan diambil dari jumlah yang Anda transfer"
     },
     "selectRegisteredAsset": {
         "title": "Pilih token",
@@ -1179,8 +1182,8 @@
             "action": "Pilih layanan",
             "dialog": {
                 "title": "{Sora} Pemilihan layanan jaringan",
-                "fiat": "Nilai Fiat",
-                "chartsAndActivity": "Bagan & Aktivitas"
+                "indexer": "Pengindeks",
+                "useCeres": "Gunakan {Ceres} untuk nilai fiat"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Masukkan nama",
             "present": "Sudah hadir",
             "saveChanges": "Simpan perubahan"
-        }
+        },
+        "input": "Masukkan alamat atau pilih kontak",
+        "selectContact": "Pilih kontak"
     },
     "browserPermission": {
         "title": "Izinkan akses kamera di setelan browser",

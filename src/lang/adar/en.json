@@ -1,178 +1,184 @@
 {
-    "adar": {
-        "disclaimerTitle": "Disclaimer",
-        "disclaimer": "The token swap functionality on ADAR Technologies Inc’s website is powered by  the Polkaswap website (www.polkaswap.io) which is not maintained by us and is maintained by the SORA community. Therefore, in addition to our terms {adarTS} {adarPrivacy}, the terms of Polkaswap apply mutatis mutandis.  The terms of Polkaswap are available at {polkaswapFaqLink}, {memorandumLink}, and {privacyLink} ",
-        "routeAssets": {
-            "continue": "Continue",
-            "cancelProcessing": "Cancel processing",
-            "cancel": "cancel",
-            "back": "back",
-            "total": "total",
-            "name": "name",
-            "wallet": "wallet",
-            "usd": "usd",
-            "asset": "asset",
-            "status": "status",
-            "recipients": "Recipients",            
-            "totalUsdToRoute": "total usd to be routed",
-            "totalTokensRequired": "total tokens required",
-            "inputAsset": "input asset",
-            "stagesNames": {
-                "authorize": "Authorize",
-                "done": "Done",
-                "processTemplate": "Process template",
-                "reviewDetails": "Review Details",
-                "routing": "Routing",
-                "transactionOverview": "Transaction overview",
-                "uploadTemplate": "Upload template"
-            },
-            "stages": {
-                "uploadTemplate": {
-                    "title": "Upload Routing Template for processing",
-                    "description": "Upload your Process Routing Template as a .CSV file",
-                    "instruction": "Drop your completed process routing template or click to upload",
-                    "typesInfo": "Supported file types: CSV",
-                    "uploadButtonTitle": "upload",
-                    "templateHelp": "Dont have a template?",
-                    "download": "Download",
-                    "parcingError": {
-                        "title": "The .csv file couldn’t be parsed.",
-                        "description": "Please, upload new file or re-start the process.",
-                        "buttonTitle": "Re-start process"
-                    }
-                },
-                "processTemplate": {
-                    "recipients": "Recipients",
-                    "assets": "Assets",
-                    "usd": "usd equivalent",
-                    "wallets": "wallets",
-                    "amount": "ESTIMATED AMOUNTS",
-                    "calculated": "calculated",
-                    "issues": "issues found",
-                    "payeers": "payeers",
-                    "processing": "processing",
-                    "waiting": "waiting",
-                    "title": "Process routing template",
-                    "description": "Our system is processing your uploaded Routing Template",
-                    "fixButton": "fix issues"
-                },
-                "transactionOverview": {
-                    "title": "transaction overview",
-                    "amount": "in tokens"
-                },
-                "reviewDetails": {
-                    "title": "Review Routing Details",
-                    "description": "Review the details of your routing transaction",
-                    "asset": "input asset",
-                    "adarFee": "estimated adar fee ({adarFee}%)",
-                    "networkFee": "network fee",
-                    "priceImpact": "maximum price impact ({priceImpact}%)",
-                    "feeRequired": "XOR fee required",
-                    "tokensAvailable": "total tokens available",
-                    "remainingAmount": "remaining amount required",
-                    "badBalance": "insufficient funds",
-                    "okBalance": "balance is ok",
-                    "add": "add",
-                    "useTransferTitle": "Available funds will be used",
-                    "routingDetails": {
-                        "title": "Routing Details",
-                        "amount": "Token amount required"
-                    },
-                    "swapless": {
-                        "balance": "balance",
-                        "adarFee": "adar fee",
-                        "amount": "amount",
-                        "required": "tokens required"
-                    }
-
-                },
-                "routing": {
-                    "pending": "Processing the routing transactions...",
-                    "passed": "Transactions are passed",
-                    "success": "Completed",
-                    "failed": "Failed",
-                    "amountText": {
-                        "pending": "total amount to be routed",
-                        "passed": "total amount authorized",
-                        "success": "total amount routed",
-                        "default": "total amount"
-                    }
-                },
-                "done": {
-                    "title": "Review Routing Details",
-                    "description": "Review the details of your routing transaction",
-                    "failedTransactions": "FAILED TRANSACTIONS",
-                    "rerun": "re-run failed transactions",
-                    "finishAnyway": "Re-run doesn’t help? Finish routing anyway",
-                    "pdfButton": "download report",
-                    "finish": "finish",
-                    "routingDetails": {
-                        "title": "Routing Details",
-                        "amount": "Token amount routed",
-                        "status": {
-                            "status": "status",
-                            "success": "routed",
-                            "pending": "pending",                            
-                            "passed": "passed",
-                            "failed": "failed"
-                        }
-                    }
-
-                }
-            },
-            "dialogs": {
-                "fixIssuesDialog": {
-                    "title": "Fix or remove issues",
-                    "issue": "Issue",
-                    "recipient": "recipient",
-                    "wallets": "wallets",
-                    "walletAddress": "wallet address",
-                    "fieldStatusCorrect": "correct",
-                    "fieldStatusIncorrect": "incorrect",
-                    "usd": "usd number",
-                    "assets": "Assets",
-                    "estimatedAmount": "estimated amount",
-                    "amount": "amount",
-                    "fixButton": "fix issue",
-                    "deleteButton": "delete recipient",
-                    "usdError": "Should be a number",
-                    "amountError": "Token price hasn't been found"
-                },
-                "selectInputAssetDialog": {
-                    "title": "Select an input asset",
-                    "totalUsd": "total usd to be routed",
-                    "estimatedToken": "estimated {assetName} required",
-                    "description": "Select an asset you want to work with"
-                },
-                "reportDialog": {
-                    "title": "Select report file format",
-                    "description": "Please, upload new file or re-start the process.",
-                    "pdf": "pdf",
-                    "csv": "csv"
-                },
-                "failedTransactionDialog": {
-                    "title": "Failed transactions",
-                    "rerunButton": "re-run all"
-                },
-                "finishAnywayDialog": {
-                    "title": "Confirm finishing routing despite transaction issues",
-                    "description": "If there is a certain transaction issue and re-running it doesn’t help, you can finish the routing process despite transaction issues.",
-                    "confirmButton": "I confirm, finish routing"
-                }
-            },
-            "txStatus": {
-                "status": "status",
-                "success": "success",
-                "pending": "pending",                  
-                "passed": "passed",
-                "failed": "failed",
-                "addressValid": "address valid",
-                "addressInvalid": "address Invalid"
-            }
+  "adar": {
+    "disclaimerTitle": "Disclaimer",
+    "disclaimer": "The token swap functionality on ADAR Technologies Inc’s website is powered by  the Polkaswap website (www.polkaswap.io) which is not maintained by us and is maintained by the SORA community. Therefore, in addition to our terms {adarTS} {adarPrivacy}, the terms of Polkaswap apply mutatis mutandis.  The terms of Polkaswap are available at {polkaswapFaqLink}, {memorandumLink}, and {privacyLink} ",
+    "routeAssets": {
+      "continue": "Continue",
+      "cancelProcessing": "Cancel processing",
+      "cancel": "cancel",
+      "back": "back",
+      "total": "total",
+      "name": "name",
+      "wallet": "wallet",
+      "usd": "usd",
+      "asset": "asset",
+      "status": "status",
+      "recipients": "Recipients",
+      "totalUsdToRoute": "total usd to be routed",
+      "totalTokensRequired": "total tokens required",
+      "inputAsset": "input asset",
+      "stagesNames": {
+        "authorize": "Authorize",
+        "done": "Done",
+        "processTemplate": "Process template",
+        "reviewDetails": "Review Details",
+        "routing": "Routing",
+        "transactionOverview": "Transaction overview",
+        "uploadTemplate": "Upload template"
+      },
+      "stages": {
+        "uploadTemplate": {
+          "title": "Upload Routing Template for processing",
+          "description": "Upload your Process Routing Template as a .CSV file",
+          "instruction": "Drop your completed process routing template or click to upload",
+          "typesInfo": "Supported file types: CSV",
+          "uploadButtonTitle": "upload",
+          "templateHelp": "Dont have a template?",
+          "download": "Download",
+          "parcingError": {
+            "title": "The .csv file couldn’t be parsed.",
+            "description": "Please, upload new file or re-start the process.",
+            "buttonTitle": "Re-start process"
+          }
         },
-        "about": {
-            "description": "ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis.",
-            "learnMore": "Learn More"
+        "processTemplate": {
+          "recipients": "Recipients",
+          "assets": "Assets",
+          "usd": "usd equivalent",
+          "wallets": "wallets",
+          "amount": "ESTIMATED AMOUNTS",
+          "calculated": "calculated",
+          "issues": "issues found",
+          "payeers": "payeers",
+          "processing": "processing",
+          "waiting": "waiting",
+          "title": "Process routing template",
+          "description": "Our system is processing your uploaded Routing Template",
+          "fixButton": "fix issues"
+        },
+        "transactionOverview": {
+          "title": "transaction overview",
+          "amount": "in tokens"
+        },
+        "reviewDetails": {
+          "title": "Review Routing Details",
+          "description": "Review the details of your routing transaction",
+          "asset": "input asset",
+          "adarFee": "estimated adar fee ({adarFee}%)",
+          "networkFee": "network fee",
+          "priceImpact": "maximum price impact ({priceImpact}%)",
+          "feeRequired": "XOR fee required",
+          "tokensAvailable": "total tokens available",
+          "remainingAmount": "remaining amount required",
+          "badBalance": "insufficient funds",
+          "okBalance": "balance is ok",
+          "add": "add",
+          "useTransferTitle": "Available funds will be used",
+          "routingDetails": {
+            "title": "Routing Details",
+            "amount": "Token amount required"
+          },
+          "swapless": {
+              "balance": "balance",
+              "adarFee": "adar fee",
+              "amount": "amount",
+              "required": "tokens required"
+          }
+        },
+        "routing": {
+          "pending": "Processing the routing transactions...",
+          "passed": "Transactions are passed",
+          "success": "Completed",
+          "failed": "Failed",
+          "amountText": {
+            "pending": "total amount to be routed",
+            "passed": "total amount authorized",
+            "success": "total amount routed",
+            "default": "total amount"
+          }
+        },
+        "done": {
+          "title": "Review Routing Details",
+          "description": "Review the details of your routing transaction",
+          "failedTransactions": "FAILED TRANSACTIONS",
+          "rerun": "re-run failed transactions",
+          "finishAnyway": "Re-run doesn’t help? Finish routing anyway",
+          "pdfButton": "download report",
+          "finish": "finish",
+          "routingDetails": {
+            "title": "Routing Details",
+            "amount": "Token amount routed",
+            "status": {
+              "status": "status",
+              "success": "routed",
+              "pending": "pending",
+              "passed": "passed",
+              "failed": "failed"
+            }
+          },
+          "report": {
+            "exchangeRate": "Rate",
+            "transactionId": "Transaction Id",
+            "blockNumber": "Block Number",
+            "blockId": "Block Id",
+            "senderWallet": "Sender wallet",
+            "datetime": "Datetime"
+          }
         }
+      },
+      "dialogs": {
+        "fixIssuesDialog": {
+          "title": "Fix or remove issues",
+          "issue": "Issue",
+          "recipient": "recipient",
+          "wallets": "wallets",
+          "walletAddress": "wallet address",
+          "fieldStatusCorrect": "correct",
+          "fieldStatusIncorrect": "incorrect",
+          "usd": "usd number",
+          "assets": "Assets",
+          "estimatedAmount": "estimated amount",
+          "amount": "amount",
+          "fixButton": "fix issue",
+          "deleteButton": "delete recipient",
+          "usdError": "Should be a number",
+          "amountError": "Token price hasn't been found"
+        },
+        "selectInputAssetDialog": {
+          "title": "Select an input asset",
+          "totalUsd": "total usd to be routed",
+          "estimatedToken": "estimated {assetName} required",
+          "description": "Select an asset you want to work with"
+        },
+        "reportDialog": {
+          "title": "Select report file format",
+          "description": "Please, upload new file or re-start the process.",
+          "pdf": "pdf",
+          "csv": "csv"
+        },
+        "failedTransactionDialog": {
+          "title": "Failed transactions",
+          "rerunButton": "re-run all"
+        },
+        "finishAnywayDialog": {
+          "title": "Confirm finishing routing despite transaction issues",
+          "description": "If there is a certain transaction issue and re-running it doesn’t help, you can finish the routing process despite transaction issues.",
+          "confirmButton": "I confirm, finish routing"
+        }
+      },
+      "txStatus": {
+        "status": "status",
+        "success": "success",
+        "pending": "pending",
+        "passed": "passed",
+        "failed": "failed",
+        "addressValid": "address valid",
+        "addressInvalid": "address Invalid"
+      }
+    },
+    "about": {
+      "description": "ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis.",
+      "learnMore": "Learn More"
     }
+  }
 }

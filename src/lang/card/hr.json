@@ -21,9 +21,11 @@
         },
         "okReadyText": "OK, spreman sam",
         "emailPlaceholder": "E-mail",
+        "noSpamText": "Bez spama! Samo da osigurate svoj račun",
         "sendCodeBtn": "Pošalji SMS kod",
         "firstNamePlaceholder": "Ime",
         "lastNamePlaceholder": "Prezime",
+        "verificationCodeText": "Primit ćete kontrolni kod putem SMS-a",
         "phonePlaceholder": "Broj telefona",
         "statusPendingTitle": "Provjera u tijeku",
         "sendEmailLinkBtn": "Pošalji link",
@@ -69,6 +71,7 @@
         "reIssuanceFee": "0 € godišnja naknada za uslugu",
         "freeCardIssuance": "Besplatno izdavanje kartice",
         "loginBtn": "Prijavite se ili Prijavite se",
+        "applicationFee": "€ {0} naknada za izdavanje",
         "telegramSupport": "Telegram podrška",
         "rejectionPriceAttemptDisclaimer": "Svaki drugi pokušaj koštat će vas € {0}",
         "rejectCount": "Imate još {count} besplatni pokušaj KYC| |Imate još {count} besplatnih pokušaja KYC",
@@ -89,6 +92,13 @@
         "cardhub": {
             "accountInfo": "Informacije o računu"
         },
-        "attentionText": "Pažnja"
+        "attentionText": "Pažnja",
+        "or": "ili",
+        "oneTimeApplicationFee": "Jednokratna naknada za izdavanje kartice",
+        "applicationFeeNote": "Napomena: izdavanje plaćene kartice bit će dostupno naknadno.",
+        "statusRejectReasonMultiple": "Vaša prijava je odbijena iz više razloga:",
+        "selectCountryText": "Izaberite svoju zemlju",
+        "filterCountries": "Filtrirajte po zemlji ili pozivnom broju",
+        "ibanPendingDesc": "Vaše izdavanje IBAN-a je na čekanju.\n U slučaju čekanja dužeg od 72h kontaktirajte nas putem {email}"
     }
 }

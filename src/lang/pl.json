@@ -305,7 +305,8 @@
         "viewIn": "Pokaż w {explorer}",
         "referrer": "Osoba polecająca",
         "referral": "Kod polecający",
-        "adarTxDetailsTitle": "Szczegóły transakcji"
+        "adarTxDetailsTitle": "Szczegóły transakcji",
+        "comment": "Komentarz"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Zmień sieć w portfelu {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Skopiuj adres sieciowy",
         "soraAddress": "{Sora} adres",
         "ethereumAddress": "{Ethereum} adres",
-        "limitMessage": "Obecnie istnieje {type} {amount} {symbol} do mostkowania, aby zapewnić stabilność i bezpieczeństwo sieci {Sora} . Doceniamy twoje zrozumienie."
+        "limitMessage": "Obecnie istnieje {type} {amount} {symbol} do mostkowania, aby zapewnić stabilność i bezpieczeństwo sieci {Sora} . Doceniamy twoje zrozumienie.",
+        "externalTransferFee": "Opłata {network} {XCM}",
+        "externalTransferFeeTooltip": "Kiedy wysyłasz transakcję pomostową do sieci {network} , od kwoty przelewu pobierana jest niewielka opłata"
     },
     "selectRegisteredAsset": {
         "title": "Wybierz token",
@@ -1179,8 +1182,8 @@
             "action": "Wybierz usługi",
             "dialog": {
                 "title": "{Sora} Wybór usługi sieciowej",
-                "fiat": "wartości Fiata",
-                "chartsAndActivity": "Wykresy i aktywność"
+                "indexer": "Indeksator",
+                "useCeres": "Użyj {Ceres} dla wartości fiat"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Wprowadź imię",
             "present": "Już obecny",
             "saveChanges": "Zapisz zmiany"
-        }
+        },
+        "input": "Wprowadź adres lub wybierz kontakt",
+        "selectContact": "Wybierz kontakt"
     },
     "browserPermission": {
         "title": "Zezwól na dostęp do aparatu w ustawieniach przeglądarki",

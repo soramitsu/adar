@@ -5,17 +5,11 @@ import { defineGetters } from 'direct-vuex';
 
 import { ZeroStringValue } from '@/consts';
 import { bridgeGetterContext } from '@/store/bridge';
+import { formatSubAddress } from '@/utils/bridge/sub/utils';
 
 import type { BridgeState } from './types';
 import type { IBridgeTransaction, CodecString } from '@sora-substrate/util';
 import type { RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
-
-// [TECH] move to js-lib
-function formatSubAddress(address: string, ss58: number): string {
-  const publicKey = decodeAddress(address, false);
-
-  return encodeAddress(publicKey, ss58);
-}
 
 const getters = defineGetters<BridgeState>()({
   asset(...args): Nullable<RegisteredAccountAsset> {
@@ -137,10 +131,6 @@ const getters = defineGetters<BridgeState>()({
     } else {
       return state.isSoraToEvm ? Operation.SubstrateOutgoing : Operation.SubstrateIncoming;
     }
-  },
-  soraNetworkFee(...args): CodecString {
-    const { getters, rootState } = bridgeGetterContext(args);
-    return rootState.wallet.settings.networkFees[getters.operation] ?? ZeroStringValue;
   },
   externalNetworkFee(...args): CodecString {
     const { state, getters } = bridgeGetterContext(args);

@@ -21,9 +21,11 @@
         },
         "okReadyText": "OK, som pripravený",
         "emailPlaceholder": "Email",
+        "noSpamText": "Žiadny spam! Iba na zabezpečenie vášho účtu",
         "sendCodeBtn": "Pošlite SMS kód",
         "firstNamePlaceholder": "Krstné meno",
         "lastNamePlaceholder": "Priezvisko",
+        "verificationCodeText": "Dostanete overovací kód prostredníctvom SMS",
         "phonePlaceholder": "Telefónne číslo",
         "statusPendingTitle": "Prebieha overovanie",
         "sendEmailLinkBtn": "Odoslať odkaz",
@@ -69,6 +71,7 @@
         "reIssuanceFee": "0 € ročný servisný poplatok",
         "freeCardIssuance": "Bezplatné vydanie karty",
         "loginBtn": "Prihláste sa alebo sa zaregistrujte",
+        "applicationFee": "Poplatok za vydanie {0} €",
         "telegramSupport": "Podpora telegramov",
         "rejectionPriceAttemptDisclaimer": "Každý ďalší pokus vás bude stáť {0} €",
         "rejectCount": "Máte ešte {count} bezplatný pokus o KYC| | |Máte ešte {count} bezplatné pokusy o KYC",
@@ -89,6 +92,13 @@
         "cardhub": {
             "accountInfo": "Informácie o účte"
         },
-        "attentionText": "Pozornosť"
+        "attentionText": "Pozornosť",
+        "or": "alebo",
+        "oneTimeApplicationFee": "Jednorazový poplatok za vydanie karty",
+        "applicationFeeNote": "Poznámka: Vydanie platenej karty bude k dispozícii neskôr.",
+        "statusRejectReasonMultiple": "Vaša žiadosť bola zamietnutá z viacerých dôvodov:",
+        "selectCountryText": "Vyber svoju krajinu",
+        "filterCountries": "Filtrovať podľa krajiny alebo kódového čísla",
+        "ibanPendingDesc": "Čaká sa na vydanie vášho čísla IBAN.\n V prípade čakania dlhšieho ako 72 hodín nás kontaktujte na {email}"
     }
 }
