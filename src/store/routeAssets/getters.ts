@@ -119,15 +119,16 @@ const getters = defineGetters<RouteAssetsState>()({
       ).map((assetArray: Array<Recipient>) => {
         const reduceData = assetArray.reduce(
           (acc, item) => {
+            const swapless = item.useTransfer && item.asset.address !== token.address;
             return {
               usd: new FPNumber(item.usd).add(acc.usd),
-              usdSwap: item.useTransfer ? acc.usdSwap : new FPNumber(item.usd).add(acc.usdSwap),
-              usdTransfer: item.useTransfer ? new FPNumber(item.usd).add(acc.usdTransfer) : acc.usdTransfer,
+              usdSwap: swapless ? acc.usdSwap : new FPNumber(item.usd).add(acc.usdSwap),
+              usdTransfer: swapless ? new FPNumber(item.usd).add(acc.usdTransfer) : acc.usdTransfer,
               total: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.total),
-              totalWithSwap: item.useTransfer
+              totalWithSwap: swapless
                 ? acc.totalWithSwap
                 : (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithSwap),
-              totalWithTransfer: item.useTransfer
+              totalWithTransfer: swapless
                 ? (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalWithTransfer)
                 : acc.totalWithTransfer,
               required: new FPNumber(item.usd).div(getAssetUSDPrice(token, priceObject)).add(acc.required),
@@ -192,7 +193,7 @@ const getters = defineGetters<RouteAssetsState>()({
   outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
     const { getters, rootState } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipients
-      .filter((item) => item.useTransfer)
+      .filter((item) => item.useTransfer && item.asset.address !== getters.inputToken.address)
       .map((item) => ({ symbol: item.asset.symbol, ...item }));
     return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
       const reduceData = assetArray.reduce(
