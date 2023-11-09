@@ -52,12 +52,12 @@ import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import axiosInstance, { updateBaseUrl, getFullBaseUrl } from '@/api';
 import AppFooter from '@/components/App/Footer/AppFooter.vue';
-import AppHeader from '@/components/App/Header/AppHeader.vue';
 import AppMenu from '@/components/App/Menu/AppMenu.vue';
 import NodeErrorMixin from '@/components/mixins/NodeErrorMixin';
 import SoraLogo from '@/components/shared/Logo/Sora.vue';
 import { PageNames, Components, Language, BreakpointClass, Breakpoint } from '@/consts';
 import { getLocale } from '@/lang';
+import AppHeader from '@/modules/ADAR/components/App/Header/AppHeader.vue';
 import router, { goTo, lazyComponent } from '@/router';
 import { action, getter, mutation, state } from '@/store/decorators';
 import { preloadFontFace, updateDocumentTitle } from '@/utils';
