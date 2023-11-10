@@ -226,7 +226,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, 18);
   }
 
-  getRecipientTransferAmount(address: string, assetAddress: string) {
+  getRecipientTransferAmount(address: string, assetAddress: string): string {
     const formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
     return new FPNumber(
       this.txHistoryDataTransfers.find((item) => item.to === formattedAddress && item.assetId === assetAddress)
