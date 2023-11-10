@@ -226,9 +226,12 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, 18);
   }
 
-  getRecipientTransferAmount(address: string) {
+  getRecipientTransferAmount(address: string, assetAddress: string): string {
     const formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
-    return new FPNumber(this.txHistoryDataTransfers.find((item) => item.to === formattedAddress)?.amount ?? '0')
+    return new FPNumber(
+      this.txHistoryDataTransfers.find((item) => item.to === formattedAddress && item.assetId === assetAddress)
+        ?.amount ?? '0'
+    )
       .dp(4)
       .toLocaleString();
   }
@@ -271,7 +274,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         recipient.usd.dp(2).toLocaleString(),
         recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
-        this.getRecipientTransferAmount(recipient.wallet),
+        this.getRecipientTransferAmount(recipient.wallet, recipient.asset.address),
         recipient.amountInTokens || recipient.useTransfer ? '-' : recipient.exchangeRate || '',
         recipient.status.toString(),
       ];
