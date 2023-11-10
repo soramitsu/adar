@@ -49,7 +49,7 @@ async function goTo(name: PageNames | AdarPageNames): Promise<void> {
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    redirect: '/swap',
+    redirect: '/route-assets',
   },
   {
     path: '/swap/:first?/:second?',
