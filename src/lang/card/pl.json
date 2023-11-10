@@ -21,9 +21,11 @@
         },
         "okReadyText": "Ok, jestem gotowy",
         "emailPlaceholder": "E-mail",
+        "noSpamText": "Bez spamu! Tylko w celu zabezpieczenia Twojego konta",
         "sendCodeBtn": "Wyślij kod SMS",
         "firstNamePlaceholder": "Imię",
         "lastNamePlaceholder": "Nazwisko",
+        "verificationCodeText": "Otrzymasz kod weryfikacyjny SMS-em",
         "phonePlaceholder": "Numer telefonu",
         "statusPendingTitle": "Trwa weryfikacja",
         "sendEmailLinkBtn": "Wyślij link",
@@ -69,6 +71,7 @@
         "reIssuanceFee": "Roczna opłata za usługę 0 €",
         "freeCardIssuance": "Bezpłatne wydanie karty",
         "loginBtn": "Zaloguj się albo Zarejestruj",
+        "applicationFee": "€ {0} opłata za wydanie",
         "telegramSupport": "Wsparcie telegramu",
         "rejectionPriceAttemptDisclaimer": "Każda inna próba będzie kosztować € {0}",
         "rejectCount": "Masz jeszcze {count} darmową próbę KYC| | |Masz jeszcze {count} darmowe próby KYC",
@@ -89,6 +92,13 @@
         "cardhub": {
             "accountInfo": "informacje o koncie"
         },
-        "attentionText": "Uwaga"
+        "attentionText": "Uwaga",
+        "or": "Lub",
+        "oneTimeApplicationFee": "Opłata jednorazowa za wydanie karty",
+        "applicationFeeNote": "Uwaga: wydawanie kart płatnych będzie możliwe w późniejszym terminie.",
+        "statusRejectReasonMultiple": "Twój wniosek został odrzucony z wielu powodów:",
+        "selectCountryText": "Wybierz swój kraj",
+        "filterCountries": "Filtruj według kraju lub kodu kierunkowego",
+        "ibanPendingDesc": "Wydanie Twojego numeru IBAN oczekuje na realizację.\n W przypadku, gdy czas oczekiwania będzie dłuższy niż 72 godziny, skontaktuj się z nami za pośrednictwem {email}"
     }
 }

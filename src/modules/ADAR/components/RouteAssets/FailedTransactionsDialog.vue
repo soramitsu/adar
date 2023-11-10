@@ -111,7 +111,7 @@
             </template>
             <template v-slot="{ row }">
               <div>
-                <s-checkbox @input="onUseTransferClick(row.id)" size="small" :value="row.useTransfer" />
+                <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" />
               </div>
             </template>
           </s-table-column>
@@ -394,6 +394,11 @@ export default class FailedTransactionsDialog extends Mixins(
 </style>
 
 <style scoped lang="scss">
+.checkbox-no-actions {
+  cursor: default;
+  pointer-events: none;
+}
+
 .container {
   min-height: auto;
 }

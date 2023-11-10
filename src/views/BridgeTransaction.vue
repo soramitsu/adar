@@ -83,9 +83,17 @@
         :fiat-value="txExternalNetworkFeeFiatValue"
       >
         <template v-if="txExternalNetworkFeePrefix" #info-line-value-prefix>
-          <span class="info-line-value-prefix">~</span>
+          <span class="info-line-value-prefix">{{ ApproximateSign }}</span>
         </template>
       </info-line>
+      <info-line
+        v-if="txExternalTransferFeeNotZero"
+        is-formatted
+        :label="t('bridge.externalTransferFee', { network: externalNetworkName })"
+        :value="txExternalTransferFeeFormatted"
+        :asset-symbol="assetSymbol"
+        :fiat-value="txExternalTransferFeeFiatValue"
+      />
 
       <div v-if="txSoraHash" class="transaction-hash-container transaction-hash-container--with-dropdown">
         <s-input
@@ -189,7 +197,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 import BridgeMixin from '@/components/mixins/BridgeMixin';
 import BridgeTransactionMixin from '@/components/mixins/BridgeTransactionMixin';
 import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
-import { Components, PageNames, ZeroStringValue } from '@/consts';
+import { Components, PageNames, ZeroStringValue, ApproximateSign } from '@/consts';
 import router, { lazyComponent } from '@/router';
 import { action, state, getter, mutation } from '@/store/decorators';
 import { hasInsufficientBalance, hasInsufficientXorForFee, hasInsufficientNativeTokenForFee } from '@/utils';
@@ -219,6 +227,7 @@ export default class BridgeTransaction extends Mixins(
   NetworkFormatterMixin
 ) {
   readonly KnownSymbols = KnownSymbols;
+  readonly ApproximateSign = ApproximateSign;
 
   @state.bridge.externalBlockNumber private externalBlockNumber!: number;
   @state.bridge.waitingForApprove private waitingForApprove!: Record<string, boolean>;
@@ -332,6 +341,22 @@ export default class BridgeTransaction extends Mixins(
     return this.nativeToken ? this.getFiatAmountByCodecString(this.txExternalNetworkFee, this.nativeToken) : null;
   }
 
+  get txExternalTransferFee(): CodecString {
+    return (this.historyItem as SubHistory)?.parachainNetworkFee ?? ZeroStringValue;
+  }
+
+  get txExternalTransferFeeFormatted(): string {
+    return this.formatCodecNumber(this.txExternalTransferFee, this.asset?.externalDecimals);
+  }
+
+  get txExternalTransferFeeNotZero(): boolean {
+    return this.txExternalTransferFee !== ZeroStringValue;
+  }
+
+  get txExternalTransferFeeFiatValue(): Nullable<string> {
+    return this.asset ? this.getFiatAmountByCodecString(this.txExternalTransferFee, this.asset) : null;
+  }
+
   get txId(): Nullable<string> {
     return this.isSoraToEvm ? this.txSoraId : this.txExternalHash;
   }
@@ -345,7 +370,9 @@ export default class BridgeTransaction extends Mixins(
   }
 
   get txSoraHash(): string {
-    return this.historyItem?.hash ?? this.txSoraBlockId;
+    // don't use Sora blockId in incoming direction
+    const blockId = this.isSoraToEvm ? this.txSoraBlockId : '';
+    return this.historyItem?.hash ?? blockId;
   }
 
   get txSoraHashFormatted(): string {
@@ -515,6 +542,12 @@ export default class BridgeTransaction extends Mixins(
 
   get hashCopyTooltip(): string {
     return this.copyTooltip(this.t('bridgeTransaction.transactionHash'));
+  }
+
+  get externalNetworkName(): string {
+    return this.externalNetworkType && this.externalNetworkId
+      ? this.getNetworkName(this.externalNetworkType, this.externalNetworkId)
+      : '';
   }
 
   getNetworkText(key: string, networkId?: Nullable<BridgeNetworkId>): string {

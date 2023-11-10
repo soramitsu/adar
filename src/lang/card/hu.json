@@ -21,9 +21,11 @@
         },
         "okReadyText": "Rendben, készen állok",
         "emailPlaceholder": "Email",
+        "noSpamText": "Nincs spam! Csak a fiók biztonsága érdekében",
         "sendCodeBtn": "SMS kód küldése",
         "firstNamePlaceholder": "Keresztnév",
         "lastNamePlaceholder": "Vezetéknév",
+        "verificationCodeText": "SMS-ben fog kapni egy ellenőrző kódot",
         "phonePlaceholder": "Telefonszám",
         "statusPendingTitle": "Ellenőrzés folyamatban",
         "sendEmailLinkBtn": "Link elküldése",
@@ -69,6 +71,7 @@
         "reIssuanceFee": "0 € éves szolgáltatási díj",
         "freeCardIssuance": "Ingyenes kártyakibocsátás",
         "loginBtn": "Jelentkezzen be vagy Regisztráljon",
+        "applicationFee": "{0} € kibocsátási díj",
         "telegramSupport": "Telegram támogatás",
         "rejectionPriceAttemptDisclaimer": "Minden más próbálkozás {0} €-ba kerül",
         "rejectCount": "Még {count} ingyenes KYC próbálkozása van|Még {count} ingyenes KYC próbálkozása van",
@@ -89,6 +92,13 @@
         "cardhub": {
             "accountInfo": "Számla információ"
         },
-        "attentionText": "Figyelem"
+        "attentionText": "Figyelem",
+        "or": "vagy",
+        "oneTimeApplicationFee": "A kártya kiállításának egyszeri díja",
+        "applicationFeeNote": "Megjegyzés: a fizetős kártya kibocsátása egy későbbi szakaszban lesz elérhető.",
+        "statusRejectReasonMultiple": "Jelentkezését több okból is elutasították:",
+        "selectCountryText": "Válaszd ki az országod",
+        "filterCountries": "Szűrés ország vagy hívószám szerint",
+        "ibanPendingDesc": "Az Ön IBAN-kibocsátása függőben van.\n 72 óránál hosszabb várakozás esetén vegye fel velünk a kapcsolatot a következő címen {email}"
     }
 }

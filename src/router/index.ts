@@ -26,7 +26,7 @@ const lazyView = (name: string) => () => import(`@/views/${name}.vue`);
  * It checks wallet routing, page loading and the current route.
  * if the current route isn't the same as param, then it will wait for `router.push`
  */
-async function goTo(name: PageNames): Promise<void> {
+async function goTo(name: PageNames | AdarPageNames): Promise<void> {
   const current = router.currentRoute.name;
   if (name === PageNames.Wallet) {
     if (!store.getters.wallet.account.isLoggedIn) {
@@ -49,7 +49,7 @@ async function goTo(name: PageNames): Promise<void> {
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    redirect: '/swap',
+    redirect: '/route-assets',
   },
   {
     path: '/swap/:first?/:second?',
@@ -253,7 +253,7 @@ const routes: Array<RouteConfig> = [
   // },
   {
     path: '*',
-    redirect: '/swap',
+    redirect: '/route-assets',
   },
 ];
 

@@ -305,7 +305,8 @@
         "viewIn": "Прикажите у {explorer}",
         "referrer": "Предложилтељ",
         "referral": "Препорука",
-        "adarTxDetailsTitle": "Detalji transakcije"
+        "adarTxDetailsTitle": "Detalji transakcije",
+        "comment": "Коментар"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Промените мрежу у {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Копирајте мрежну адресу",
         "soraAddress": "{Sora} adresa",
         "ethereumAddress": "{Ethereum} adresa",
-        "limitMessage": "Тренутно постоји {type} {amount} {symbol} за премошћавање да би се обезбедила стабилност и безбедност мреже {Sora} . Ценимо ваше разумевање."
+        "limitMessage": "Тренутно постоји {type} {amount} {symbol} за премошћавање да би се обезбедила стабилност и безбедност мреже {Sora} . Ценимо ваше разумевање.",
+        "externalTransferFee": "{network} {XCM} накнада",
+        "externalTransferFeeTooltip": "Када пошаљете бридге трансакцију на мрежу {network} , од износа који преносите узима се мања накнада"
     },
     "selectRegisteredAsset": {
         "title": "Изаберите токен",
@@ -1179,8 +1182,8 @@
             "action": "Изаберите услуге",
             "dialog": {
                 "title": "{Sora} Избор мрежне услуге",
-                "fiat": "Фиат вредности",
-                "chartsAndActivity": "Графикони и активности"
+                "indexer": "Индексер",
+                "useCeres": "Користите {Ceres} за фиат вредности"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Унесите име",
             "present": "Већ присутан",
             "saveChanges": "Сачувај измене"
-        }
+        },
+        "input": "Унесите адресу или изаберите контакт",
+        "selectContact": "Изаберите контакт"
     },
     "browserPermission": {
         "title": "Дозволите приступ камери у подешавањима претраживача",

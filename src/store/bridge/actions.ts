@@ -90,7 +90,7 @@ function bridgeDataToHistoryItem(
   context: ActionContext<any, any>,
   { date = Date.now(), payload = {}, ...params } = {}
 ): IBridgeTransaction {
-  const { getters, state, rootState, rootGetters } = bridgeActionContext(context);
+  const { getters, state, rootState } = bridgeActionContext(context);
   const { isEthBridge, isEvmBridge } = getters;
   const transactionState = isEthBridge ? WALLET_CONSTS.ETH_BRIDGE_STATES.INITIAL : BridgeTxStatus.Pending;
   const externalNetwork = rootState.web3.networkSelected as BridgeNetworkId as any;
@@ -100,7 +100,7 @@ function bridgeDataToHistoryItem(
     ? BridgeNetworkType.Evm
     : BridgeNetworkType.Sub;
 
-  return {
+  const data = {
     type: (params as any).type ?? getters.operation,
     amount: (params as any).amount ?? state.amountSend,
     amount2: (params as any).amount2 ?? state.amountReceived,
@@ -109,13 +109,16 @@ function bridgeDataToHistoryItem(
     startTime: date,
     endTime: date,
     transactionState,
-    soraNetworkFee: (params as any).soraNetworkFee ?? getters.soraNetworkFee,
+    soraNetworkFee: (params as any).soraNetworkFee ?? state.soraNetworkFee,
+    parachainNetworkFee: (params as any).parachainNetworkFee ?? state.externalTransferFee,
     externalNetworkFee: (params as any).externalNetworkFee,
     externalNetwork,
     externalNetworkType,
     to: (params as any).to ?? getters.externalAccountFormatted,
     payload,
   };
+
+  return data;
 }
 
 async function getEvmNetworkFee(context: ActionContext<any, any>): Promise<void> {
@@ -317,24 +320,54 @@ async function updateExternalBlockNumber(context: ActionContext<any, any>): Prom
   }
 }
 
-async function updateExternalFeesAndLockedFunds(context: ActionContext<any, any>): Promise<void> {
+async function updateFeesAndLockedFunds(context: ActionContext<any, any>, withSora = false): Promise<void> {
   const { commit } = bridgeActionContext(context);
 
   commit.setFeesAndLockedFundsFetching(true);
 
-  await Promise.allSettled([
+  const promises = [
     updateExternalLockedBalance(context),
     updateExternalNetworkFee(context),
     updateExternalTransferFee(context),
-  ]);
+  ];
+
+  if (withSora) {
+    promises.push(updateSoraNetworkFee(context));
+  }
+
+  await Promise.allSettled(promises);
 
   commit.setFeesAndLockedFundsFetching(false);
 }
 
-async function updateBalancesAndFees(context: ActionContext<any, any>): Promise<void> {
+async function updateSoraNetworkFee(context: ActionContext<any, any>): Promise<void> {
+  const { commit, state, getters, rootState } = bridgeActionContext(context);
+  const { asset, operation } = getters;
+  const {
+    web3: { networkSelected },
+    wallet: {
+      settings: { networkFees },
+    },
+  } = rootState;
+
+  let fee = ZeroStringValue;
+
+  if (networkSelected && asset && state.isSoraToEvm) {
+    if (getters.isEthBridge) {
+      fee = networkFees[operation];
+    } else {
+      const bridgeApi = getBridgeApi(context) as typeof subBridgeApi | typeof evmBridgeApi;
+      fee = await bridgeApi.getNetworkFee(asset, networkSelected as never);
+    }
+  }
+
+  commit.setSoraNetworkFee(fee);
+}
+
+async function updateBalancesAndFees(context: ActionContext<any, any>, withSora = false): Promise<void> {
   const { dispatch } = bridgeActionContext(context);
 
-  await Promise.allSettled([dispatch.updateExternalBalance(), updateExternalFeesAndLockedFunds(context)]);
+  await Promise.allSettled([dispatch.updateExternalBalance(), updateFeesAndLockedFunds(context, withSora)]);
 }
 
 const actions = defineActions({
@@ -387,7 +420,7 @@ const actions = defineActions({
     commit.setAssetSenderBalance();
     commit.setAssetRecipientBalance();
 
-    await updateBalancesAndFees(context);
+    await updateBalancesAndFees(context, true);
 
     if (state.focusedField === FocusedField.Received) {
       await dispatch.setSendedAmount(state.amountReceived);
@@ -406,7 +439,7 @@ const actions = defineActions({
     await Promise.allSettled([
       dispatch.updateOutgoingMaxLimit(),
       dispatch.updateIncomingMinLimit(),
-      updateBalancesAndFees(context),
+      updateBalancesAndFees(context, true),
     ]);
   },
 
@@ -431,10 +464,7 @@ const actions = defineActions({
 
     if (getters.isSubBridge && getters.asset && getters.isRegisteredAsset) {
       try {
-        const value = await subBridgeApi.soraParachainApi.getAssetMinimumAmount(
-          getters.asset.address,
-          subBridgeConnector.parachainAdapter.api
-        );
+        const value = await subBridgeConnector.parachainAdapter.getAssetMinimumAmount(getters.asset.address);
         minLimit = FPNumber.fromCodecValue(value, getters.asset.externalDecimals);
       } catch (error) {
         console.error(error);
@@ -460,7 +490,9 @@ const actions = defineActions({
     const referenceAsset = DAI.address;
     const sources = [LiquiditySourceTypes.XYKPool, LiquiditySourceTypes.XSTPool];
     const limitObservable = api.bridgeProxy.getCurrentTransferLimitObservable();
-    const quoteObservable = await api.swap.getSwapQuoteObservable(referenceAsset, limitAsset, sources, DexId.XOR);
+    const quoteObservable = api.swap.getSwapQuoteObservable(referenceAsset, limitAsset, sources, DexId.XOR);
+
+    if (!quoteObservable) return;
 
     let subscription!: Subscription;
 

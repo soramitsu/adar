@@ -1,12 +1,6 @@
 import { Operation } from '@sora-substrate/util';
 import { BridgeNetworkType, BridgeTxStatus } from '@sora-substrate/util/build/bridgeProxy/consts';
-import {
-  api,
-  historyElementsFilter,
-  SubqueryExplorerService,
-  SUBQUERY_TYPES,
-  WALLET_CONSTS,
-} from '@soramitsu/soraneo-wallet-web';
+import { api, SUBQUERY_TYPES, WALLET_CONSTS, getCurrentIndexer } from '@soramitsu/soraneo-wallet-web';
 import { ethers, EtherscanProvider, BlockTag } from 'ethers';
 import first from 'lodash/fp/first';
 import last from 'lodash/fp/last';
@@ -233,12 +227,14 @@ export class EthBridgeHistory {
 
     for (const tx of Object.values(transactions)) {
       try {
-        const decodedInput = BRIDGE_INTERFACE.parseTransaction(tx);
+        const data = (tx as any).input; // 'data' is named as 'input'
+        const decodedInput = BRIDGE_INTERFACE.parseTransaction({ data });
 
-        if (decodedInput?.args.txHash.toLowerCase() === hash.toLowerCase()) {
+        if (decodedInput?.args.getValue('txHash').toLowerCase() === hash.toLowerCase()) {
           return tx;
         }
       } catch (err) {
+        console.info(err);
         continue;
       }
     }
@@ -257,8 +253,9 @@ export class EthBridgeHistory {
   }
 
   public async fetchHistoryElements(address: string, timestamp = 0, ids?: string[]): Promise<HistoryElement[]> {
+    const indexer = getCurrentIndexer();
     const operations = [Operation.EthBridgeOutgoing, Operation.EthBridgeIncoming];
-    const filter = historyElementsFilter({ address, operations, timestamp, ids });
+    const filter = indexer.historyElementsFilter({ address, operations, timestamp, ids });
     const history: HistoryElement[] = [];
 
     let hasNext = true;
@@ -266,21 +263,26 @@ export class EthBridgeHistory {
 
     do {
       const variables = { after, filter, first: 100 };
-      const response = await SubqueryExplorerService.account.getHistory(variables);
+      const response = await indexer.services.explorer.account.getHistoryPaged(variables);
 
       if (!response) return history;
 
       hasNext = !!response.pageInfo?.hasNextPage;
       after = response.pageInfo?.endCursor ?? '';
-      history.push(...response.nodes);
+      history.push(...response.edges.map((edge) => edge.node));
     } while (hasNext);
 
     return history;
   }
 
-  public async clearHistory(updateCallback?: FnWithoutArgs | AsyncFnWithoutArgs): Promise<void> {
+  public async clearHistory(
+    inProgressIds: Record<string, boolean>,
+    updateCallback?: FnWithoutArgs | AsyncFnWithoutArgs
+  ): Promise<void> {
+    // don't remove history, what in progress
+    const ids = Object.keys(ethBridgeApi.history).filter((id) => !(id in inProgressIds));
+    ethBridgeApi.removeHistory(...ids);
     this.historySyncTimestamp = 0;
-    ethBridgeApi.clearHistory();
     await updateCallback?.();
   }
 
@@ -418,7 +420,7 @@ export const updateEthBridgeHistory =
       await ethBridgeHistory.init(ethBridgeContractAddress);
 
       if (clearHistory) {
-        await ethBridgeHistory.clearHistory(updateCallback);
+        await ethBridgeHistory.clearHistory(inProgressIds, updateCallback);
       }
 
       await ethBridgeHistory.updateAccountHistory(
