@@ -77,6 +77,12 @@
             "routingDetails": {
               "title": "ルーティング詳細",
               "amount": "必要なトークン量"
+            },
+            "swapless": {
+              "balance": "残高",
+              "adarFee": "ADAR手数料",
+              "amount": "量",
+              "required": "必要なトークン"
             }
           },
           "routing": {

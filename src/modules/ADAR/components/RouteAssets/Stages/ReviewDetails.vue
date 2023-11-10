@@ -117,27 +117,72 @@
               <s-icon v-if="transferBalanceErrors" class="icon-status" name="basic-clear-X-xs-24" />
               {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
             </p>
-            <info-line
-              v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered"
-              :key="idx"
-              :asset-symbol="tokenData.asset.symbol"
-              :label="tokenData.asset.symbol"
-              :value="tokenData.totalAmount.toLocaleString()"
-              :fiat-value="tokenData.usd.dp(2).toLocaleString()"
-              class="transfer-assets-section__asset-data"
-              :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
-              is-formatted
-            >
-              <template v-if="!isTransferAssetBalanceOk(tokenData)">
-                <s-button
-                  type="primary"
-                  class="s-typography-button--mini add-button"
-                  @click.stop="onTransferAddFundsClick(tokenData)"
-                >
-                  {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-                </s-button>
-              </template>
-            </info-line>
+            <s-collapse>
+              <s-collapse-item v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered" :key="idx">
+                <template #title>
+                  <div class="field transfer-assets-section__asset-title">
+                    <div class="field__label">
+                      <s-icon
+                        v-if="!isTransferAssetBalanceOk(tokenData)"
+                        class="icon-status"
+                        name="basic-clear-X-xs-24"
+                      />
+                      {{ tokenData.asset.symbol }}
+                    </div>
+                    <div class="field__value">
+                      {{ tokenData.totalAmount.toLocaleString() }}
+                      <token-logo class="token-logo" :token="tokenData.asset" />
+                      <div class="usd">{{ tokenData.usd.dp(2).toLocaleString() }}</div>
+                    </div>
+                  </div>
+                </template>
+                <div>
+                  <info-line
+                    :asset-symbol="tokenData.asset.symbol"
+                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.adarFee')"
+                    :value="tokenData.adarFee.toLocaleString()"
+                    class="transfer-assets-section__asset-data"
+                    is-formatted
+                  >
+                  </info-line>
+                  <info-line
+                    :asset-symbol="tokenData.asset.symbol"
+                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.amount')"
+                    :value="tokenData.amount.toLocaleString()"
+                    class="transfer-assets-section__asset-data"
+                    is-formatted
+                  >
+                  </info-line>
+                  <info-line
+                    :asset-symbol="tokenData.asset.symbol"
+                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
+                    :value="tokenData.userBalance.toLocaleString()"
+                    class="transfer-assets-section__asset-data"
+                    is-formatted
+                  >
+                  </info-line>
+                  <info-line
+                    v-if="!isTransferAssetBalanceOk(tokenData)"
+                    :asset-symbol="tokenData.asset.symbol"
+                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.required')"
+                    :value="tokenData.amountRequired.toLocaleString()"
+                    class="transfer-assets-section__asset-data"
+                    :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
+                    is-formatted
+                  >
+                    <template>
+                      <s-button
+                        type="primary"
+                        class="s-typography-button--mini add-button"
+                        @click.stop="onTransferAddFundsClick(tokenData)"
+                      >
+                        {{ t('adar.routeAssets.stages.reviewDetails.add') }}
+                      </s-button>
+                    </template>
+                  </info-line>
+                </div>
+              </s-collapse-item>
+            </s-collapse>
           </div>
           <s-divider />
         </template>
@@ -389,7 +434,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   }
 
   onTransferAddFundsClick(tokenData: OutcomeAssetsAmount) {
-    const requiredAmount = this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount);
+    const requiredAmount = this.tokenTransferAmountRequired(tokenData.asset, tokenData.amountRequired);
     this.swapData = {
       assetFrom: this.inputToken,
       assetTo: tokenData.asset,
@@ -398,7 +443,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     this.showSwapDialog = true;
   }
 
-  isTransferAssetBalanceOk(tokenData) {
+  isTransferAssetBalanceOk(tokenData: OutcomeAssetsAmount) {
     return FPNumber.lt(this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount), FPNumber.ZERO);
   }
 
@@ -496,6 +541,31 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
       button.el-button.neumorphic.s-primary.add-button {
         box-shadow: none;
       }
+    }
+
+    &__asset-title {
+      width: 100%;
+    }
+
+    .el-collapse.neumorphic .el-icon-arrow-right {
+      transition: transform 0.3s;
+
+      margin-left: 6px;
+      height: 15px;
+      line-height: 15px;
+      width: 15.8px;
+      padding: 0;
+
+      background-color: var(--s-color-base-content-tertiary);
+      color: var(--s-color-base-on-accent) !important;
+      border-radius: var(--s-border-radius-medium);
+      font-size: 16px;
+    }
+
+    .el-collapse-item__header {
+      height: 36px;
+      position: relative;
+      margin-bottom: 12px;
     }
   }
 

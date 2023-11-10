@@ -118,5 +118,9 @@ export type SummaryAssetRecipientsInfo = {
 export type OutcomeAssetsAmount = {
   asset: Asset;
   usd: FPNumber;
+  amount: FPNumber;
+  adarFee: FPNumber;
   totalAmount: FPNumber;
+  userBalance: FPNumber;
+  amountRequired: FPNumber;
 };

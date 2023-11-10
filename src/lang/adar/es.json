@@ -77,6 +77,12 @@
             "routingDetails": {
               "title": "Detalles de enrutamiento",
               "amount": "Cantidad de tokens requerida"
+            },
+            "swapless": {
+              "balance": "saldo",
+              "adarFee": "tarifa ADAR",
+              "amount": "cantidad",
+              "required": "tokens requeridos"
             }
           },
           "routing": {

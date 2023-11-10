@@ -10,6 +10,7 @@ import { defineActions } from 'direct-vuex';
 import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
 
+import { adarFee } from '@/modules/ADAR/consts';
 import { routeAssetsActionContext } from '@/store/routeAssets';
 import { delay } from '@/utils';
 
@@ -334,7 +335,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       assetAddress: item.swapAndSendData.asset.address,
       recipientId: item.recipient.id,
       usd: item.recipient.usd,
-      useTransfer: item.recipient.useTransfer,
+      useTransfer: item.recipient.useTransfer && item.recipient.asset.address !== inputAsset.address,
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
@@ -359,7 +360,9 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       outcomeAssetId,
       receivers,
       dexId,
-      outcomeAssetReuse: outcomeAssetReuse.toCodecString(),
+      outcomeAssetReuse: outcomeAssetReuse
+        .add(outcomeAssetReuse.mul(new FPNumber(adarFee).div(FPNumber.HUNDRED)))
+        .toCodecString(),
     };
   });
 
