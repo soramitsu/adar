@@ -10,6 +10,7 @@ import { defineActions } from 'direct-vuex';
 import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
 
+import { adarFee } from '@/modules/ADAR/consts';
 import { routeAssetsActionContext } from '@/store/routeAssets';
 import { delay } from '@/utils';
 
@@ -61,8 +62,8 @@ const actions = defineActions({
           try {
             // const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
             // const useTransfer = row.data[5] ? row.data[5].trim().toLowerCase() === 'true' : false;
-            const amountInTokens = row.data[4] ? JSON.parse(row.data[4]) : false;
-            const useTransfer = row.data[5] ? JSON.parse(row.data[5]) : false;
+            const amountInTokens = row.data[4] ? JSON.parse(row.data[4].toLowerCase()) : false;
+            const useTransfer = row.data[5] ? JSON.parse(row.data[5].toLowerCase()) : false;
             const csvAmount = row.data[2]?.replace(/,/g, '');
             const asset = findAsset(row.data[3]);
             const amount = amountInTokens
@@ -125,10 +126,13 @@ const actions = defineActions({
     }
     if (!tokens || tokens.length < 1) return;
 
+    api.swap.update();
+
     const tokensPromises = tokens.map((tokenAddress) => {
       return new Promise<void>((resolve, reject) => {
-        api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
-          commit.addSubscription({ assetAddress: tokenAddress });
+        const observableQuote = api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress);
+        commit.addSubscription({ assetAddress: tokenAddress });
+        if (observableQuote) {
           const quoteSubscription = observableQuote.subscribe((quoteData) => {
             dispatch.setSubscriptionPayload({
               data: quoteData,
@@ -137,7 +141,18 @@ const actions = defineActions({
             resolve();
           });
           commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
-        });
+        }
+        // api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
+        //   commit.addSubscription({ assetAddress: tokenAddress });
+        //   const quoteSubscription = observableQuote.subscribe((quoteData) => {
+        //     dispatch.setSubscriptionPayload({
+        //       data: quoteData,
+        //       outputAssetId: tokenAddress,
+        //     });
+        //     resolve();
+        //   });
+        //   commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
+        // });
       });
     });
     Promise.allSettled(tokensPromises).then(() => {
@@ -320,7 +335,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       assetAddress: item.swapAndSendData.asset.address,
       recipientId: item.recipient.id,
       usd: item.recipient.usd,
-      useTransfer: item.recipient.useTransfer,
+      useTransfer: item.recipient.useTransfer && item.recipient.asset.address !== inputAsset.address,
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
@@ -345,7 +360,9 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       outcomeAssetId,
       receivers,
       dexId,
-      outcomeAssetReuse: outcomeAssetReuse.toCodecString(),
+      outcomeAssetReuse: outcomeAssetReuse
+        .add(outcomeAssetReuse.mul(new FPNumber(adarFee).div(FPNumber.HUNDRED)))
+        .toCodecString(),
     };
   });
 

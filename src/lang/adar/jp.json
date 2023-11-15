@@ -77,6 +77,12 @@
             "routingDetails": {
               "title": "ルーティング詳細",
               "amount": "必要なトークン量"
+            },
+            "swapless": {
+              "balance": "残高",
+              "adarFee": "ADAR手数料",
+              "amount": "量",
+              "required": "必要なトークン"
             }
           },
           "routing": {
@@ -109,6 +115,14 @@
                 "passed": "承認済み",
                 "failed": "失敗"
               }
+            },
+            "report": {
+              "exchangeRate": "為替レート",
+              "transactionId": "取引 ID",
+              "blockNumber": "ブロック番号",
+              "blockId": "ブロック ID",
+              "senderWallet": "送信者ウォレット",
+              "datetime": "日付と時刻"
             }
           }
         },

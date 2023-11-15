@@ -305,7 +305,8 @@
         "viewIn": "Ver en {explorer}",
         "referrer": "Referente",
         "referral": "Referencia",
-        "adarTxDetailsTitle": "Detalles de la transacción"
+        "adarTxDetailsTitle": "Detalles de la transacción",
+        "comment": "Comentario"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Cambiar de red en {Metamask}",
@@ -546,7 +547,9 @@
         "copy": "Copiar dirección de red",
         "soraAddress": "Dirección de {Sora}",
         "ethereumAddress": "dirección {Ethereum}",
-        "limitMessage": "Actualmente, existe un {type} {amount} {symbol} para establecer puentes para garantizar la estabilidad y seguridad de la red {Sora} . apreciamos su comprensión."
+        "limitMessage": "Actualmente, existe un {type} {amount} {symbol} para establecer puentes para garantizar la estabilidad y seguridad de la red {Sora} . apreciamos su comprensión.",
+        "externalTransferFee": "tarifa de {network} {XCM}",
+        "externalTransferFeeTooltip": "Cuando envía una transacción puente a la red {network} , se deduce una tarifa menor del monto que está transfiriendo"
     },
     "selectRegisteredAsset": {
         "title": "Seleccione un Token",
@@ -1180,8 +1183,8 @@
             "action": "Seleccionar servicios",
             "dialog": {
                 "title": "{Sora} Selección de servicio de red",
-                "fiat": "Valores fiduciarios",
-                "chartsAndActivity": "Gráficos y actividad"
+                "indexer": "indexador",
+                "useCeres": "Utilice {Ceres} para valores fiduciarios"
             }
         }
     },
@@ -1249,7 +1252,9 @@
             "enterName": "Ingrese su nombre",
             "present": "Ya presente",
             "saveChanges": "Guardar cambios"
-        }
+        },
+        "input": "Introduzca la dirección o seleccione el contacto",
+        "selectContact": "Seleccione un contacto"
     },
     "browserPermission": {
         "title": "Permitir el acceso a la cámara en la configuración del navegador",

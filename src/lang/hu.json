@@ -305,7 +305,8 @@
         "viewIn": "Megtekintés {explorer}-ben",
         "referrer": "Ajánló",
         "referral": "Ajánlás",
-        "adarTxDetailsTitle": "Tranzakció részlete"
+        "adarTxDetailsTitle": "Tranzakció részlete",
+        "comment": "Megjegyzés"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Hálózatváltás a {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Hálózati cím másolása",
         "soraAddress": "{Sora} cím",
         "ethereumAddress": "{Ethereum} cím",
-        "limitMessage": "Jelenleg létezik egy {type} {amount} {symbol} áthidalás, amely biztosítja a {Sora} hálózat stabilitását és biztonságát. Köszönjük megértését."
+        "limitMessage": "Jelenleg létezik egy {type} {amount} {symbol} áthidalás, amely biztosítja a {Sora} hálózat stabilitását és biztonságát. Köszönjük megértését.",
+        "externalTransferFee": "{network} {XCM} díj",
+        "externalTransferFeeTooltip": "Ha hídtranzakciót küld a {network} hálózatra, az átutalt összegből egy kisebb díjat számítanak fel"
     },
     "selectRegisteredAsset": {
         "title": "Token kiválasztása",
@@ -1179,8 +1182,8 @@
             "action": "Válassza ki a szolgáltatásokat",
             "dialog": {
                 "title": "{Sora} Hálózati szolgáltatás kiválasztása",
-                "fiat": "Fiat értékek",
-                "chartsAndActivity": "Diagramok és tevékenység"
+                "indexer": "Indexelő",
+                "useCeres": "Fiat értékekhez használja {Ceres} értéket"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Írja be a nevet",
             "present": "Már jelen van",
             "saveChanges": "Változtatások mentése"
-        }
+        },
+        "input": "Írja be a címet vagy válassza ki a kapcsolatot",
+        "selectContact": "Válasszon névjegyet"
     },
     "browserPermission": {
         "title": "A kamera hozzáférésének engedélyezése a böngésző beállításaiban",

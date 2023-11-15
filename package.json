@@ -1,6 +1,6 @@
 {
   "name": "adar",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "repository": {
     "type": "git",
     "url": "https://github.com/soramitsu/adar.git"
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@metamask/detect-provider": "^2.0.0",
-    "@soramitsu/soraneo-wallet-web": "1.22.1",
+    "@soramitsu/soraneo-wallet-web": "1.23.4",
     "@walletconnect/web3-provider": "^1.8.0",
     "core-js": "^3.26.0",
     "country-code-emoji": "^2.3.0",

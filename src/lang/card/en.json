@@ -21,9 +21,11 @@
         },
         "okReadyText": "OK, I’m ready",
         "emailPlaceholder": "Email",
+        "noSpamText": "No spam! Only to secure your account",
         "sendCodeBtn": "Send SMS code",
         "firstNamePlaceholder": "First name",
         "lastNamePlaceholder": "Last name",
+        "verificationCodeText": "You will receive a verification code via SMS",
         "phonePlaceholder": "Phone Number",
         "statusPendingTitle": "Verification in progress",
         "sendEmailLinkBtn": "Send link",
@@ -69,6 +71,7 @@
         "reIssuanceFee": "€0 annual service fee",
         "freeCardIssuance": "Free card issuance",
         "loginBtn": "Log in or Sign up",
+        "applicationFee": "€{0} Issuance fee",
         "telegramSupport": "Telegram support",
         "rejectionPriceAttemptDisclaimer": "Every other attempt will cost you €{0}",
         "rejectCount": "You have {count} more free KYC attempt|You have {count} more free KYC attempts",
@@ -89,6 +92,13 @@
         "cardhub": {
             "accountInfo": "Account Information"
         },
-        "attentionText": "Attention"
+        "attentionText": "Attention",
+        "or": "or",
+        "oneTimeApplicationFee": "One-time fee to issue a card",
+        "applicationFeeNote": "Note: paid card issuance will be available at a later stage.",
+        "statusRejectReasonMultiple": "Your application has been rejected for multiple reasons:",
+        "selectCountryText": "Select your country",
+        "filterCountries": "Filter by Country or Dial code",
+        "ibanPendingDesc": "Your IBAN issuance is pending.<br/>In case the wait longer than 72h contact us via {email}"
     }
 }

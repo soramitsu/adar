@@ -1,7 +1,7 @@
 import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { api } from '@soramitsu/soraneo-wallet-web';
-import { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/subquery/types';
+import { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 import { Recipient } from './types';
 

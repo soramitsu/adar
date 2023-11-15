@@ -48,6 +48,7 @@
           type="secondary"
           class="s-typography-button--big"
           @click.stop="onReportDownloadClick()"
+          :disabled="!finalAmount"
         >
           {{ t('adar.routeAssets.stages.done.pdfButton') }}
         </s-button>
@@ -107,7 +108,7 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
-import { components } from '@soramitsu/soraneo-wallet-web';
+import { components, api } from '@soramitsu/soraneo-wallet-web';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { groupBy, sumBy } from 'lodash';
@@ -168,6 +169,10 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return this.txHistoryData?.amount;
   }
 
+  get txHistoryDataTransfers() {
+    return this.txHistoryData?.payload?.transfers || [];
+  }
+
   get finalAmountFormatted() {
     return new FPNumber(this.finalAmount || 0).dp(4).toLocaleString();
   }
@@ -221,6 +226,16 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, 18);
   }
 
+  getRecipientTransferAmount(address: string, assetAddress: string): string {
+    const formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
+    return new FPNumber(
+      this.txHistoryDataTransfers.find((item) => item.to === formattedAddress && item.assetId === assetAddress)
+        ?.amount ?? '0'
+    )
+      .dp(4)
+      .toLocaleString();
+  }
+
   formatNumber(num) {
     return new FPNumber(num).dp(4).toLocaleString();
   }
@@ -238,7 +253,17 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     this.showSelectReportFormatDialog = true;
   }
 
-  headers = ['№', 'NAME', 'WALLET', 'USD', 'INPUT TOKEN', 'TOKEN', 'AMOUNT', 'RATE', 'STATUS'];
+  headers = [
+    '№',
+    this.t('adar.routeAssets.name'),
+    this.t('adar.routeAssets.wallet'),
+    this.t('adar.routeAssets.usd'),
+    this.t('adar.routeAssets.inputAsset'),
+    this.t('adar.routeAssets.asset'),
+    this.t('adar.routeAssets.stages.transactionOverview.amount'),
+    this.t('adar.routeAssets.stages.done.report.exchangeRate'),
+    this.t('adar.routeAssets.status'),
+  ];
 
   get reportData() {
     return this.recipients.map((recipient, idx) => {
@@ -249,7 +274,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         recipient.usd.dp(2).toLocaleString(),
         recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
-        recipient.amount?.dp(4).toLocaleString(),
+        this.getRecipientTransferAmount(recipient.wallet, recipient.asset.address),
         recipient.amountInTokens || recipient.useTransfer ? '-' : recipient.exchangeRate || '',
         recipient.status.toString(),
       ];
@@ -264,9 +289,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
       // `Transaction Id - ${txId}\n` +
       // `Block Hash - ${blockId}\n` +
       // `Sender wallet - ${from}\n` +
-      `Datetime - ${datetime?.toUTCString()}\n` +
+      `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
       this.headers.join(',') +
-      `,TRANSACTION ID,BLOCK NUMBER,SENDER WALLET` +
+      `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
+        'adar.routeAssets.stages.done.report.blockNumber'
+      )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
       '\n' +
       this.reportData.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -283,11 +310,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     const { txId, blockId, from, blockNumber } = this.batchTxInfo;
     const datetime = this.batchTxDatetime;
     doc.setFontSize(12);
-    doc.text(`Transaction Id - ${txId}`, 5, 5);
-    doc.text(`Block Number - ${blockNumber}`, 5, 10);
-    doc.text(`Block Id - ${blockId}`, 5, 15);
-    doc.text(`Sender wallet - ${from}`, 5, 20);
-    doc.text(`Datetime - ${datetime?.toUTCString()}`, 5, 25);
+    doc.text(`${this.t('adar.routeAssets.stages.done.report.transactionId')} - ${txId}`, 5, 5);
+    doc.text(`${this.t('adar.routeAssets.stages.done.report.blockNumber')} - ${blockNumber}`, 5, 10);
+    doc.text(`${this.t('adar.routeAssets.stages.done.report.blockId')} - ${blockId}`, 5, 15);
+    doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
+    doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
     autoTable(doc, {
       head: [this.headers],
       body: this.reportData as RowInput[],

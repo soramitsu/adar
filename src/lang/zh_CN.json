@@ -305,7 +305,8 @@
         "viewIn": "在{explorer}中查看",
         "referrer": "推荐人",
         "referral": "推荐",
-        "adarTxDetailsTitle": "交易详情"
+        "adarTxDetailsTitle": "交易详情",
+        "comment": "评论"
     },
     "appName": "{AppName}",
     "changeNetworkText": "在 {Metamask} 中更改网络",
@@ -545,7 +546,9 @@
         "copy": "复制网络地址",
         "soraAddress": "{Sora} 地址",
         "ethereumAddress": "{Ethereum} 地址",
-        "limitMessage": "目前，有一个{type} {amount} {symbol}用于桥接，以确保 {Sora} 网络的稳定性和安全性。我们感谢您的理解。"
+        "limitMessage": "目前，有一个{type} {amount} {symbol}用于桥接，以确保 {Sora} 网络的稳定性和安全性。我们感谢您的理解。",
+        "externalTransferFee": "{network} {XCM}费用",
+        "externalTransferFeeTooltip": "当您向{network}网络发送桥接交易时，将从您传输的金额中收取少量费用"
     },
     "selectRegisteredAsset": {
         "title": "选择一个代币",
@@ -1179,8 +1182,8 @@
             "action": "选择服务",
             "dialog": {
                 "title": "{Sora}网络服务选择",
-                "fiat": "法定价值",
-                "chartsAndActivity": "图表和活动"
+                "indexer": "索引器",
+                "useCeres": "使用{Ceres}作为法定值"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "输入名字",
             "present": "已经存在",
             "saveChanges": "保存更改"
-        }
+        },
+        "input": "输入地址或选择联系人",
+        "selectContact": "选择联系人"
     },
     "browserPermission": {
         "title": "在浏览器设置中允许相机访问",

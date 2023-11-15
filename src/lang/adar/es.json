@@ -77,6 +77,12 @@
             "routingDetails": {
               "title": "Detalles de enrutamiento",
               "amount": "Cantidad de tokens requerida"
+            },
+            "swapless": {
+              "balance": "saldo",
+              "adarFee": "tarifa ADAR",
+              "amount": "cantidad",
+              "required": "tokens requeridos"
             }
           },
           "routing": {
@@ -109,6 +115,14 @@
                 "passed": "aprobada",
                 "failed": "fallida"
               }
+            },
+            "report": {
+              "exchangeRate": "tasa de cambio",
+              "transactionId": "ID de transacción",
+              "blockNumber": "Número de bloque",
+              "blockId": "ID de bloque",
+              "senderWallet": "Billetera del remitente",
+              "datetime": "Fecha y hora"
             }
           }
         },

@@ -305,7 +305,8 @@
         "viewIn": "Visualizza in {explorer}",
         "referrer": "Referente",
         "referral": "Referral",
-        "adarTxDetailsTitle": "Dettagli della transazione"
+        "adarTxDetailsTitle": "Dettagli della transazione",
+        "comment": "Commento"
     },
     "appName": "{AppName}",
     "changeNetworkText": "Cambia rete in {Metamask}",
@@ -545,7 +546,9 @@
         "copy": "Copia l'indirizzo di rete",
         "soraAddress": "{Sora} indirizzo",
         "ethereumAddress": "{Ethereum} indirizzo",
-        "limitMessage": "Attualmente, esiste un {type} {amount} {symbol} per il bridging per garantire la stabilità e la sicurezza della rete {Sora} . Apprezziamo la tua comprensione."
+        "limitMessage": "Attualmente, esiste un {type} {amount} {symbol} per il bridging per garantire la stabilità e la sicurezza della rete {Sora} . Apprezziamo la tua comprensione.",
+        "externalTransferFee": "Tariffa {network} {XCM}",
+        "externalTransferFeeTooltip": "Quando invii una transazione bridge alla rete {network} , viene trattenuta una commissione minore dall'importo che stai trasferendo"
     },
     "selectRegisteredAsset": {
         "title": "Seleziona un token",
@@ -1179,8 +1182,8 @@
             "action": "Seleziona i servizi",
             "dialog": {
                 "title": "{Sora} Selezione del servizio di rete",
-                "fiat": "Valori Fiat",
-                "chartsAndActivity": "Grafici e attività"
+                "indexer": "Indicizzatore",
+                "useCeres": "Usa {Ceres} per i valori fiat"
             }
         }
     },
@@ -1248,7 +1251,9 @@
             "enterName": "Inserisci il nome",
             "present": "Già presente",
             "saveChanges": "Salvare le modifiche"
-        }
+        },
+        "input": "Inserisci l'indirizzo o seleziona il contatto",
+        "selectContact": "Seleziona contatto"
     },
     "browserPermission": {
         "title": "Consenti l'accesso alla fotocamera nelle impostazioni del browser",

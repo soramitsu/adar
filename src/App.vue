@@ -37,18 +37,27 @@
 
 <script lang="ts">
 import { Operation, TransactionStatus } from '@sora-substrate/util';
-import { api, connection, components, mixins, settingsStorage, AlertsApiService } from '@soramitsu/soraneo-wallet-web';
+import {
+  api,
+  connection,
+  components,
+  mixins,
+  settingsStorage,
+  WALLET_CONSTS,
+  WALLET_TYPES,
+  AlertsApiService,
+} from '@soramitsu/soraneo-wallet-web';
 import debounce from 'lodash/debounce';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import axiosInstance, { updateBaseUrl, getFullBaseUrl } from '@/api';
 import AppFooter from '@/components/App/Footer/AppFooter.vue';
-import AppHeader from '@/components/App/Header/AppHeader.vue';
 import AppMenu from '@/components/App/Menu/AppMenu.vue';
 import NodeErrorMixin from '@/components/mixins/NodeErrorMixin';
 import SoraLogo from '@/components/shared/Logo/Sora.vue';
 import { PageNames, Components, Language, BreakpointClass, Breakpoint } from '@/consts';
 import { getLocale } from '@/lang';
+import AppHeader from '@/modules/ADAR/components/App/Header/AppHeader.vue';
 import router, { goTo, lazyComponent } from '@/router';
 import { action, getter, mutation, state } from '@/store/decorators';
 import { preloadFontFace, updateDocumentTitle } from '@/utils';
@@ -64,7 +73,6 @@ import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types
 import type { EvmNetwork } from '@sora-substrate/util/build/bridgeProxy/evm/types';
 import type DesignSystem from '@soramitsu/soramitsu-js-ui/lib/types/DesignSystem';
 import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-import type { WALLET_CONSTS, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 
 @Component({
   components: {
@@ -235,7 +243,6 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
       // ____________________________________________________________________
       await this.setEthBridgeSettings(data.ETH_BRIDGE);
       this.setSoraNetwork(data.NETWORK_TYPE);
-      this.setSubqueryEndpoint(data.SUBQUERY_ENDPOINT);
       this.setDefaultNodes(data?.DEFAULT_NETWORKS);
       this.setEvmNetworksApp(data.EVM_NETWORKS_IDS);
       this.setSubNetworkApps(data.SUB_NETWORKS);
@@ -243,6 +250,8 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
       if (data.PARACHAIN_IDS) {
         api.bridgeProxy.sub.parachainIds = data.PARACHAIN_IDS;
       }
+
+      this.setSubqueryEndpoint(data.SUBQUERY_ENDPOINT);
 
       if (data.FAUCET_URL) {
         this.setFaucetUrl(data.FAUCET_URL);
