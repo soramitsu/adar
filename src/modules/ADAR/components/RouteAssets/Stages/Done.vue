@@ -231,9 +231,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return new FPNumber(
       this.txHistoryDataTransfers.find((item) => item.to === formattedAddress && item.assetId === assetAddress)
         ?.amount ?? '0'
-    )
-      .dp(4)
-      .toLocaleString();
+    ).toLocaleString();
   }
 
   formatNumber(num) {
@@ -262,7 +260,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     this.t('adar.routeAssets.asset'),
     this.t('adar.routeAssets.stages.transactionOverview.amount'),
     this.t('adar.routeAssets.stages.done.report.exchangeRate'),
-    this.t('adar.routeAssets.status'),
+    // this.t('adar.routeAssets.status'),
   ];
 
   get reportData() {
@@ -275,8 +273,8 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
         this.getRecipientTransferAmount(recipient.wallet, recipient.asset.address),
-        recipient.amountInTokens || recipient.useTransfer ? '-' : recipient.exchangeRate || '',
-        recipient.status.toString(),
+        recipient.exchangeRate || '',
+        // recipient.status.toString(),
       ];
     });
   }
@@ -319,6 +317,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
       head: [this.headers],
       body: this.reportData as RowInput[],
       startY: 30,
+      rowPageBreak: 'avoid',
       margin: { top: 5, left: 5, right: 5, bottom: 5 },
       styles: {
         lineColor: [237, 228, 231],
@@ -454,6 +453,12 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     display: block;
     width: 100%;
     margin: 16px 0 0 0;
+
+    span {
+      span {
+        white-space: wrap;
+      }
+    }
   }
 }
 
