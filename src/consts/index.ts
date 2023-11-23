@@ -93,8 +93,6 @@ export const ZeroStringValue = '0';
 
 export const ApproximateSign = '~';
 
-export const MetamaskCancellationCode = 4001;
-
 export const DefaultSlippageTolerance = '0.5';
 
 export enum MarketAlgorithms {
@@ -238,6 +236,7 @@ export enum Components {
   ConfirmBridgeTransactionDialog = 'shared/Dialog/ConfirmBridgeTransaction',
   NetworkFeeWarningDialog = 'shared/Dialog/NetworkFeeWarning',
   PaymentErrorDialog = 'shared/Dialog/PaymentError',
+  SelectProviderDialog = 'shared/Dialog/SelectProvider',
   // Shared Asset selection
   SelectAssetList = 'shared/SelectAsset/List',
   SelectToken = 'shared/SelectAsset/SelectToken',
@@ -304,10 +303,10 @@ const MainMenu: Array<SidebarMenuItemLink> = [
   //   icon: 'basic-layers-24',
   //   title: PageNames.StakingContainer,
   // },
-  // {
-  //   icon: 'grid-block-distribute-vertically-24',
-  //   title: PageNames.Bridge,
-  // },
+  {
+    icon: 'grid-block-distribute-vertically-24',
+    title: PageNames.Bridge,
+  },
 ];
 
 const AccountMenu: Array<SidebarMenuItemLink> = [
