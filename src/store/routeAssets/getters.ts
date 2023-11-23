@@ -188,6 +188,7 @@ const getters = defineGetters<RouteAssetsState>()({
       totalAmount: maxInputAmount.amount,
       totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
       asetSymbol: maxInputAmount.assetSymbol,
+      totalLiquidityProviderFee: maxInputAmount.totalLiquidityProviderFee,
     };
   },
   outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
