@@ -31,6 +31,6 @@ def pipeline = new org.js.AppPipeline(steps: this,
     initialSecretName: "adar-adar-web-eso-base",
     initialNameSpace: "adar-dev-web",
     targetNameSpace: "adar-${env.CHANGE_ID}-web",
-    targetSecretName: "adar-${env.CHANGE_ID}-adar-web-eso-base"
+    targetSecretName: "adar-${env.CHANGE_ID}-adar-pr-adar-web-eso-base"
 )
 pipeline.runPipeline()
