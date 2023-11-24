@@ -37,6 +37,7 @@
 
 <script lang="ts">
 import { Operation, TransactionStatus } from '@sora-substrate/util';
+import { XOR } from '@sora-substrate/util/build/assets/consts';
 import {
   api,
   connection,
@@ -56,6 +57,8 @@ import AppMenu from '@/components/App/Menu/AppMenu.vue';
 import NodeErrorMixin from '@/components/mixins/NodeErrorMixin';
 import SoraLogo from '@/components/shared/Logo/Sora.vue';
 import { PageNames, Components, Language, BreakpointClass, Breakpoint } from '@/consts';
+import { SECONDS_IN_TYPE, ASSET_SUPPLY_LINE_FILTERS } from '@/consts/snapshots';
+import { fetchData } from '@/indexer/queries/assetSupply';
 import { getLocale } from '@/lang';
 import AppHeader from '@/modules/ADAR/components/App/Header/AppHeader.vue';
 import router, { goTo, lazyComponent } from '@/router';
@@ -98,6 +101,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   showMobilePopup = false;
   showNotifsDarkPage = false;
   responsiveClass = BreakpointClass.LargeDesktop;
+  intervalId: Nullable<NodeJS.Timeout> = null;
 
   @state.settings.browserNotifPopupVisibility private browserNotifPopup!: boolean;
   @state.settings.browserNotifPopupBlockedVisibility private browserNotifPopupBlocked!: boolean;
@@ -275,6 +279,27 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
 
   mounted(): void {
     window.addEventListener('resize', this.setResponsiveClassDebounced);
+
+    // #region LOAD TEST FOR SUBQUERY
+    let index = 0;
+    this.intervalId = setInterval(async () => {
+      ++index;
+      const { type, count } = ASSET_SUPPLY_LINE_FILTERS[0];
+      const seconds = SECONDS_IN_TYPE[type];
+      const now = Math.floor(Date.now() / (seconds * 1000)) * seconds; // rounded to latest snapshot type
+      const aTime = now - seconds * count;
+      try {
+        const data = await fetchData(XOR.address, now, aTime, type);
+        if (!data.length) {
+          alert('SUBSQUID: CHECK CONSOLE!');
+        } else {
+          console.info(`#${index}, DATA has been received, waiting for bug...`);
+        }
+      } catch (err) {
+        alert('SUBSQUID: CHECK CONSOLE!');
+      }
+    }, 2_000);
+    // #endregion
   }
 
   private get isSwapPageWithCharts(): boolean {
@@ -360,6 +385,9 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   }
 
   async beforeDestroy(): Promise<void> {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
     window.removeEventListener('resize', this.setResponsiveClassDebounced);
     await this.resetInternalSubscriptions();
     await this.resetNetworkSubscriptions();
