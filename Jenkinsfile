@@ -25,6 +25,16 @@ def pipeline = new org.js.AppPipeline(steps: this,
     sonarSrcPath: 'src',
     sonarTestsPath: 'tests',
     dojoProductType: 'Dev',
-    movingFiles: [ "*":"./", ".well-known/":"./"]
+    movingFiles: [ "*":"./", ".well-known/":"./"],
+    k8sPrDeploy: true,
+    vaultPrPath: "argocd-cc/src/charts/adar/web/environments/tachi/",
+    vaultUser: "adar-rw",
+    vaultCredId: "adarVaultCreds",
+    valuesDestPath: "argocd-cc/src/charts/adar/web/",
+    devValuesPath: "dev/dev/",
+    initialSecretName: "adar-adar-web-eso-base",
+    initialNameSpace: "adar-dev-web",
+    targetNameSpace: "adar-${env.CHANGE_ID}-web",
+    targetSecretName: "adar-${env.CHANGE_ID}-adar-web-eso-base"
 )
 pipeline.runPipeline()
