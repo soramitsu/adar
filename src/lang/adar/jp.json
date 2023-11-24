@@ -176,6 +176,11 @@
           "addressInvalid": "無効なアドレス"
         }
       },
+      "adarStats": {
+        "totalAdarTransactions": "ADAR トランザクションの合計数",
+        "uniqueRecipients": "ユニークな受取人数",
+        "dollarEquivalentTokens": "ADAR トランザクションを通じて送信されたトークンのドル換算"
+      },
       "about": {
         "description": "ADARは、中小企業（SMB）のビジネスオーナーが、多数のグローバルサプライヤーや従業員に定期的に支払いを行うことを簡単かつ費用効果的に行うことを可能にします。",
         "learnMore": "詳細を知る"

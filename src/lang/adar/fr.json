@@ -176,6 +176,11 @@
         "addressInvalid": "adresse invalide"
       }
     },
+    "adarStats": {
+      "totalAdarTransactions": "Total des transactions ADAR",
+      "uniqueRecipients": "Destinataires uniques",
+      "dollarEquivalentTokens": "Équivalent en dollars des tokens envoyés via des transactions ADAR"
+    },
     "about": {
       "description": "ADAR permet aux propriétaires de petites et moyennes entreprises (PME) de gagner du temps et de l'argent en facilitant et en réduisant le coût du paiement à un grand nombre de fournisseurs et d'employés mondiaux de manière récurrente.",
       "learnMore": "En savoir plus"

@@ -176,6 +176,11 @@
         "addressInvalid": "address Invalid"
       }
     },
+    "adarStats": {
+      "totalAdarTransactions": "Total ADAR transactions",
+      "uniqueRecipients": "Unique recipients",
+      "dollarEquivalentTokens": "Dollar equivalent of tokens sent via ADAR transactions"
+    },
     "about": {
       "description": "ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis.",
       "learnMore": "Learn More"

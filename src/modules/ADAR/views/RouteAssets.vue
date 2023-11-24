@@ -1,8 +1,8 @@
 <template>
   <div v-loading="parentLoading" class="route-assets">
     <component :is="component"></component>
-    <!-- <adar-stat-widget></adar-stat-widget> -->
-    <div class="stat-cards">
+    <adar-stats v-if="showAdarStats" class="adar-stat-cards"></adar-stats>
+    <!-- <div class="stat-cards">
       <stats-card class="adar-stat-widget">
         <template #title>
           <div slot="header" class="stats-card-title">
@@ -36,7 +36,7 @@
         </template>
         <div class="stats-card-value">${{ usdVolume }}</div>
       </stats-card>
-    </div>
+    </div> -->
     <!-- <div class="temp-div">
       <s-button
         type="primary"
@@ -64,12 +64,15 @@ import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components } from '@/consts';
-import { AdarComponents } from '@/modules/ADAR/consts';
+import { AdarComponents, Stages } from '@/modules/ADAR/consts';
+import { fetchData } from '@/modules/ADAR/indexer/queries/adarStats';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent } from '@/router';
 import { getter, action, mutation, state } from '@/store/decorators';
 import { getTokenEquivalent, getAssetUSDPrice } from '@/store/routeAssets/utils';
 import { FeatureFlags } from '@/store/settings/types';
+
+import AdarStats from '../components/Stats/adarStats.vue';
 
 import type { HistoryItem } from '@sora-substrate/util';
 import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
@@ -83,7 +86,7 @@ import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types
     Routing: adarLazyComponent(AdarComponents.RouteAssetsRouting),
     TransactionOverview: adarLazyComponent(AdarComponents.RouteAssetsTransactionOverview),
     UploadTemplate: adarLazyComponent(AdarComponents.RouteAssetsUploadTemplate),
-    StatsCard: lazyComponent(Components.StatsCard),
+    AdarStats,
   },
 })
 export default class RouteAssets extends Mixins(mixins.LoadingMixin, TranslationMixin) {
@@ -106,16 +109,14 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
 
-  // @Watch('liquiditySource')
-  // private handleLiquiditySourceChange(): void {
-  //   this.subscribeOnReserves();
-  // }
+  // statsArray: any[] = [];
 
   created() {
     this.withApi(async () => {
       this.subscribeOnReserves();
       this.setFeatureFlags({ charts: false, moonpay: false });
-      this.getHistory();
+      // this.getHistory();
+      // this.statsArray = await fetchData();
     });
   }
 
@@ -123,41 +124,12 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     this.cleanSwapReservesSubscription();
   }
 
+  get showAdarStats() {
+    return this.component === Stages[0].component;
+  }
+
   get component() {
     return this.currentStageComponentName;
-  }
-
-  get userTxs() {
-    // return this.historyObject.values()
-    return (Object.values(this.historyObject) as any).filter(
-      (tx) => tx.from === this.address && tx.type === Operation.SwapTransferBatch
-    );
-  }
-
-  get totalTransactionsCount() {
-    return this.userTxs.length;
-  }
-
-  get uniqueRecipients() {
-    return [
-      ...new Set(
-        this.userTxs.reduce((acc, item) => {
-          const dat = item.payload?.receivers.map((receiver) => receiver.accountId) || [];
-          return [...acc, ...dat];
-        }, [])
-      ),
-    ].length;
-  }
-
-  get usdVolume() {
-    return this.userTxs
-      .reduce((acc, item) => {
-        const assetsTable = this.whitelistArray;
-        const asset = assetsTable.find((asset) => asset.address === item.assetAddress);
-        const usd = getAssetUSDPrice(asset, this.fiatPriceObject);
-        return acc.add(usd);
-      }, FPNumber.ZERO)
-      .toLocaleString();
   }
 
   @Watch('txHistoryStoreItem', { deep: true, immediate: true })
@@ -302,40 +274,9 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   }
 }
 
-.adar-stat-widget {
-  width: 230px;
-}
-
-.stat-cards {
-  gap: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: end;
+.adar-stat-cards {
   position: absolute;
   right: 24px;
   top: 24px;
-}
-
-.stats-card {
-  &-title {
-    display: flex;
-    align-items: center;
-    gap: $inner-spacing-mini;
-
-    color: var(--s-color-base-content-secondary);
-    font-size: var(--s-font-size-small);
-    font-weight: 800;
-    text-transform: uppercase;
-  }
-  &-data {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-between;
-    margin-top: $inner-spacing-small;
-  }
-  &-value {
-    font-size: var(--s-font-size-big);
-    font-weight: 800;
-  }
 }
 </style>
