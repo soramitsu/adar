@@ -280,7 +280,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   mounted(): void {
     window.addEventListener('resize', this.setResponsiveClassDebounced);
 
-    // #region LOAD TEST FOR SUBQUERY
+    // #region LOAD TEST FOR SUBQUERY_
     let index = 0;
     this.intervalId = setInterval(async () => {
       ++index;
