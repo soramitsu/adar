@@ -15,7 +15,7 @@ export type Recipient = {
   id: string;
   isCompleted?: boolean;
   txId?: string;
-  exchangeRate?: string;
+  exchangeRate?: FPNumber;
   amountInTokens: boolean;
   useTransfer: boolean;
 };
