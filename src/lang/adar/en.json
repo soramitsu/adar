@@ -178,6 +178,7 @@
     },
     "adarStats": {
       "totalAdarTransactions": "Total ADAR transactions",
+      "transactions": "Transactions",
       "uniqueRecipients": "Unique recipients",
       "dollarEquivalentTokens": "Dollar equivalent of tokens sent via ADAR transactions"
     },

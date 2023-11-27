@@ -5,7 +5,7 @@
       <stats-card class="stats-card">
         <template #title>
           <div slot="header" class="stats-card__title">
-            <span>Transactions</span>
+            <span>{{ t('adar.adarStats.transactions') }}</span>
             <s-tooltip border-radius="mini" :content="t('adar.adarStats.totalAdarTransactions')">
               <s-icon name="info-16" size="14px" />
             </s-tooltip>
@@ -16,7 +16,7 @@
       <stats-card v-if="uniqueRecipients" class="stats-card">
         <template #title>
           <div slot="header" class="stats-card__title">
-            <span>Unique Recipients</span>
+            <span>{{ t('adar.adarStats.uniqueRecipients') }}</span>
             <s-tooltip border-radius="mini" :content="t('adar.adarStats.uniqueRecipients')">
               <s-icon name="info-16" size="14px" />
             </s-tooltip>
@@ -27,7 +27,7 @@
       <stats-card v-if="showUsdVolume" class="stats-card">
         <template #title>
           <div slot="header" class="stats-card__title">
-            <span>USD</span>
+            <span>{{ t('adar.routeAssets.usd') }}</span>
             <s-tooltip border-radius="mini" :content="t('adar.adarStats.dollarEquivalentTokens')">
               <s-icon name="info-16" size="14px" />
             </s-tooltip>

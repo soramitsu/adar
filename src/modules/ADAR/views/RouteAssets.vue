@@ -2,74 +2,18 @@
   <div v-loading="parentLoading" class="route-assets">
     <component :is="component"></component>
     <adar-stats v-if="showAdarStats" class="adar-stat-cards"></adar-stats>
-    <!-- <div class="stat-cards">
-      <stats-card class="adar-stat-widget">
-        <template #title>
-          <div slot="header" class="stats-card-title">
-            <span>Transactions</span>
-            <s-tooltip border-radius="mini" :content="'gggggggg'">
-              <s-icon name="info-16" size="14px" />
-            </s-tooltip>
-          </div>
-        </template>
-        <div class="stats-card-value">{{ totalTransactionsCount }}</div>
-      </stats-card>
-      <stats-card class="adar-stat-widget">
-        <template #title>
-          <div slot="header" class="stats-card-title">
-            <span>Unique Recipients</span>
-            <s-tooltip border-radius="mini" :content="'gggggggg'">
-              <s-icon name="info-16" size="14px" />
-            </s-tooltip>
-          </div>
-        </template>
-        <div class="stats-card-value">{{ uniqueRecipients }}</div>
-      </stats-card>
-      <stats-card class="adar-stat-widget">
-        <template #title>
-          <div slot="header" class="stats-card-title">
-            <span>USD</span>
-            <s-tooltip border-radius="mini" :content="'gggggggg'">
-              <s-icon name="info-16" size="14px" />
-            </s-tooltip>
-          </div>
-        </template>
-        <div class="stats-card-value">${{ usdVolume }}</div>
-      </stats-card>
-    </div> -->
-    <!-- <div class="temp-div">
-      <s-button
-        type="primary"
-        class="s-typography-button--big route-assets-upload-csv__button"
-        @click.stop="previousStage"
-      >
-        {{ 'Previous step' }}
-      </s-button>
-      <s-button
-        type="secondary"
-        class="s-typography-button--big route-assets-upload-csv__button"
-        @click.stop="nextStage"
-      >
-        {{ 'Next step' }}
-      </s-button>
-    </div> -->
   </div>
 </template>
 
 <script lang="ts">
-import { Operation, TransactionStatus, FPNumber } from '@sora-substrate/util';
-import { mixins, api } from '@soramitsu/soraneo-wallet-web';
+import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { Components } from '@/consts';
 import { AdarComponents, Stages } from '@/modules/ADAR/consts';
-import { fetchData } from '@/modules/ADAR/indexer/queries/adarStats';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { lazyComponent } from '@/router';
 import { getter, action, mutation, state } from '@/store/decorators';
-import { getTokenEquivalent, getAssetUSDPrice } from '@/store/routeAssets/utils';
 import { FeatureFlags } from '@/store/settings/types';
 
 import AdarStats from '../components/Stats/adarStats.vue';
@@ -99,9 +43,6 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     args?: ExternalHistoryParams
   ) => Promise<void>;
 
-  @mutation.wallet.transactions.getHistory private getHistory!: FnWithoutArgs;
-  @state.wallet.transactions.history private historyObject!: any;
-  @state.wallet.account.address private address!: string;
   @state.wallet.account.whitelistArray whitelistArray!: Array<WhitelistArrayItem>;
   @state.wallet.account.fiatPriceObject fiatPriceObject!: any;
 
@@ -109,14 +50,10 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
 
-  // statsArray: any[] = [];
-
   created() {
     this.withApi(async () => {
       this.subscribeOnReserves();
       this.setFeatureFlags({ charts: false, moonpay: false });
-      // this.getHistory();
-      // this.statsArray = await fetchData();
     });
   }
 

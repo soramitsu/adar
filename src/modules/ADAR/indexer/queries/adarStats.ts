@@ -1,10 +1,8 @@
-import { FPNumber } from '@sora-substrate/math';
-import { Operation } from '@sora-substrate/util';
 import { getCurrentIndexer, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import { SubqueryIndexer, SubsquidIndexer } from '@soramitsu/soraneo-wallet-web/lib/services/indexer';
-import { ModuleMethods, ModuleNames } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/subsquid/types';
+import { SubqueryIndexer } from '@soramitsu/soraneo-wallet-web/lib/services/indexer';
 import { gql } from '@urql/core';
 
+import type { HistoryItem } from '@sora-substrate/util';
 import type { SubqueryConnectionQueryResponse } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/subquery/types';
 
 const { IndexerType } = WALLET_CONSTS;
@@ -86,8 +84,9 @@ export const historyElementsFilter = ({ address = '' }: any = {}): any => {
   return filter;
 };
 
-export async function fetchData(address = ''): Promise<any> {
+export async function fetchData(address = ''): Promise<Array<HistoryItem>> {
   const indexer = getCurrentIndexer();
+  if (indexer.type !== IndexerType.SUBQUERY) return [];
   const filter = historyElementsFilter({
     address,
   });
@@ -97,9 +96,10 @@ export async function fetchData(address = ''): Promise<any> {
   };
   const subqueryIndexer = indexer as SubqueryIndexer;
   const parseData = async (txs: any) => {
-    const result: any = [];
+    const result: Array<HistoryItem> = [];
     txs.forEach(async (tx) => {
-      result.push(await subqueryIndexer.services.dataParser.parseTransactionAsHistoryItem(tx));
+      const parsedHistoryItem = await subqueryIndexer.services.dataParser.parseTransactionAsHistoryItem(tx);
+      if (parsedHistoryItem) result.push(parsedHistoryItem);
     });
     return result;
   };

@@ -178,6 +178,7 @@
       },
       "adarStats": {
         "totalAdarTransactions": "ADAR トランザクションの合計数",
+        "transactions": "トランザクション",
         "uniqueRecipients": "ユニークな受取人数",
         "dollarEquivalentTokens": "ADAR トランザクションを通じて送信されたトークンのドル換算"
       },
