@@ -29,6 +29,7 @@ function initialState(): RouteAssetsState {
       maxInputAmount: {
         assetSymbol: XOR.symbol,
         amount: FPNumber.ZERO,
+        totalLiquidityProviderFee: FPNumber.ZERO,
         updateDate: new Date(),
       },
       txHistoryData: undefined,

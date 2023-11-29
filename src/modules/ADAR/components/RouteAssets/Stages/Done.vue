@@ -226,14 +226,12 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, 18);
   }
 
-  getRecipientTransferAmount(address: string, assetAddress: string): string {
+  getRecipientTransferAmount(address: string, assetAddress: string): FPNumber {
     const formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
     return new FPNumber(
       this.txHistoryDataTransfers.find((item) => item.to === formattedAddress && item.assetId === assetAddress)
         ?.amount ?? '0'
-    )
-      .dp(4)
-      .toLocaleString();
+    );
   }
 
   formatNumber(num) {
@@ -262,21 +260,24 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     this.t('adar.routeAssets.asset'),
     this.t('adar.routeAssets.stages.transactionOverview.amount'),
     this.t('adar.routeAssets.stages.done.report.exchangeRate'),
-    this.t('adar.routeAssets.status'),
+    // this.t('adar.routeAssets.status'),
   ];
 
-  get reportData() {
+  getReportData(isCsv = false) {
     return this.recipients.map((recipient, idx) => {
+      const usd = recipient.usd.dp(2);
+      const amount = this.getRecipientTransferAmount(recipient.wallet, recipient.asset.address);
+      const rate = recipient.exchangeRate ?? FPNumber.ZERO;
       return [
         `${idx + 1}`,
-        recipient.name.toString(),
-        recipient.wallet.toString(),
-        recipient.usd.dp(2).toLocaleString(),
+        recipient.name,
+        recipient.wallet,
+        isCsv ? usd.toString() : usd.toLocaleString(),
         recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
-        this.getRecipientTransferAmount(recipient.wallet, recipient.asset.address),
-        recipient.amountInTokens || recipient.useTransfer ? '-' : recipient.exchangeRate || '',
-        recipient.status.toString(),
+        isCsv ? amount.toString() : amount.toLocaleString(),
+        isCsv ? rate.toString() : rate.toLocaleString(),
+        // recipient.status.toString(),
       ];
     });
   }
@@ -295,7 +296,9 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         'adar.routeAssets.stages.done.report.blockNumber'
       )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
       '\n' +
-      this.reportData.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n');
+      this.getReportData(true)
+        .map((e) => `${e.join(',')},${txId},${blockNumber},${from}`)
+        .join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -317,8 +320,9 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
     autoTable(doc, {
       head: [this.headers],
-      body: this.reportData as RowInput[],
+      body: this.getReportData() as RowInput[],
       startY: 30,
+      rowPageBreak: 'avoid',
       margin: { top: 5, left: 5, right: 5, bottom: 5 },
       styles: {
         lineColor: [237, 228, 231],
@@ -454,6 +458,12 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     display: block;
     width: 100%;
     margin: 16px 0 0 0;
+
+    span {
+      span {
+        white-space: wrap;
+      }
+    }
   }
 }
 
