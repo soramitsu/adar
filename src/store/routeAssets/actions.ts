@@ -270,7 +270,7 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
       ? new FPNumber(recipient.amount)
       : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
     const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
-    commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toLocaleString() });
+    commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate });
     return {
       recipient,
       swapAndSendData: {
@@ -286,7 +286,7 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
         ? new FPNumber(recipient.amount, recipient.asset?.decimals)
         : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
 
-      commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate?.toLocaleString() });
+      commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate });
 
       return {
         swapAndSendData: {
