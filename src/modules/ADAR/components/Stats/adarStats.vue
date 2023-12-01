@@ -1,51 +1,69 @@
 <template>
-  <div class="adar-stats" v-if="adarTxs.length">
-    <p class="adar-stats__title text-animation">ADAR community usage to date</p>
-    <div class="stat-cards-container">
-      <stats-card class="stats-card">
-        <template #title>
-          <div slot="header" class="stats-card__title">
-            <span>{{ t('adar.adarStats.transactions') }}</span>
-            <s-tooltip border-radius="mini" :content="t('adar.adarStats.totalAdarTransactions')">
-              <s-icon name="info-16" size="14px" />
-            </s-tooltip>
+  <div class="adar-stats">
+    <s-skeleton :loading="!adarTxs.length" :throttle="0" animated>
+      <template #template>
+        <div class="stat-cards-container">
+          <s-skeleton-item element="p" />
+          <s-skeleton-item element="div" class="stats-card-sketeton" />
+          <s-skeleton-item element="div" class="stats-card-sketeton" />
+          <s-skeleton-item element="div" class="stats-card-sketeton" />
+        </div>
+      </template>
+      <p class="adar-stats__title text-animation">{{ t('adar.adarStats.title') }}</p>
+      <div class="stat-cards-container">
+        <stats-card class="stats-card">
+          <template #title>
+            <div slot="header" class="stats-card__title">
+              <span>{{ t('adar.adarStats.transactions') }}</span>
+              <s-tooltip border-radius="mini" :content="t('adar.adarStats.totalAdarTransactions')">
+                <s-icon name="info-16" size="14px" />
+              </s-tooltip>
+            </div>
+          </template>
+          <div class="stats-card__value text-animation">{{ totalTransactionsCount }}</div>
+        </stats-card>
+        <stats-card class="stats-card">
+          <template #title>
+            <div slot="header" class="stats-card__title">
+              <span>{{ t('adar.adarStats.uniqueRecipients') }}</span>
+              <s-tooltip border-radius="mini" :content="t('adar.adarStats.uniqueRecipients')">
+                <s-icon name="info-16" size="14px" />
+              </s-tooltip>
+            </div>
+          </template>
+          <div v-if="uniqueRecipients" class="stats-card__value text-animation">{{ uniqueRecipients }}</div>
+          <div v-else>
+            <spinner />
           </div>
-        </template>
-        <div class="stats-card__value text-animation">{{ totalTransactionsCount }}</div>
-      </stats-card>
-      <stats-card v-if="uniqueRecipients" class="stats-card">
-        <template #title>
-          <div slot="header" class="stats-card__title">
-            <span>{{ t('adar.adarStats.uniqueRecipients') }}</span>
-            <s-tooltip border-radius="mini" :content="t('adar.adarStats.uniqueRecipients')">
-              <s-icon name="info-16" size="14px" />
-            </s-tooltip>
+        </stats-card>
+        <stats-card class="stats-card">
+          <template #title>
+            <div slot="header" class="stats-card__title">
+              <span>{{ t('adar.routeAssets.usd') }}</span>
+              <s-tooltip border-radius="mini" :content="t('adar.adarStats.dollarEquivalentTokens')">
+                <s-icon name="info-16" size="14px" />
+              </s-tooltip>
+            </div>
+          </template>
+          <div v-if="showUsdVolume" class="stats-card__value text-animation">${{ usdVolume.toLocaleString() }}</div>
+          <div v-else>
+            <spinner />
           </div>
-        </template>
-        <div class="stats-card__value text-animation">{{ uniqueRecipients }}</div>
-      </stats-card>
-      <stats-card v-if="showUsdVolume" class="stats-card">
-        <template #title>
-          <div slot="header" class="stats-card__title">
-            <span>{{ t('adar.routeAssets.usd') }}</span>
-            <s-tooltip border-radius="mini" :content="t('adar.adarStats.dollarEquivalentTokens')">
-              <s-icon name="info-16" size="14px" />
-            </s-tooltip>
-          </div>
-        </template>
-        <div class="stats-card__value text-animation">${{ usdVolume.toLocaleString() }}</div>
-      </stats-card>
-    </div>
+        </stats-card>
+      </div>
+    </s-skeleton>
   </div>
 </template>
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util';
+import { SSkeleton, SSkeletonItem } from '@soramitsu/soramitsu-js-ui/lib/components/Skeleton';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components } from '@/consts';
+import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { fetchData } from '@/modules/ADAR/indexer/queries/adarStats';
 import { lazyComponent } from '@/router';
 import { state } from '@/store/decorators';
@@ -53,15 +71,19 @@ import { getAssetUSDPrice } from '@/store/routeAssets/utils';
 
 import type { HistoryItem } from '@sora-substrate/util';
 import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
+import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 @Component({
   components: {
     StatsCard: lazyComponent(Components.StatsCard),
+    SSkeleton,
+    SSkeletonItem,
+    Spinner,
   },
 })
 export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMixin) {
   @state.wallet.account.whitelistArray whitelistArray!: Array<WhitelistArrayItem>;
-  @state.wallet.account.fiatPriceObject fiatPriceObject!: any;
+  @state.wallet.account.fiatPriceObject fiatPriceObject!: FiatPriceObject;
 
   adarTxs: Array<HistoryItem> = [];
 
@@ -106,14 +128,15 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .adar-stats {
   &__title {
     color: var(--s-color-base-content-secondary);
-    font-size: var(--s-font-size-big);
+    font-size: var(--s-font-size-small);
     font-weight: 800;
     text-transform: uppercase;
     margin-bottom: 16px;
+    max-width: 255px;
   }
   .stat-cards-container {
     gap: 16px;
@@ -143,10 +166,16 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
         font-size: var(--s-font-size-big);
         font-weight: 800;
       }
+      &-sketeton {
+        width: 230px;
+        height: 94px;
+      }
     }
   }
 }
+</style>
 
+<style lang="scss" scoped>
 .text-animation {
   background: linear-gradient(
     to right,
@@ -158,7 +187,6 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
   background-size: 200% auto;
 
   background-clip: text;
-  text-fill-color: transparent;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 

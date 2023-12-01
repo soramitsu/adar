@@ -7,7 +7,6 @@
 
 <script lang="ts">
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
@@ -19,7 +18,6 @@ import { FeatureFlags } from '@/store/settings/types';
 import AdarStats from '../components/Stats/adarStats.vue';
 
 import type { HistoryItem } from '@sora-substrate/util';
-import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
 
 @Component({
   components: {
@@ -39,12 +37,6 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
-  @action.wallet.transactions.getExternalHistory private getExternalHistory!: (
-    args?: ExternalHistoryParams
-  ) => Promise<void>;
-
-  @state.wallet.account.whitelistArray whitelistArray!: Array<WhitelistArrayItem>;
-  @state.wallet.account.fiatPriceObject fiatPriceObject!: any;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
@@ -215,5 +207,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   position: absolute;
   right: 24px;
   top: 24px;
+  @media (max-width: 1200px) {
+    display: none;
+  }
 }
 </style>

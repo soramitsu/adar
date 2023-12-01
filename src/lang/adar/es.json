@@ -180,7 +180,8 @@
         "totalAdarTransactions": "Total de transacciones ADAR",
         "transactions": "Transacciones",
         "uniqueRecipients": "Destinatarios únicos",
-        "dollarEquivalentTokens": "Equivalente en dólares de los tokens enviados a través de transacciones ADAR"
+        "dollarEquivalentTokens": "Equivalente en dólares de los tokens enviados a través de transacciones ADAR",
+        "title": "Uso de la comunidad ADAR hasta la fecha"
       },
       "about": {
         "description": "ADAR ahorra tiempo y dinero a los propietarios de pequeñas y medianas empresas (PYMES) al facilitar y abaratar el pago a grandes números de proveedores y empleados globales de forma recurrente.",
