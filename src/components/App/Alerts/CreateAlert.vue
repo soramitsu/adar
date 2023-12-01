@@ -45,14 +45,7 @@
           <span class="slash">/</span>
           <span :class="activeSignClass('-')"> - </span> {{ deltaPercentage }}%
         </span>
-        <div class="asset-highlight">
-          {{ asset.name || asset.symbol }}
-          <s-tooltip :content="copyValueAssetId" tabindex="-1">
-            <span class="asset-id" @click="handleCopyAddress(asset.address, $event)">
-              ({{ getFormattedAddress(asset) }})
-            </span>
-          </s-tooltip>
-        </div>
+        <token-address v-bind="asset" />
       </div>
     </s-float-input>
     <span class="setup-price-alert__title">{{ t('alerts.alertFrequencyTitle') }}</span>
@@ -77,16 +70,16 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/math';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { Component, Mixins, Prop } from 'vue-property-decorator';
+import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 import { Components, MAX_ALERTS_NUMBER, ZeroStringValue } from '@/consts';
 import type { EditableAlertObject, NumberedAlert } from '@/consts';
 import { lazyComponent } from '@/router';
 import { getter, mutation, state } from '@/store/decorators';
 import { AlertFrequencyTabs, AlertTypeTabs } from '@/types/tabs';
-import { formatAddress, getDeltaPercent } from '@/utils';
+import { calcPriceChange, showMostFittingValue } from '@/utils';
 
-import type { AccountAsset, Asset, WhitelistIdsBySymbol } from '@sora-substrate/util/build/assets/types';
+import type { AccountAsset, WhitelistIdsBySymbol } from '@sora-substrate/util/build/assets/types';
 import type { Alert } from '@soramitsu/soraneo-wallet-web/lib/types/common';
 
 @Component({
@@ -94,6 +87,7 @@ import type { Alert } from '@soramitsu/soraneo-wallet-web/lib/types/common';
     TokenLogo: components.TokenLogo,
     FormattedAmount: components.FormattedAmount,
     FormattedAmountWithFiatValue: components.FormattedAmountWithFiatValue,
+    TokenAddress: components.TokenAddress,
     AlertsSelectAsset: lazyComponent(Components.SelectToken),
     TokenSelectButton: lazyComponent(Components.TokenSelectButton),
   },
@@ -107,7 +101,6 @@ export default class CreateAlert extends Mixins(
 ) {
   @state.wallet.settings.alerts alerts!: Array<Alert>;
 
-  @getter.assets.whitelistAssets assets!: Array<Asset>;
   @getter.assets.xor private xor!: AccountAsset;
   @getter.wallet.account.whitelistIdsBySymbol private whitelistIdsBySymbol!: WhitelistIdsBySymbol;
   @getter.assets.assetDataByAddress private getAsset!: (addr?: string) => AccountAsset;
@@ -117,11 +110,19 @@ export default class CreateAlert extends Mixins(
 
   @Prop({ default: null, type: Object }) readonly alertToEdit!: NumberedAlert;
 
+  @Watch('negativeDelta')
+  private updateChoise(value: boolean): void {
+    if (this.autoChoice) {
+      this.currentTypeTab = value ? AlertTypeTabs.Drop : AlertTypeTabs.Raise;
+    }
+
+    this.autoChoice = true;
+  }
+
   readonly delimiters = FPNumber.DELIMITERS_CONFIG;
 
   amount = '';
   asset = {} as AccountAsset;
-  negativeDelta = false;
   autoChoice = true;
 
   currentTypeTab: AlertTypeTabs = AlertTypeTabs.Drop;
@@ -130,75 +131,35 @@ export default class CreateAlert extends Mixins(
   readonly AlertFrequencyTabs = AlertFrequencyTabs;
   readonly AlertTypeTabs = AlertTypeTabs;
 
+  get assetPrice(): FPNumber {
+    return FPNumber.fromCodecValue(this.getAssetFiatPrice(this.asset) ?? ZeroStringValue);
+  }
+
+  get priceChange(): FPNumber {
+    const price = FPNumber.fromNatural(this.amount);
+    const desired = price.isZero() ? this.assetPrice : price;
+    return calcPriceChange(desired, this.assetPrice);
+  }
+
+  get negativeDelta(): boolean {
+    return FPNumber.lt(this.priceChange, FPNumber.ZERO);
+  }
+
   get deltaPercentage(): string {
-    const desiredPrice = FPNumber.fromNatural(this.amount);
-    const assetPrice = this.getAssetFiatPrice(this.asset) ?? ZeroStringValue;
-    let currentPrice = FPNumber.fromCodecValue(assetPrice);
-
-    // if current price is zero, set minimal value for proper calculations
-    if (FPNumber.eq(currentPrice, FPNumber.ZERO)) {
-      currentPrice = FPNumber.fromNatural('0.0000001');
-    }
-
-    if (FPNumber.eq(desiredPrice, currentPrice) || !this.amount) {
-      this.negativeDelta = false;
-      return '0.00';
-    }
-
-    let percent = getDeltaPercent(desiredPrice, currentPrice);
-    this.negativeDelta = FPNumber.lt(percent, FPNumber.ZERO);
-
-    if (this.negativeDelta) {
-      percent = percent.negative();
-      if (this.autoChoice) this.currentTypeTab = AlertTypeTabs.Drop;
-    } else {
-      if (this.autoChoice) this.currentTypeTab = AlertTypeTabs.Raise;
-    }
-
-    this.autoChoice = true;
-    return this.showMostFittingValue(percent.toLocaleString());
+    const value = this.negativeDelta ? this.priceChange.negative() : this.priceChange;
+    return showMostFittingValue(value);
   }
 
   get placeholder(): string {
-    return this.showMostFittingValue(this.fiatAmountValue);
+    return showMostFittingValue(this.assetPrice);
   }
 
   handleTabClick(): void {
     this.autoChoice = false;
   }
 
-  /**
-   * Returns formatted value in most suitable form
-   * @param value
-   *
-   * 0.152345 -> 0.15
-   * 0.000043 -> 0.000043
-   */
-  showMostFittingValue(value, precisionForLowCostAsset = 18) {
-    const [integer, decimal = '00'] = value.split(FPNumber.DELIMITERS_CONFIG.decimal);
-
-    if (parseInt(integer) > 0) {
-      return this.getFormattedValue(value, 2);
-    }
-
-    if (decimal && parseInt(decimal.substring(0, 2)) > 0) {
-      return this.getFormattedValue(value, 2);
-    }
-
-    return this.getFormattedValue(value, precisionForLowCostAsset);
-  }
-
-  getFormattedValue(value: string, precision = 18): string {
-    const [integer, decimal = '00'] = value.split(FPNumber.DELIMITERS_CONFIG.decimal);
-    return `${integer}.${decimal.substring(0, precision)}`;
-  }
-
-  get fiatAmountValue() {
-    return this.getFiatAmount('1', this.asset) || '';
-  }
-
-  get copyValueAssetId(): string {
-    return this.copyTooltip(this.t('assets.assetId'));
+  get fiatAmountValue(): string {
+    return this.assetPrice.toLocaleString();
   }
 
   get btnDisabled(): boolean {
@@ -209,7 +170,7 @@ export default class CreateAlert extends Mixins(
     return this.alertToEdit !== null;
   }
 
-  activeSignClass(sign): string {
+  activeSignClass(sign: string): string {
     if (sign === '+' && this.negativeDelta) return 'delta-percent--not-active';
     if (sign === '-' && !this.negativeDelta) return 'delta-percent--not-active';
     return '';
@@ -261,11 +222,6 @@ export default class CreateAlert extends Mixins(
   selectAsset(selectedAsset?: AccountAsset): void {
     if (!selectedAsset) return;
     this.asset = selectedAsset;
-  }
-
-  getFormattedAddress(asset: AccountAsset): string | undefined {
-    if (!asset.address) return;
-    return formatAddress(asset.address, 10);
   }
 
   mounted(): void {
@@ -375,6 +331,7 @@ export default class CreateAlert extends Mixins(
 .info {
   display: flex;
   align-items: baseline;
+  justify-content: space-between;
 
   .delta-percent {
     margin-right: calc(var(--s-basic-spacing) / 2);
@@ -390,16 +347,6 @@ export default class CreateAlert extends Mixins(
     &--not-active {
       opacity: 40%;
     }
-  }
-
-  .asset-highlight {
-    margin-left: auto;
-    color: var(--s-color-base-content-secondary);
-    font-size: var(--s-font-size-extra-mini);
-    font-weight: 300;
-    line-height: var(--s-line-height-medium);
-    letter-spacing: var(--s-letter-spacing-small);
-    text-align: right;
   }
 }
 </style>

@@ -15,7 +15,7 @@ export type Recipient = {
   id: string;
   isCompleted?: boolean;
   txId?: string;
-  exchangeRate?: string;
+  exchangeRate?: FPNumber;
   amountInTokens: boolean;
   useTransfer: boolean;
 };
@@ -61,11 +61,13 @@ export type MaxInputAmount = {
   assetSymbol: string;
   amount: FPNumber;
   updateDate: Date;
+  totalLiquidityProviderFee: FPNumber;
 };
 
 export type MaxInputAmountInfo = {
   totalAmount: FPNumber;
   totalAmountWithFee: FPNumber;
+  totalLiquidityProviderFee: FPNumber;
   asetSymbol: string;
 };
 
