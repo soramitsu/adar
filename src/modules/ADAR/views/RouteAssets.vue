@@ -12,7 +12,7 @@ import { Component, Mixins, Watch } from 'vue-property-decorator';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { getter, action, mutation, state } from '@/store/decorators';
+import { getter, action, mutation } from '@/store/decorators';
 import { FeatureFlags } from '@/store/settings/types';
 
 import AdarStats from '../components/Stats/adarStats.vue';
