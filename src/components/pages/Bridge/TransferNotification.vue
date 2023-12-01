@@ -2,17 +2,12 @@
   <dialog-base :visible.sync="visibility" class="bridge-transfer-notification">
     <simple-notification modal-content success @submit.native.prevent="close">
       <template #title>{{ t('bridgeTransferNotification.title') }}</template>
-      <s-button
-        v-if="addTokenBtnVisibility"
-        type="secondary"
-        @click="addToken"
-        class="add-token-btn s-typography-button--big"
-      >
+      <s-button v-if="addTokenBtnVisibility" @click="addToken" class="add-token-btn s-typography-button--big">
         <span>{{ t('bridgeTransferNotification.addToken', { symbol: assetSymbol }) }}</span>
         <div class="token-icons">
-          <token-logo :token="asset" />
-          <token-logo class="metamask-icon" />
+          <token-logo size="small" :token="asset" />
         </div>
+        <span>{{ t('operations.andText') }} {{ t('closeText') }}</span>
       </s-button>
     </simple-notification>
   </dialog-base>
@@ -85,39 +80,27 @@ export default class BridgeTransferNotification extends Mixins(TranslationMixin)
     const { externalAddress, externalDecimals, symbol, address } = this.asset;
     const image = this.whitelist[address]?.icon;
     await ethersUtil.addToken(externalAddress, symbol, +externalDecimals, image);
+
+    this.visibility = false;
   }
 }
 </script>
 
 <style lang="scss">
-.dialog-wrapper.bridge-transfer-notification {
-  $metamask-icon-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.8);
-  $metamask-icon-filter: drop-shadow(-5px -5px 10px #ffffff) drop-shadow(1px 1px 10px rgba(0, 0, 0, 0.1));
-
-  .el-dialog .el-dialog__body {
-    .metamask-icon > .asset-logo {
-      background-color: var(--s-color-base-content-secondary);
-      background-image: url('~@/assets/img/metamask.svg');
-      box-shadow: $metamask-icon-shadow;
-      filter: $metamask-icon-filter;
-
-      &:before {
-        content: '';
-      }
-    }
+.bridge-transfer-notification {
+  .el-button + .el-button {
+    margin-left: 0;
   }
 }
 </style>
 
 <style lang="scss" scoped>
 .add-token-btn {
+  width: 100%;
+
   .token-icons {
     display: flex;
-    margin-left: $inner-spacing-mini;
-
-    .metamask-icon {
-      margin-left: -$inner-spacing-tiny;
-    }
+    margin: 0 $inner-spacing-tiny;
   }
 }
 </style>

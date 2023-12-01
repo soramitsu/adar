@@ -7,11 +7,16 @@ export function initialState(): Web3State {
   return {
     evmAddress: '', // external evm address
     subAddress: '', // external sub address
+    subAddressName: '',
     subSS58: 69, // external sub network ss58 prefix (sora by default)
 
     networkType: null, // network type for selected network
     networkSelected: null, // network selected by user
-    evmNetworkProvided: null, // evm network in provider
+
+    evmProvider: null,
+    evmProviderLoading: null,
+    evmProviderNetwork: null, // evm network in provider
+    evmProviderSubscription: null, // provider event listeners
 
     evmNetworkApps: [], // evm networks from app config
     subNetworkApps: {}, // sub netowrks from app config
@@ -33,6 +38,7 @@ export function initialState(): Web3State {
     // dialogs
     selectNetworkDialogVisibility: false,
     selectAccountDialogVisibility: false,
+    selectProviderDialogVisibility: false,
   };
 }
 

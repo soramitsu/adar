@@ -91,16 +91,14 @@ export const ObjectInit = () => null;
 
 export const ZeroStringValue = '0';
 
-export const ApproximateSign = '~';
-
-export const MetamaskCancellationCode = 4001;
-
 export const DefaultSlippageTolerance = '0.5';
 
 export enum MarketAlgorithms {
   SMART = 'SMART',
   TBC = 'TBC',
   XYK = 'XYK',
+  XST = 'XST',
+  ORB = 'Order Book',
 }
 
 export const DefaultMarketAlgorithm = MarketAlgorithms.SMART;
@@ -195,6 +193,7 @@ export enum Components {
   BridgeSelectAccount = 'pages/Bridge/SelectAccount',
   BridgeLinksDropdown = 'pages/Bridge/LinksDropdown',
   BridgeLimitCard = 'pages/Bridge/LimitCard',
+  BridgeAccountPanel = 'pages/Bridge/AccountPanel',
   // Moonpay Page
   Moonpay = 'pages/Moonpay/Moonpay',
   MoonpayNotification = 'pages/Moonpay/Notification',
@@ -210,6 +209,7 @@ export enum Components {
   SwapTransactionDetails = 'pages/Swap/TransactionDetails',
   SwapSettings = 'pages/Swap/Settings/Settings',
   SwapLossWarningDialog = 'pages/Swap/LossWarningDialog',
+  SwapDistribution = 'pages/Swap/Distribution',
   // Referrals Page
   ReferralsConfirmBonding = 'pages/Referrals/ConfirmBonding',
   ReferralsConfirmInviteUser = 'pages/Referrals/ConfirmInviteUser',
@@ -238,6 +238,7 @@ export enum Components {
   ConfirmBridgeTransactionDialog = 'shared/Dialog/ConfirmBridgeTransaction',
   NetworkFeeWarningDialog = 'shared/Dialog/NetworkFeeWarning',
   PaymentErrorDialog = 'shared/Dialog/PaymentError',
+  SelectProviderDialog = 'shared/Dialog/SelectProvider',
   // Shared Asset selection
   SelectAssetList = 'shared/SelectAsset/List',
   SelectToken = 'shared/SelectAsset/SelectToken',
@@ -249,6 +250,7 @@ export enum Components {
   StatsFilter = 'shared/Stats/StatsFilter',
   // Shared Chart
   ChartSkeleton = 'shared/Chart/ChartSkeleton',
+  DataRowSkeleton = 'shared/Skeleton/DataRow',
 }
 
 export enum RewardsTabsItems {
@@ -304,10 +306,10 @@ const MainMenu: Array<SidebarMenuItemLink> = [
   //   icon: 'basic-layers-24',
   //   title: PageNames.StakingContainer,
   // },
-  // {
-  //   icon: 'grid-block-distribute-vertically-24',
-  //   title: PageNames.Bridge,
-  // },
+  {
+    icon: 'grid-block-distribute-vertically-24',
+    title: PageNames.Bridge,
+  },
 ];
 
 const AccountMenu: Array<SidebarMenuItemLink> = [

@@ -9,7 +9,7 @@
         size="big"
         primary
       >
-        <generic-page-header class="header--bridge" :title="t('bridge.title')" :tooltip="t('bridge.info')">
+        <generic-page-header class="header--bridge" :title="t('hashiBridgeText')" :tooltip="t('bridge.info')">
           <div class="bridge-header-buttons">
             <s-button
               v-if="areAccountsConnected"
@@ -100,19 +100,24 @@
                 />
               </template>
             </div>
-            <div v-if="sender" class="bridge-item-footer">
+            <div v-if="sender" class="connect-wallet-panel">
               <s-divider type="tertiary" />
-              <s-tooltip
-                :content="getCopyTooltip(isSoraToEvm)"
-                border-radius="mini"
-                placement="bottom-end"
-                tabindex="-1"
-              >
-                <span class="bridge-network-address" @click="handleCopyAddress(sender, $event)">
-                  {{ formatAddress(sender, 8) }}
+              <bridge-account-panel :address="sender" :name="senderName" :tooltip="getCopyTooltip(isSoraToEvm)">
+                <template #icon v-if="changeSenderWalletEvm">
+                  <img :src="getEvmProviderIcon(evmProvider)" :alt="evmProvider" class="connect-wallet-logo" />
+                </template>
+              </bridge-account-panel>
+              <div class="connect-wallet-group">
+                <span v-if="changeSenderWalletEvm" class="connect-wallet-btn" @click="connectExternalWallet">
+                  {{ t('changeAccountText') }}
                 </span>
-              </s-tooltip>
-              <span>{{ t('connectedText') }}</span>
+                <span v-else>{{ t('connectedText') }}</span>
+                <span
+                  v-if="changeSenderWalletEvm"
+                  class="connect-wallet-btn disconnect"
+                  @click="resetEvmProviderConnection"
+                >{{ t('disconnectWalletText') }}</span>
+              </div>
             </div>
             <s-button
               v-else
@@ -180,27 +185,33 @@
                 />
               </template>
             </div>
-            <div v-if="recipient" class="bridge-item-footer">
+            <div v-if="recipient" class="connect-wallet-panel">
               <s-divider type="tertiary" />
-              <s-tooltip
-                :content="getCopyTooltip(!isSoraToEvm)"
-                border-radius="mini"
-                placement="bottom-end"
-                tabindex="-1"
-              >
-                <span class="bridge-network-address" @click="handleCopyAddress(recipient, $event)">
-                  {{ formatAddress(recipient, 8) }}
+              <bridge-account-panel :address="recipient" :name="recipientName" :tooltip="getCopyTooltip(!isSoraToEvm)">
+                <template #icon v-if="changeRecipientWalletEvm">
+                  <img :src="getEvmProviderIcon(evmProvider)" :alt="evmProvider" class="connect-wallet-logo" />
+                </template>
+              </bridge-account-panel>
+              <div class="connect-wallet-group">
+                <span
+                  v-if="isSubBridge || changeRecipientWalletEvm"
+                  class="connect-wallet-btn"
+                  @click="connectExternalWallet"
+                >
+                  {{ t('changeAccountText') }}
                 </span>
-              </s-tooltip>
-              <span v-if="isSubBridge" class="bridge-network-address" @click="connectExternalWallet">
-                {{ t('changeAccountText') }}
-              </span>
-              <span v-else>{{ t('connectedText') }}</span>
+                <span v-else>{{ t('connectedText') }}</span>
+                <span
+                  v-if="changeRecipientWalletEvm"
+                  class="connect-wallet-btn disconnect"
+                  @click="resetEvmProviderConnection"
+                >{{ t('disconnectWalletText') }}</span>
+              </div>
             </div>
             <s-button
               v-else
               class="el-button--connect s-typography-button--large"
-              data-test-name="connectMetamask"
+              data-test-name="useMetamaskProvider"
               type="primary"
               @click="connectRecipientWallet"
             >
@@ -210,7 +221,7 @@
         </s-float-input>
 
         <s-button
-          v-if="!isValidNetwork"
+          v-if="!isValidNetwork && areAccountsConnected"
           class="el-button--next s-typography-button--big"
           type="primary"
           @click="changeEvmNetworkProvided"
@@ -263,7 +274,7 @@
             v-if="!isInsufficientBalance && (isLowerThanMinAmount || isGreaterThanMaxAmount)"
             class="bridge-limit-card"
             :max="isGreaterThanMaxAmount"
-            :amount="(isGreaterThanMaxAmount ? outgoingMaxAmount : incomingMinAmount).toLocaleString()"
+            :amount="(isGreaterThanMaxAmount ? transferMaxAmount : transferMinAmount).toLocaleString()"
             :symbol="asset.symbol"
           />
 
@@ -286,6 +297,7 @@
     <bridge-select-asset :visible.sync="showSelectTokenDialog" :asset="asset" @select="selectAsset" />
     <bridge-select-account />
     <bridge-select-network />
+    <select-provider-dialog />
     <confirm-bridge-transaction-dialog
       :visible.sync="showConfirmTransactionDialog"
       :is-sora-to-evm="isSoraToEvm"
@@ -348,8 +360,10 @@ import type { AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/
     BridgeSelectAsset: lazyComponent(Components.BridgeSelectAsset),
     BridgeSelectNetwork: lazyComponent(Components.BridgeSelectNetwork),
     BridgeSelectAccount: lazyComponent(Components.BridgeSelectAccount),
+    BridgeAccountPanel: lazyComponent(Components.BridgeAccountPanel),
     BridgeTransactionDetails: lazyComponent(Components.BridgeTransactionDetails),
     BridgeLimitCard: lazyComponent(Components.BridgeLimitCard),
+    SelectProviderDialog: lazyComponent(Components.SelectProviderDialog),
     GenericPageHeader: lazyComponent(Components.GenericPageHeader),
     ConfirmBridgeTransactionDialog: lazyComponent(Components.ConfirmBridgeTransactionDialog),
     NetworkFeeWarningDialog: lazyComponent(Components.NetworkFeeWarningDialog),
@@ -364,7 +378,6 @@ import type { AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/
 export default class Bridge extends Mixins(
   mixins.FormattedAmountMixin,
   mixins.NetworkFeeWarningMixin,
-  mixins.CopyAddressMixin,
   BridgeMixin,
   NetworkFormatterMixin,
   NetworkFeeDialogMixin,
@@ -380,8 +393,9 @@ export default class Bridge extends Mixins(
   @state.assets.registeredAssetsFetching private registeredAssetsFetching!: boolean;
   @state.bridge.amountSend amountSend!: string;
   @state.bridge.amountReceived amountReceived!: string;
-  @state.bridge.isSoraToEvm isSoraToEvm!: boolean;
 
+  @getter.bridge.senderName senderName!: string;
+  @getter.bridge.recipientName recipientName!: string;
   @getter.bridge.isRegisteredAsset isRegisteredAsset!: boolean;
   @getter.bridge.operation private operation!: Operation;
   @getter.settings.nodeIsConnected nodeIsConnected!: boolean;
@@ -457,6 +471,14 @@ export default class Bridge extends Mixins(
     return asZeroValue(this.amountReceived);
   }
 
+  get transferMaxAmount(): FPNumber | null {
+    return this.getTransferMaxAmount(this.isSoraToEvm);
+  }
+
+  get transferMinAmount(): FPNumber | null {
+    return this.getTransferMinAmount(this.isSoraToEvm);
+  }
+
   get maxValue(): string {
     if (!(this.asset && this.isRegisteredAsset)) return ZeroStringValue;
 
@@ -466,8 +488,8 @@ export default class Bridge extends Mixins(
       isExternalNative: this.isNativeTokenSelected,
     });
 
-    if (this.isSoraToEvm && this.outgoingMaxAmount) {
-      if (FPNumber.gt(maxBalance, this.outgoingMaxAmount)) return this.outgoingMaxAmount.toString();
+    if (this.transferMaxAmount) {
+      if (FPNumber.gt(maxBalance, this.transferMaxAmount)) return this.transferMaxAmount.toString();
     }
 
     return maxBalance.toString();
@@ -481,11 +503,11 @@ export default class Bridge extends Mixins(
   }
 
   get isGreaterThanMaxAmount(): boolean {
-    return this.isGreaterThanOutgoingMaxAmount(this.amountSend, this.asset, this.isSoraToEvm, this.isRegisteredAsset);
+    return this.isGreaterThanTransferMaxAmount(this.amountSend, this.asset, this.isSoraToEvm, this.isRegisteredAsset);
   }
 
   get isLowerThanMinAmount(): boolean {
-    return this.isLowerThanIncomingMinAmount(this.amountSend, this.asset, this.isSoraToEvm, this.isRegisteredAsset);
+    return this.isLowerThanTransferMinAmount(this.amountSend, this.asset, this.isSoraToEvm, this.isRegisteredAsset);
   }
 
   get isInsufficientXorForFee(): boolean {
@@ -590,6 +612,14 @@ export default class Bridge extends Mixins(
     return Math.min(internal, external);
   }
 
+  get changeSenderWalletEvm(): boolean {
+    return !this.isSubBridge && !!this.evmProvider && !this.isSoraToEvm;
+  }
+
+  get changeRecipientWalletEvm(): boolean {
+    return !this.isSubBridge && !!this.evmProvider && this.isSoraToEvm;
+  }
+
   private getBalance(isSora = true): Nullable<FPNumber> {
     if (!(this.asset && (this.isRegisteredAsset || isSora))) {
       return null;
@@ -625,9 +655,7 @@ export default class Bridge extends Mixins(
 
   getCopyTooltip(isSoraNetwork = false): string {
     const networkName = this.formatNetworkShortName(isSoraNetwork);
-    const text = `${networkName} ${this.t('addressText')}`;
-
-    return this.copyTooltip(text);
+    return `${networkName} ${this.t('addressText')}`;
   }
 
   handleMaxValue(): void {
@@ -746,6 +774,36 @@ $bridge-input-color: var(--s-color-base-content-tertiary);
 </style>
 
 <style lang="scss" scoped>
+.connect-wallet {
+  &-panel {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: var(--s-font-size-mini);
+    line-height: var(--s-line-height-medium);
+    color: var(--s-color-base-content-primary);
+  }
+
+  &-logo {
+    width: 18px;
+    height: 18px;
+  }
+
+  &-group {
+    display: flex;
+    align-items: center;
+    gap: $inner-spacing-mini;
+  }
+
+  &-btn {
+    @include copy-address;
+
+    &.disconnect {
+      color: var(--s-color-status-error);
+    }
+  }
+}
+
 .bridge {
   flex-direction: column;
   align-items: center;
@@ -774,19 +832,6 @@ $bridge-input-color: var(--s-color-base-content-tertiary);
     align-items: center;
     gap: $inner-spacing-mini;
     margin-left: auto;
-  }
-
-  &-item-footer {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    font-size: var(--s-font-size-mini);
-    line-height: var(--s-line-height-medium);
-    color: var(--s-color-base-content-primary);
-  }
-
-  &-network-address {
-    @include copy-address;
   }
 
   &-footer {

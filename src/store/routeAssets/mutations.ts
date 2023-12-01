@@ -117,11 +117,19 @@ const mutations = defineMutations<RouteAssetsState>()({
   setSlippageTolerance(state, slippage: string): void {
     state.processingState.slippageTolerance = slippage;
   },
-  updateMaxInputAmount(state, { amount, assetSymbol }: { amount: FPNumber; assetSymbol: string }): void {
+  updateMaxInputAmount(
+    state,
+    {
+      amount,
+      assetSymbol,
+      totalLiquidityProviderFee,
+    }: { amount: FPNumber; assetSymbol: string; totalLiquidityProviderFee: FPNumber }
+  ): void {
     state.processingState.maxInputAmount = {
       amount,
       assetSymbol,
       updateDate: new Date(),
+      totalLiquidityProviderFee,
     };
   },
   setPricesAreUpdated(state, value: boolean): void {

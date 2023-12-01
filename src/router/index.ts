@@ -86,29 +86,29 @@ const routes: Array<RouteConfig> = [
   //   name: PageNames.SoraCard,
   //   component: lazyView(PageNames.SoraCard),
   // },
-  // {
-  //   path: '/bridge',
-  //   component: lazyView(PageNames.BridgeContainer),
-  //   children: [
-  //     {
-  //       path: '',
-  //       name: PageNames.Bridge,
-  //       component: lazyView(PageNames.Bridge),
-  //     },
-  //     {
-  //       path: 'history',
-  //       name: PageNames.BridgeTransactionsHistory,
-  //       component: lazyView(PageNames.BridgeTransactionsHistory),
-  //       meta: { requiresAuth: true },
-  //     },
-  //     {
-  //       path: 'transaction',
-  //       name: PageNames.BridgeTransaction,
-  //       component: lazyView(PageNames.BridgeTransaction),
-  //       meta: { requiresAuth: true },
-  //     },
-  //   ],
-  // },
+  {
+    path: '/bridge',
+    component: lazyView(PageNames.BridgeContainer),
+    children: [
+      {
+        path: '',
+        name: PageNames.Bridge,
+        component: lazyView(PageNames.Bridge),
+      },
+      {
+        path: 'history',
+        name: PageNames.BridgeTransactionsHistory,
+        component: lazyView(PageNames.BridgeTransactionsHistory),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'transaction',
+        name: PageNames.BridgeTransaction,
+        component: lazyView(PageNames.BridgeTransaction),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
   // {
   //   path: '/pool',
   //   component: lazyView(PageNames.PoolContainer),

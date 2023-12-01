@@ -2,6 +2,7 @@ import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts
 import { defineMutations } from 'direct-vuex';
 
 import ethersUtil from '@/utils/ethers-util';
+import type { Provider } from '@/utils/ethers-util';
 
 import type { Web3State, EthBridgeSettings, SubNetworkApps } from './types';
 import type { EvmNetwork } from '@sora-substrate/util/build/bridgeProxy/evm/types';
@@ -18,8 +19,9 @@ const mutations = defineMutations<Web3State>()({
     ethersUtil.removeEvmUserAddress();
   },
 
-  setSubAddress(state, address: string): void {
+  setSubAddress(state, { address, name }: { address: string; name: string }): void {
     state.subAddress = address;
+    state.subAddressName = name;
   },
 
   setSubSS58(state, prefix: number) {
@@ -35,12 +37,28 @@ const mutations = defineMutations<Web3State>()({
   setSupportedApps(state, supportedApps: SupportedApps): void {
     state.supportedApps = supportedApps;
   },
-  // by provider
-  setProvidedEvmNetwork(state, networkId: BridgeNetworkId): void {
-    state.evmNetworkProvided = networkId;
+  setEvmProvider(state, provider: Provider): void {
+    state.evmProvider = provider;
   },
-  resetProvidedEvmNetwork(state): void {
-    state.evmNetworkProvided = null;
+  resetEvmProvider(state): void {
+    state.evmProvider = null;
+  },
+  setEvmProviderLoading(state, provider: Nullable<Provider> = null): void {
+    state.evmProviderLoading = provider;
+  },
+  // by provider
+  setProvidedEvmNetwork(state, networkId: BridgeNetworkId | null): void {
+    state.evmProviderNetwork = networkId;
+  },
+  resetEvmProviderNetwork(state): void {
+    state.evmProviderNetwork = null;
+  },
+  setEvmProviderSubscription(state, subscription: FnWithoutArgs): void {
+    state.evmProviderSubscription = subscription;
+  },
+  resetEvmProviderSubscription(state): void {
+    state.evmProviderSubscription?.();
+    state.evmProviderSubscription = null;
   },
   // by user
   setSelectedNetwork(state, networkId: BridgeNetworkId): void {
@@ -59,6 +77,10 @@ const mutations = defineMutations<Web3State>()({
 
   setSelectAccountDialogVisibility(state, flag: boolean): void {
     state.selectAccountDialogVisibility = flag;
+  },
+
+  setSelectProviderDialogVisibility(state, flag: boolean): void {
+    state.selectProviderDialogVisibility = flag;
   },
 
   // for hashi bridge

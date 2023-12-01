@@ -28,13 +28,14 @@ const TranslationConsts = {
   APR: 'APR', // Annual percentage rate
   TVL: 'TVL',
   EVM: 'EVM',
+  Substrate: 'Substrate',
   Kusama: 'Kusama',
-  Metamask: 'MetaMask',
   ROI: 'ROI', // Return of investment
   mbps: 'mbps',
   online: 'Online',
   offline: 'Offline',
   XCM: 'XCM',
+  Max: 'Max.',
 } as const;
 
 @Component

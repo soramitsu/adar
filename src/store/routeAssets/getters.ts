@@ -70,7 +70,7 @@ const getters = defineGetters<RouteAssetsState>()({
   },
   recipientsTokens(...args): Asset[] {
     const { getters, rootGetters } = routeAssetsGetterContext(args);
-    const assetsTable = rootGetters.assets.assetsDataTable;
+    const assetsTable = rootGetters.wallet.account.assetsDataTable;
     const addressSet = [...new Set<string>(getters.recipients.map((item) => item.asset.address))];
     return addressSet.map((item) => assetsTable[item]);
   },
@@ -188,6 +188,7 @@ const getters = defineGetters<RouteAssetsState>()({
       totalAmount: maxInputAmount.amount,
       totalAmountWithFee: totalAmount.add(priceImpact).add(adarFee),
       asetSymbol: maxInputAmount.assetSymbol,
+      totalLiquidityProviderFee: maxInputAmount.totalLiquidityProviderFee,
     };
   },
   outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
