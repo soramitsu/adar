@@ -889,3 +889,12 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     }
   }
 }
+
+@mixin popper-content {
+  background: var(--s-color-utility-surface);
+  border-color: var(--s-color-base-border-secondary);
+  border-radius: var(--s-border-radius-mini);
+  box-shadow: var(--s-shadow-dialog);
+  color: var(--s-color-base-content-primary);
+  padding: $inner-spacing-medium;
+}

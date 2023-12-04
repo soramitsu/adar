@@ -272,11 +272,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
         `${idx + 1}`,
         recipient.name,
         recipient.wallet,
-        isCsv ? usd.toString() : usd.toLocaleString(),
+        isCsv ? usd.toFixed(2) : usd.toLocaleString(),
         recipient.useTransfer ? recipient.asset.symbol : this.inputToken.symbol,
         recipient.asset.symbol,
-        isCsv ? amount.toString() : amount.toLocaleString(),
-        isCsv ? rate.toString() : rate.toLocaleString(),
+        isCsv ? amount.toFixed(7) : amount.toLocaleString(),
+        isCsv ? rate.toFixed(7) : rate.toLocaleString(),
         // recipient.status.toString(),
       ];
     });
@@ -359,7 +359,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
           cellWidth: 25,
         },
         6: {
-          minCellWidth: 25,
+          minCellWidth: 45,
         },
         7: {
           minCellWidth: 25,
