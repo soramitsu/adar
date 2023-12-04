@@ -207,7 +207,7 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   position: absolute;
   right: 24px;
   top: 24px;
-  @media (max-width: 1200px) {
+  @include desktop(true) {
     display: none;
   }
 }

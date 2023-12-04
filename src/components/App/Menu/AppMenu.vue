@@ -340,7 +340,7 @@ export default class AppMenu extends Mixins(TranslationMixin) {
       }
     }
 
-    @include large-desktop {
+    @include tablet {
       position: absolute;
       right: initial;
     }
