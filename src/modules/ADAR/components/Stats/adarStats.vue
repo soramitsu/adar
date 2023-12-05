@@ -82,8 +82,8 @@ import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services
   },
 })
 export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMixin) {
-  @getter.wallet.account.assetsDataTable assetsDataTable!: Readonly<AssetsTable>;
-  @state.wallet.account.fiatPriceObject fiatPriceObject!: FiatPriceObject;
+  @getter.wallet.account.assetsDataTable private assetsDataTable!: Readonly<AssetsTable>;
+  @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
 
   adarTxs: Array<HistoryItem> = [];
 
@@ -114,8 +114,7 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
 
   get usdVolume() {
     return this.adarTxs.reduce((acc, item) => {
-      const assetsTable = Object.values(this.assetsDataTable);
-      const asset = assetsTable.find((asset) => asset.address === item.assetAddress);
+      const asset = this.assetsDataTable[item.assetAddress as string];
       const price = getAssetUSDPrice(asset, this.fiatPriceObject);
       const usd = item?.amount ? price.mul(new FPNumber(item.amount)) : FPNumber.ZERO;
       return acc.add(usd);

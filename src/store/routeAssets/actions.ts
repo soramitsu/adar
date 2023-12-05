@@ -355,8 +355,8 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
   const assetsTable = rootGetters.wallet.account.assetsDataTable;
-  const findAsset = (assetName: string) => {
-    return Object.values(assetsTable).find((item: Asset) => item.address === assetName);
+  const findAsset = (assetAddress: string) => {
+    return assetsTable[assetAddress];
   };
   let inputTokenAmount: FPNumber = FPNumber.ZERO;
   const swapTransferData = groupedData.map((entry) => {
