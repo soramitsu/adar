@@ -5,8 +5,6 @@ import { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/inde
 
 import { Recipient } from './types';
 
-import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
-
 export default {
   validate(recipient: Recipient) {
     return (
@@ -41,11 +39,7 @@ export default {
   },
 };
 
-export function getTokenEquivalent(
-  priceObject: FiatPriceObject,
-  asset: Asset | AccountAsset | WhitelistArrayItem,
-  usd: FPNumber
-): FPNumber {
+export function getTokenEquivalent(priceObject: FiatPriceObject, asset: Asset | AccountAsset, usd: FPNumber): FPNumber {
   return usd.div(FPNumber.fromCodecValue(priceObject[asset.address], asset.decimals));
 }
 

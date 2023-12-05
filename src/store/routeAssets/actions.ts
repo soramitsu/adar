@@ -39,14 +39,14 @@ const actions = defineActions({
     commit.clearData();
   },
   async updateRecipients(context, file?: File): Promise<void> {
-    const { commit, dispatch, rootState } = routeAssetsActionContext(context);
+    const { commit, dispatch, rootState, rootGetters } = routeAssetsActionContext(context);
     if (!file) {
       commit.clearData();
       return;
     }
-    const assetsTable = rootState.wallet.account.whitelistArray;
+    const assetsTable = rootGetters.wallet.account.assetsDataTable;
     const findAsset = (assetName: string) => {
-      return assetsTable.find((item: Asset) => item.symbol === assetName.toUpperCase());
+      return Object.values(assetsTable).find((item: Asset) => item.symbol === assetName.toUpperCase());
     };
 
     const data: Array<any> = [];
@@ -339,7 +339,7 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
 // ______________________________________________________________________
 
 async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
-  const { commit, getters, rootCommit, rootState, rootDispatch } = routeAssetsActionContext(context);
+  const { commit, getters, rootCommit, rootGetters, rootDispatch } = routeAssetsActionContext(context);
   commit.setPricesAreUpdated(false);
   const inputAsset = getters.inputToken;
   const newData = data.map((item) => {
@@ -354,9 +354,9 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
-  const assetsTable = rootState.wallet.account.whitelistArray;
+  const assetsTable = rootGetters.wallet.account.assetsDataTable;
   const findAsset = (assetName: string) => {
-    return assetsTable.find((item: Asset) => item.address === assetName);
+    return Object.values(assetsTable).find((item: Asset) => item.address === assetName);
   };
   let inputTokenAmount: FPNumber = FPNumber.ZERO;
   const swapTransferData = groupedData.map((entry) => {
