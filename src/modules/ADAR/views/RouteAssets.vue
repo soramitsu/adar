@@ -1,5 +1,5 @@
 <template>
-  <div v-loading="parentLoading" class="route-assets">
+  <div v-loading="parentLoading || !adarDataLoaded" class="route-assets">
     <component :is="component"></component>
     <adar-stats v-if="showAdarStats" class="adar-stat-cards"></adar-stats>
   </div>
@@ -7,17 +7,20 @@
 
 <script lang="ts">
 import { mixins } from '@soramitsu/soraneo-wallet-web';
+import isEmpty from 'lodash/fp/isEmpty';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { getter, action, mutation } from '@/store/decorators';
+import { getter, action, mutation, state } from '@/store/decorators';
 import { FeatureFlags } from '@/store/settings/types';
 
 import AdarStats from '../components/Stats/adarStats.vue';
 
 import type { HistoryItem } from '@sora-substrate/util';
+import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
+import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 @Component({
   components: {
@@ -37,6 +40,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
+  @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
+  @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
@@ -51,6 +56,10 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
 
   beforeDestroy(): void {
     this.cleanSwapReservesSubscription();
+  }
+
+  get adarDataLoaded() {
+    return !!this.whitelistArray.length && !isEmpty(this.fiatPriceObject);
   }
 
   get showAdarStats() {

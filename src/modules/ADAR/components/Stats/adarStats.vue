@@ -59,7 +59,6 @@
 import { FPNumber } from '@sora-substrate/util';
 import { SSkeleton, SSkeletonItem } from '@soramitsu/soramitsu-js-ui/lib/components/Skeleton';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import { AssetsTable } from '@soramitsu/soraneo-wallet-web/lib/types/common';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
@@ -67,10 +66,11 @@ import { Components } from '@/consts';
 import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { fetchData } from '@/modules/ADAR/indexer/queries/adarStats';
 import { lazyComponent } from '@/router';
-import { getter, state } from '@/store/decorators';
+import { state } from '@/store/decorators';
 import { getAssetUSDPrice } from '@/store/routeAssets/utils';
 
 import type { HistoryItem } from '@sora-substrate/util';
+import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
 import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 @Component({
@@ -82,7 +82,7 @@ import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services
   },
 })
 export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMixin) {
-  @getter.wallet.account.assetsDataTable private assetsDataTable!: Readonly<AssetsTable>;
+  @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
   @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
 
   adarTxs: Array<HistoryItem> = [];
@@ -114,7 +114,8 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
 
   get usdVolume() {
     return this.adarTxs.reduce((acc, item) => {
-      const asset = this.assetsDataTable[item.assetAddress as string];
+      const assetsTable = this.whitelistArray;
+      const asset = assetsTable.find((asset) => asset.address === item.assetAddress);
       const price = getAssetUSDPrice(asset, this.fiatPriceObject);
       const usd = item?.amount ? price.mul(new FPNumber(item.amount)) : FPNumber.ZERO;
       return acc.add(usd);
