@@ -107,9 +107,6 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
     @include tablet(true) {
       display: none;
     }
-    @media (max-width: 1550px) and (min-width: 1440px) {
-      left: 40%;
-    }
   }
 
   .balance-widget {

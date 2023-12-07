@@ -22,7 +22,7 @@
           :default-active="currentPath"
           @select="onSelect"
         >
-          <s-menu-item-group v-for="(item, index) in sidebarMenuItems" :key="index">
+          <s-menu-item-group v-for="item in sidebarMenuItems" :key="item.index || item.title">
             <s-menu-item
               v-button
               :key="item.title"
@@ -289,7 +289,7 @@ export default class AppMenu extends Mixins(TranslationMixin) {
 
   .el-menu-item {
     i.el-icon-bank-card {
-      width: 28px;
+      width: 28px; // to avoid issue with paddings
     }
   }
 }
@@ -340,7 +340,7 @@ export default class AppMenu extends Mixins(TranslationMixin) {
       }
     }
 
-    @include large-desktop {
+    @include tablet {
       position: absolute;
       right: initial;
     }

@@ -1,36 +1,27 @@
 <template>
-  <div v-loading="parentLoading" class="route-assets">
+  <div v-loading="parentLoading || !adarDataLoaded" class="route-assets">
     <component :is="component"></component>
-    <!-- <div class="temp-div">
-      <s-button
-        type="primary"
-        class="s-typography-button--big route-assets-upload-csv__button"
-        @click.stop="previousStage"
-      >
-        {{ 'Previous step' }}
-      </s-button>
-      <s-button
-        type="secondary"
-        class="s-typography-button--big route-assets-upload-csv__button"
-        @click.stop="nextStage"
-      >
-        {{ 'Next step' }}
-      </s-button>
-    </div> -->
+    <adar-stats v-if="showAdarStats" class="adar-stat-cards"></adar-stats>
   </div>
 </template>
 
 <script lang="ts">
 import { mixins } from '@soramitsu/soraneo-wallet-web';
+import isEmpty from 'lodash/fp/isEmpty';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { AdarComponents } from '@/modules/ADAR/consts';
+import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { getter, action, mutation } from '@/store/decorators';
+import { getter, action, mutation, state } from '@/store/decorators';
 import { FeatureFlags } from '@/store/settings/types';
 
+import AdarStats from '../components/Stats/adarStats.vue';
+
 import type { HistoryItem } from '@sora-substrate/util';
+import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
+import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
+
 @Component({
   components: {
     Authorize: adarLazyComponent(AdarComponents.RouteAssetsAuthorize),
@@ -40,6 +31,7 @@ import type { HistoryItem } from '@sora-substrate/util';
     Routing: adarLazyComponent(AdarComponents.RouteAssetsRouting),
     TransactionOverview: adarLazyComponent(AdarComponents.RouteAssetsTransactionOverview),
     UploadTemplate: adarLazyComponent(AdarComponents.RouteAssetsUploadTemplate),
+    AdarStats,
   },
 })
 export default class RouteAssets extends Mixins(mixins.LoadingMixin, TranslationMixin) {
@@ -48,15 +40,12 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
+  @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
+  @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
-
-  // @Watch('liquiditySource')
-  // private handleLiquiditySourceChange(): void {
-  //   this.subscribeOnReserves();
-  // }
 
   created() {
     this.withApi(async () => {
@@ -67,6 +56,14 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
 
   beforeDestroy(): void {
     this.cleanSwapReservesSubscription();
+  }
+
+  get adarDataLoaded() {
+    return !!this.whitelistArray.length && !isEmpty(this.fiatPriceObject);
+  }
+
+  get showAdarStats() {
+    return this.component === Stages[0].component;
   }
 
   get component() {
@@ -212,6 +209,15 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   button {
     display: block;
     margin: 0;
+  }
+}
+
+.adar-stat-cards {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  @include desktop(true) {
+    display: none;
   }
 }
 </style>

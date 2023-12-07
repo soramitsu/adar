@@ -72,6 +72,7 @@
           <div slot="right" v-if="sender || recipient" class="s-flex el-buttons">
             <s-button
               v-if="isMaxAvailable"
+              :loading="isConfirmTxLoading"
               class="el-button--max s-typography-button--small"
               type="primary"
               alternative
@@ -82,8 +83,8 @@
               {{ t('buttons.max') }}
             </s-button>
             <token-select-button
-              class="el-button--select-token"
               icon="chevron-down-rounded-16"
+              :disabled="!!autoselectedAssetAddress"
               :token="asset"
               @click="openSelectAssetDialog"
             />
@@ -171,7 +172,7 @@
             </div>
           </div>
           <div slot="right" v-if="isAssetSelected" class="s-flex el-buttons">
-            <token-select-button class="el-button--select-token" :token="asset" />
+            <token-select-button disabled :token="asset" />
           </div>
           <template #bottom>
             <div class="input-line input-line--footer">
@@ -350,6 +351,7 @@ import {
   getAssetBalance,
   asZeroValue,
   delay,
+  toPrecision,
 } from '@/utils';
 
 import type { IBridgeTransaction, CodecString } from '@sora-substrate/util';
@@ -398,6 +400,7 @@ export default class Bridge extends Mixins(
   @getter.bridge.recipientName recipientName!: string;
   @getter.bridge.isRegisteredAsset isRegisteredAsset!: boolean;
   @getter.bridge.operation private operation!: Operation;
+  @getter.bridge.autoselectedAssetAddress autoselectedAssetAddress!: Nullable<string>;
   @getter.settings.nodeIsConnected nodeIsConnected!: boolean;
 
   @mutation.bridge.setSoraToEvm private setSoraToEvm!: (value: boolean) => void;
@@ -483,16 +486,16 @@ export default class Bridge extends Mixins(
     if (!(this.asset && this.isRegisteredAsset)) return ZeroStringValue;
 
     const fee = this.isSoraToEvm ? this.soraNetworkFee : this.externalNetworkFee;
-    const maxBalance = getMaxBalance(this.asset, fee, {
+    let maxBalance = getMaxBalance(this.asset, fee, {
       isExternalBalance: !this.isSoraToEvm,
       isExternalNative: this.isNativeTokenSelected,
     });
 
-    if (this.transferMaxAmount) {
-      if (FPNumber.gt(maxBalance, this.transferMaxAmount)) return this.transferMaxAmount.toString();
+    if (this.transferMaxAmount && FPNumber.gt(maxBalance, this.transferMaxAmount)) {
+      maxBalance = this.transferMaxAmount;
     }
 
-    return maxBalance.toString();
+    return toPrecision(maxBalance, this.amountDecimals).toString();
   }
 
   get isMaxAvailable(): boolean {
