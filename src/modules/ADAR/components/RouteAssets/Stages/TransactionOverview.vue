@@ -384,6 +384,9 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   &__search {
     width: 300px;
   }
+  @include large-desktop(true) {
+    margin-left: 200px;
+  }
   @include tablet(true) {
     max-width: 85%;
     margin-left: auto;

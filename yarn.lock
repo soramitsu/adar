@@ -2353,10 +2353,10 @@
     vue-property-decorator "^9.1.2"
     vuex "^3.6.2"
 
-"@soramitsu/soraneo-wallet-web@1.26.4":
-  version "1.26.4"
-  resolved "https://nexus.iroha.tech/repository/npm-group/@soramitsu/soraneo-wallet-web/-/soraneo-wallet-web-1.26.4.tgz#fd1fa14b07ab9fc8d8e2f7a99a6c4cbfad65d721"
-  integrity sha512-TFpjTHdPv7OY2BlJjLIWQGJMHone7Q6V+fJIRjvVZ2t1TdOErZQj78mOEdn/hU91Kwmb9Yqraej8m3BmcZgdBw==
+"@soramitsu/soraneo-wallet-web@1.26.5":
+  version "1.26.5"
+  resolved "https://nexus.iroha.tech/repository/npm-group/@soramitsu/soraneo-wallet-web/-/soraneo-wallet-web-1.26.5.tgz#fd751fa6af24d703b00c1fbd3e02297ed64ebbf2"
+  integrity sha512-yp+dnjB7aaY8JnGSFjdT0IbCg/QbcdtAmilluUN86+lMVsBjH3PZIcuINQcDfZ1XyIZP9et5mtLrWcdW0ff+4Q==
   dependencies:
     "@polkadot/vue-identicon" "2.12.1"
     "@sora-substrate/util" "1.26.2"
@@ -5577,9 +5577,9 @@ core-js@^3.26.1, core-js@^3.32.2, core-js@^3.33.2, core-js@^3.8.3:
   integrity sha512-XeBzWI6QL3nJQiHmdzbAOiMYqjrb7hwU7A39Qhvd/POSa/t9E1AeZyEZx3fNvp/vtM8zXwhoL0FsiS0hD0pruQ==
 
 core-js@^3.6.0:
-  version "3.33.3"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.33.3.tgz#3c644a323f0f533a0d360e9191e37f7fc059088d"
-  integrity sha512-lo0kOocUlLKmm6kv/FswQL8zbkH7mVsLJ/FULClOhv8WRVmKLVcs6XPNQAzstfeJTCHMyButEwG+z1kHxHoDZw==
+  version "3.34.0"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.34.0.tgz#5705e6ad5982678612e96987d05b27c6c7c274a5"
+  integrity sha512-aDdvlDder8QmY91H88GzNi9EtQi2TjvQhpCX6B1v/dAZHU1AuLgHvRh54RiOerpEhEW46Tkf+vgAViB/CWC0ag==
 
 core-util-is@1.0.2:
   version "1.0.2"
@@ -9766,9 +9766,9 @@ jsonrepair@^3.2.1:
   integrity sha512-NvCthT+ciKTU62IF8z34WMl6/TEyDcBjFWWVG038Nzd08+v+VfeEI2gElgpgrbYB5tWsiRiwrAo0TTBDoiDpEA==
 
 jspdf-autotable@^3.5.28:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/jspdf-autotable/-/jspdf-autotable-3.7.1.tgz#9fdf74963a86c36e101beed5950186316d4f44ae"
-  integrity sha512-5fgjqE8nIwUoNz5l/i/aD/uONKofE4yp/kJ097EKBllPVTPGnGV5OWHld30db3+CvNrgzrRl8gmTnKF6vag05g==
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/jspdf-autotable/-/jspdf-autotable-3.8.0.tgz#b324c6b3ef198bd634255db829fa2a7a563cecad"
+  integrity sha512-qNPLTCaslDoTY/IF3+3hZ7ovD0uIX8PKq3urQUDyIYgccXBfRBSlSji2raV2Md3DMHcm9tPWWj+9tl83K1pBvQ==
 
 jspdf@^2.5.1:
   version "2.5.1"

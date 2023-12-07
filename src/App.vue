@@ -1,5 +1,5 @@
 <template>
-  <s-design-system-provider :value="libraryDesignSystem" id="app" class="app" :class="responsiveClass">
+  <s-design-system-provider :value="libraryDesignSystem" id="app" class="app" :class="dsProviderClasses">
     <app-header :loading="loading" @toggle-menu="toggleMenu" />
     <div :class="appClasses">
       <app-menu
@@ -60,7 +60,7 @@ import { getLocale } from '@/lang';
 import AppHeader from '@/modules/ADAR/components/App/Header/AppHeader.vue';
 import router, { goTo, lazyComponent } from '@/router';
 import { action, getter, mutation, state } from '@/store/decorators';
-import { preloadFontFace, updateDocumentTitle } from '@/utils';
+import { getMobileCssClasses, preloadFontFace, updateDocumentTitle } from '@/utils';
 
 import { AdarPageNames } from './modules/ADAR/consts';
 import { RecipientStatus, SwapTransferBatchStatus, TransactionInfo } from './store/routeAssets/types';
@@ -281,12 +281,20 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
     return this.$route.name === PageNames.Swap && this.chartsEnabled;
   }
 
+  private get mobileCssClasses(): string[] | undefined {
+    return getMobileCssClasses();
+  }
+
   get isAboutPage(): boolean {
     return this.$route.name === PageNames.About;
   }
 
   get isCurrentPageTooWide(): boolean {
     return this.isAboutPage || this.isSwapPageWithCharts || this.$route.name === PageNames.Tokens;
+  }
+
+  get dsProviderClasses(): string[] | BreakpointClass {
+    return this.mobileCssClasses?.length ? [...this.mobileCssClasses, this.responsiveClass] : this.responsiveClass;
   }
 
   get appClasses(): Array<string> {
@@ -526,6 +534,13 @@ ul ul {
   &-body-scrollbar {
     @include scrollbar;
     flex: 1;
+  }
+}
+
+.mobile.ios {
+  .el-scrollbar__bar,
+  .asset-list .scrollbar {
+    opacity: 0.01 !important; // Fix iOS double tap issues
   }
 }
 

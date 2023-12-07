@@ -15,8 +15,6 @@ export const app = {
   title: 'ADAR — Pay employees anywhere, instantly',
 };
 
-export const MAX_ALERTS_NUMBER = 5;
-
 export const WalletPermissions = {
   sendAssets: true, // enable 'send' button in assets list
   swapAssets: true, // enable 'swap' button in assets list
