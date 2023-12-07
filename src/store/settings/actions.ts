@@ -45,7 +45,7 @@ const actions = defineActions({
     const requestedNode = (node || (state.node.address ? state.node : defaultNode)) as Nullable<Node>;
     const walletOptions = {
       permissions: WalletPermissions,
-      appName: WALLET_CONSTS.TranslationConsts.Polkaswap,
+      appName: WALLET_CONSTS.TranslationConsts.ADAR,
     };
 
     try {

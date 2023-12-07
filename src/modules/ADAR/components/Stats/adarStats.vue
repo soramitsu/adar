@@ -82,8 +82,8 @@ import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services
   },
 })
 export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMixin) {
-  @state.wallet.account.whitelistArray whitelistArray!: Array<WhitelistArrayItem>;
-  @state.wallet.account.fiatPriceObject fiatPriceObject!: FiatPriceObject;
+  @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
+  @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
 
   adarTxs: Array<HistoryItem> = [];
 

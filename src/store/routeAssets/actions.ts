@@ -126,7 +126,7 @@ const actions = defineActions({
     }
     if (!tokens || tokens.length < 1) return;
 
-    api.swap.update();
+    await api.swap.update();
 
     const tokensPromises = tokens.map((tokenAddress) => {
       return new Promise<void>((resolve, reject) => {
