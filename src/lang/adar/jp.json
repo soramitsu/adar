@@ -186,6 +186,20 @@
       "about": {
         "description": "ADARは、中小企業（SMB）のビジネスオーナーが、多数のグローバルサプライヤーや従業員に定期的に支払いを行うことを簡単かつ費用効果的に行うことを可能にします。",
         "learnMore": "詳細を知る"
+      },
+      "routingHistory": {
+        "title": "ルーティング履歴をダウンロード",
+        "description": "このファイルには過去#ヶ月のすべてのルーティングトランザクションが含まれ、.csv形式でダウンロードされます。",
+        "periodLabel": "ファイルの時間範囲",
+        "downloadButtonTitle": "ダウンロード",
+        "dropdownItems" : {
+          "thisWeek": "今週",
+          "lastWeek": "先週",
+          "thisMonth": "今月",
+          "3Months": "3ヶ月",
+          "6Months": "6ヶ月",
+          "year": "年"
+        }
       }
     }
   }
