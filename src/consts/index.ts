@@ -292,10 +292,10 @@ const MainMenu: Array<SidebarMenuItemLink> = [
     title: PageNames.Swap,
     href: '/#/swap',
   },
-  // {
-  //   icon: 'finance-send-24',
-  //   title: PageNames.Send,
-  // },
+  {
+    icon: 'finance-send-24',
+    title: AdarPageNames.RoutingHistory,
+  },
   // {
   //   icon: 'basic-drop-24',
   //   title: PageNames.Pool,
