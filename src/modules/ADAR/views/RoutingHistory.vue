@@ -32,7 +32,7 @@
           type="primary"
           class="s-typography-button--medium restart-button"
           @click.stop="onDownloadClick"
-          :disabled="!adarTxs.length"
+          :disabled="!selectedPeriodTxsNumber"
         >
           <template v-if="!selectedPeriodTxsNumber">
             {{ t('noDataText') }}
