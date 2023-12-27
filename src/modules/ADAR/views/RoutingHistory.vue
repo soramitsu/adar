@@ -34,7 +34,12 @@
           @click.stop="onDownloadClick"
           :disabled="!adarTxs.length"
         >
-          {{ t('adar.routingHistory.downloadButtonTitle') }}
+          <template v-if="!selectedPeriodTxsNumber">
+            {{ t('noDataText') }}
+          </template>
+          <template v-else>
+            {{ t('adar.routingHistory.downloadButtonTitle') }}
+          </template>
         </s-button>
       </div>
     </div>
@@ -89,7 +94,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     },
     {
       title: this.t('adar.routingHistory.dropdownItems.year'),
-      action: () => this.getStartDate(undefined, 0),
+      action: () => this.getStartDate(undefined, undefined, 0),
     },
   ];
 
@@ -236,6 +241,10 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   get userTxs() {
     return this.adarTxs.filter((item) => !item.errorMessage);
+  }
+
+  get selectedPeriodTxsNumber() {
+    return this.userTxs.filter((item) => isAfter(new Date((item as any).endTime), this.selectedPeriod.date)).length;
   }
 }
 </script>
