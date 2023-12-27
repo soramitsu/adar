@@ -81,6 +81,11 @@ const routes: Array<RouteConfig> = [
     name: AdarPageNames.RouteAssets,
     component: adarLazyView(AdarPageNames.RouteAssets),
   },
+  {
+    path: '/routing-history',
+    name: AdarPageNames.RoutingHistory,
+    component: adarLazyView(AdarPageNames.RoutingHistory),
+  },
   // {
   //   path: '/card',
   //   name: PageNames.SoraCard,

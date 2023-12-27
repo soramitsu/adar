@@ -186,6 +186,20 @@
     "about": {
       "description": "ADAR Saves Business Owners Of Small And Medium-Sized Businesses (SMBs) Time And Money By Making It Easy And Cost Effective To Pay Large Numbers Of Global Suppliers And Employees On A Recurring Basis.",
       "learnMore": "Learn More"
+    },
+    "routingHistory": {
+      "title": "Download your routing history",
+      "description": "The file is going to have all of your routing transactions for the past # months, it will be downloaded in a .csv format.",
+      "periodLabel": "file time period",
+      "downloadButtonTitle": "download",
+      "dropdownItems" : {
+        "thisWeek": "this week",
+        "lastWeek": "last week",
+        "thisMonth": "this month",
+        "3Months": "3 months",
+        "6Months": "6 months",
+        "year": "year"
+      }
     }
   }
 }
