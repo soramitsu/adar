@@ -186,6 +186,20 @@
     "about": {
       "description": "ADAR permet aux propriétaires de petites et moyennes entreprises (PME) de gagner du temps et de l'argent en facilitant et en réduisant le coût du paiement à un grand nombre de fournisseurs et d'employés mondiaux de manière récurrente.",
       "learnMore": "En savoir plus"
+    },
+    "routingHistory": {
+      "title": "Téléchargez votre historique de routage",
+      "description": "Le fichier contiendra toutes vos transactions de routage des # derniers mois, il sera téléchargé au format .csv.",
+      "periodLabel": "période de temps du fichier",
+      "downloadButtonTitle": "télécharger",
+      "dropdownItems" : {
+        "thisWeek": "cette semaine",
+        "lastWeek": "semaine dernière",
+        "thisMonth": "ce mois-ci",
+        "3Months": "3 mois",
+        "6Months": "6 mois",
+        "year": "an"
+      }
     }
   }
 }
