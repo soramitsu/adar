@@ -12,14 +12,13 @@
           </svg>
         </div>
       </div>
-      <div class="routing-history__page-header-title">Download your routing history</div>
+      <div class="routing-history__page-header-title">{{ t('adar.routingHistory.title') }}</div>
       <div class="routing-history__page-header-description">
-        The file is going to have all of your routing transactions for the past # months, it will be downloaded in a
-        .csv format.
+        {{ t('adar.routingHistory.description') }}
       </div>
       <div class="routing-history__period period">
         <div class="routing-history__page-header-description">
-          <div class="period__label">File time period</div>
+          <div class="period__label">{{ t('adar.routingHistory.periodLabel') }}</div>
           <s-dropdown type="button" :button-type="'link'" placement="bottom-start" @select="handleSelectPeriodMenu">
             {{ selectedPeriod.title }}
             <template #menu>
@@ -33,9 +32,14 @@
           type="primary"
           class="s-typography-button--medium restart-button"
           @click.stop="onDownloadClick"
-          :disabled="!adarTxs.length"
+          :disabled="!selectedPeriodTxsNumber"
         >
-          {{ 'download' }}
+          <template v-if="!selectedPeriodTxsNumber">
+            {{ t('noDataText') }}
+          </template>
+          <template v-else>
+            {{ t('adar.routingHistory.downloadButtonTitle') }}
+          </template>
         </s-button>
       </div>
     </div>
@@ -45,7 +49,7 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
-import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears } from 'date-fns';
+import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears, isAfter } from 'date-fns';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -69,28 +73,28 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   dropdownPeriodMenuItems = [
     {
-      title: 'This week',
+      title: this.t('adar.routingHistory.dropdownItems.thisWeek'),
       action: () => this.getStartDate(0),
     },
     {
-      title: 'Last week',
+      title: this.t('adar.routingHistory.dropdownItems.lastWeek'),
       action: () => this.getStartDate(1),
     },
     {
-      title: 'This month',
+      title: this.t('adar.routingHistory.dropdownItems.thisMonth'),
       action: () => this.getStartDate(undefined, 0),
     },
     {
-      title: '3 months',
+      title: this.t('adar.routingHistory.dropdownItems.3Months'),
       action: () => this.getStartDate(undefined, 2),
     },
     {
-      title: '6 months',
+      title: this.t('adar.routingHistory.dropdownItems.6Months'),
       action: () => this.getStartDate(undefined, 5),
     },
     {
-      title: 'Year',
-      action: () => this.getStartDate(undefined, 0),
+      title: this.t('adar.routingHistory.dropdownItems.year'),
+      action: () => this.getStartDate(undefined, undefined, 0),
     },
   ];
 
@@ -118,7 +122,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
   created() {
     this.withApi(async () => {
       this.handleSelectPeriodMenu(this.dropdownPeriodMenuItems[0]);
-      this.adarTxs = await fetchData(this.address);
+      if (this.address) this.adarTxs = await fetchData(this.address);
     });
   }
 
@@ -169,19 +173,21 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   downloadCSV(fileName: string) {
     let csvContent = 'data:text/csv;charset=utf-8,';
-    this.getReportData(true).forEach((tx) => {
-      const { txId, from, blockNumber, datetime } = tx.info;
-      const txContent =
-        `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
-        this.headers.join(',') +
-        `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
-          'adar.routeAssets.stages.done.report.blockNumber'
-        )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
-        '\n' +
-        tx.outputTxs.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n') +
-        '\n\n';
-      csvContent = csvContent + txContent;
-    });
+    this.getReportData(true)
+      .filter((item) => isAfter(item.info.datetime, this.selectedPeriod.date))
+      .forEach((tx) => {
+        const { txId, from, blockNumber, datetime } = tx.info;
+        const txContent =
+          `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
+          this.headers.join(',') +
+          `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
+            'adar.routeAssets.stages.done.report.blockNumber'
+          )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
+          '\n' +
+          tx.outputTxs.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n') +
+          '\n\n';
+        csvContent = csvContent + txContent;
+      });
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -193,46 +199,52 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   downloadPDF(fileName: string) {
     const doc = new JsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' });
-    this.getReportData().forEach((tx) => {
-      const { txId, blockId, from, blockNumber, datetime } = tx.info;
-      doc.setFontSize(12);
-      doc.text(`${this.t('adar.routeAssets.stages.done.report.transactionId')} - ${txId}`, 5, 5);
-      doc.text(`${this.t('adar.routeAssets.stages.done.report.blockNumber')} - ${blockNumber}`, 5, 10);
-      doc.text(`${this.t('adar.routeAssets.stages.done.report.blockId')} - ${blockId}`, 5, 15);
-      doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
-      doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
-      autoTable(doc, {
-        head: [this.headers],
-        body: tx.outputTxs as RowInput[],
-        startY: 30,
-        rowPageBreak: 'avoid',
-        margin: { top: 5, left: 5, right: 5, bottom: 5 },
-        styles: {
-          lineColor: [237, 228, 231],
-          lineWidth: 0.3,
-          fontSize: 10,
-        },
-        headStyles: {
-          textColor: [161, 154, 157],
-          fillColor: [253, 247, 251],
-        },
-        bodyStyles: {
-          fillColor: [253, 247, 251],
-          textColor: [38, 38, 45],
-          cellPadding: { top: 10, right: 5, bottom: 10, left: 5 },
-        },
-        alternateRowStyles: {
-          fillColor: [255, 250, 251],
-        },
+    this.getReportData()
+      .filter((item) => isAfter(item.info.datetime, this.selectedPeriod.date))
+      .forEach((tx) => {
+        const { txId, blockId, from, blockNumber, datetime } = tx.info;
+        doc.setFontSize(12);
+        doc.text(`${this.t('adar.routeAssets.stages.done.report.transactionId')} - ${txId}`, 5, 5);
+        doc.text(`${this.t('adar.routeAssets.stages.done.report.blockNumber')} - ${blockNumber}`, 5, 10);
+        doc.text(`${this.t('adar.routeAssets.stages.done.report.blockId')} - ${blockId}`, 5, 15);
+        doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
+        doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
+        autoTable(doc, {
+          head: [this.headers],
+          body: tx.outputTxs as RowInput[],
+          startY: 30,
+          rowPageBreak: 'avoid',
+          margin: { top: 5, left: 5, right: 5, bottom: 5 },
+          styles: {
+            lineColor: [237, 228, 231],
+            lineWidth: 0.3,
+            fontSize: 10,
+          },
+          headStyles: {
+            textColor: [161, 154, 157],
+            fillColor: [253, 247, 251],
+          },
+          bodyStyles: {
+            fillColor: [253, 247, 251],
+            textColor: [38, 38, 45],
+            cellPadding: { top: 10, right: 5, bottom: 10, left: 5 },
+          },
+          alternateRowStyles: {
+            fillColor: [255, 250, 251],
+          },
+        });
+        doc.addPage();
       });
-      doc.addPage();
-    });
 
     doc.save(`${fileName}.pdf`);
   }
 
   get userTxs() {
-    return this.adarTxs;
+    return this.adarTxs.filter((item) => !item.errorMessage);
+  }
+
+  get selectedPeriodTxsNumber() {
+    return this.userTxs.filter((item) => isAfter(new Date((item as any).endTime), this.selectedPeriod.date)).length;
   }
 }
 </script>

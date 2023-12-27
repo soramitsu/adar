@@ -359,7 +359,8 @@
         "StakingContainer": "Staking",
         "Explore\/Container": "Explorar",
         "SoraCard": "{Sora} Tarjeta",
-        "RouteAssets": "Ruta de activos"
+        "RouteAssets": "Ruta de activos",
+        "RoutingHistory": "Historial de enrutamiento"
     },
     "social": {
         "twitter": "Twitter",
