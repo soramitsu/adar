@@ -293,7 +293,7 @@ const MainMenu: Array<SidebarMenuItemLink> = [
     href: '/#/swap',
   },
   {
-    icon: 'finance-send-24',
+    icon: 'software-cloud-checked-24',
     title: AdarPageNames.RoutingHistory,
   },
   // {
