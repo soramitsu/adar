@@ -190,8 +190,8 @@
     "routingHistory": {
       "title": "Download your routing history",
       "description": "The file is going to have all of your routing transactions for the past # months, it will be downloaded in a .csv format.",
-      "periodLabel": "file time period",
-      "downloadButtonTitle": "download",
+      "periodLabel": "routing history time period",
+      "downloadButtonTitle": "download history",
       "dropdownItems" : {
         "thisWeek": "this week",
         "lastWeek": "last week",

@@ -190,8 +190,8 @@
       "routingHistory": {
         "title": "Descargar tu historial de enrutamiento",
         "description": "El archivo contendrá todas tus transacciones de enrutamiento de los últimos # meses, se descargará en formato .csv.",
-        "periodLabel": "periodo de tiempo del archivo",
-        "downloadButtonTitle": "descargar",
+        "periodLabel": "Período de tiempo del historial de enrutamiento",
+        "downloadButtonTitle": "Descargar historial",
         "dropdownItems" : {
           "thisWeek": "esta semana",
           "lastWeek": "semana pasada",
