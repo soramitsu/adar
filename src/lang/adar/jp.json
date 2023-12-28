@@ -190,8 +190,8 @@
       "routingHistory": {
         "title": "ルーティング履歴をダウンロード",
         "description": "このファイルには過去#ヶ月のすべてのルーティングトランザクションが含まれ、.csv形式でダウンロードされます。",
-        "periodLabel": "ファイルの時間範囲",
-        "downloadButtonTitle": "ダウンロード",
+        "periodLabel": "ルーティング履歴の期間",
+        "downloadButtonTitle": "履歴をダウンロード",
         "dropdownItems" : {
           "thisWeek": "今週",
           "lastWeek": "先週",

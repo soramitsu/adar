@@ -13,21 +13,26 @@
         </div>
       </div>
       <div class="routing-history__page-header-title">{{ t('adar.routingHistory.title') }}</div>
-      <div class="routing-history__page-header-description">
+      <!-- <div class="routing-history__page-header-description">
         {{ t('adar.routingHistory.description') }}
-      </div>
+      </div> -->
       <div class="routing-history__period period">
-        <div class="routing-history__page-header-description">
-          <div class="period__label">{{ t('adar.routingHistory.periodLabel') }}</div>
-          <s-dropdown type="button" :button-type="'link'" placement="bottom-start" @select="handleSelectPeriodMenu">
-            {{ selectedPeriod.title }}
-            <template #menu>
-              <s-dropdown-item v-for="(periodItem, idx) in dropdownPeriodMenuItems" :key="idx" :value="periodItem">
-                {{ periodItem.title }}
-              </s-dropdown-item>
-            </template>
-          </s-dropdown>
-        </div>
+        <div class="period__label">{{ t('adar.routingHistory.periodLabel') }}</div>
+        <s-dropdown type="button" :button-type="'link'" placement="bottom-start" @select="handleSelectPeriodMenu">
+          {{ selectedPeriod.title }}
+          <template #menu>
+            <s-dropdown-item
+              v-for="(periodItem, idx) in dropdownPeriodMenuItems"
+              :key="idx"
+              :value="periodItem"
+              class="period__menu-item"
+            >
+              {{ periodItem.title }}
+            </s-dropdown-item>
+          </template>
+        </s-dropdown>
+      </div>
+      <div class="buttons-container">
         <s-button
           type="primary"
           class="s-typography-button--medium restart-button"
@@ -267,6 +272,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     letter-spacing: -0.02em;
     font-feature-settings: 'case' on;
     color: var(--s-color-base-content-primary);
+    margin-bottom: 20px;
   }
 
   &__page-header-description {
@@ -274,7 +280,6 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     font-weight: 300;
     font-size: var(--s-font-size-small);
     line-height: var(--s-line-height-medium);
-    margin-top: 20px;
     margin-bottom: 20px;
   }
 
@@ -296,20 +301,39 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
   }
 
   &__period {
-    box-shadow: var(--s-shadow-element);
+    // box-shadow: var(--s-shadow-element);
     border-radius: 30px;
     background: var(--s-color-base-background);
-    padding: 4px 16px;
+    padding: 16px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
 
-    .period__label {
-      text-align: left;
-      text-transform: uppercase;
-      color: var(--s-color-brand-day);
-      font-weight: 600;
+    .period {
+      &__label {
+        text-align: left;
+        text-transform: uppercase;
+        color: var(--s-color-brand-day);
+        font-weight: 600;
+      }
     }
+  }
+}
+</style>
+
+<style scoped lang="scss">
+.buttons-container {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.period {
+  &__menu-item {
+    text-transform: capitalize;
+    padding: 4px 32px;
   }
 }
 </style>
