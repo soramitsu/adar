@@ -1,4 +1,4 @@
-@Library('jenkins-library@feature/DOPS-2950') _
+@Library('jenkins-library') _
 
 def pipeline = new org.js.AppPipeline(steps: this,
     dockerImageName: 'adar/web',
