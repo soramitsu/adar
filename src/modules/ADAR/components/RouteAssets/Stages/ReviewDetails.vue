@@ -31,14 +31,38 @@
           <div class="field__value usd-appr">{{ usdToBeRouted }}</div>
         </div>
         <s-divider />
-        <div class="field">
-          <div class="field__label">
+
+        <div class="transfer-assets-section">
+          <p class="transfer-assets-section__title">
             {{ t('adar.routeAssets.stages.reviewDetails.adarFee', { adarFee: adarFeePercent }) }}
+          </p>
+          <div>
+            <info-line
+              :label="inputToken.symbol"
+              :value="formatNumber(adarFee)"
+              class="transfer-assets-section__adar-fee-info-line"
+              is-formatted
+            >
+              <template #info-line-prefix>
+                <token-logo class="token-logo" :token="inputToken" />
+              </template>
+            </info-line>
           </div>
-          <div class="field__value">
-            {{ formatNumber(adarFee) }} <token-logo class="token-logo" :token="inputToken" />
+
+          <div v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered" :key="idx">
+            <info-line
+              :label="tokenData.asset.symbol"
+              :value="tokenData.adarFee.toLocaleString()"
+              class="transfer-assets-section__adar-fee-info-line"
+              is-formatted
+            >
+              <template #info-line-prefix>
+                <token-logo class="token-logo" :token="tokenData.asset" />
+              </template>
+            </info-line>
           </div>
         </div>
+
         <s-divider />
         <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.networkFee') }}</div>
@@ -552,6 +576,13 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
     &__asset-title {
       width: 100%;
+    }
+
+    &__adar-fee-info-line {
+      margin-bottom: $inner-spacing-medium;
+      .info-line-label {
+        font-weight: 600;
+      }
     }
 
     .el-collapse.neumorphic .el-icon-arrow-right {
