@@ -2,7 +2,8 @@ import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/cons
 import invert from 'lodash/fp/invert';
 
 import { AdarPageNames } from '@/modules/ADAR/consts';
-import { DemeterPageNames } from '@/modules/demeterFarming/consts';
+import { StakingPageNames } from '@/modules/staking/consts';
+import { SoraStakingPageNames } from '@/modules/staking/sora/consts';
 
 import pkg from '../../package.json';
 
@@ -226,6 +227,7 @@ export enum Components {
   TransactionDetails = 'shared/TransactionDetails',
   PoolInfo = 'shared/PoolInfo',
   Widget = 'shared/Widget',
+  StatusBadge = 'shared/StatusBadge',
   // Shared Buttons
   SortButton = 'shared/Button/SortButton',
   SvgIconButton = 'shared/Button/SvgIconButton/SvgIconButton',
@@ -416,8 +418,13 @@ export const RewardsChildPages = [
   PageNames.ReferralBonding,
   PageNames.ReferralUnbonding,
 ];
-
-export const StakingChildPages = [DemeterPageNames.Staking];
+export const StakingChildPages = [
+  StakingPageNames.Staking,
+  SoraStakingPageNames.Overview,
+  SoraStakingPageNames.NewStake,
+  SoraStakingPageNames.ValidatorsType,
+  SoraStakingPageNames.SelectValidators,
+];
 export const ExploreChildPages = [
   PageNames.ExploreFarming, // By default
   PageNames.ExploreStaking,
