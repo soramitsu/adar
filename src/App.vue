@@ -6,7 +6,7 @@
         :visible="menuVisibility"
         :on-select="goTo"
         :is-about-page-opened="isAboutPage"
-        @open-download-dialog="openDownloadDialog"
+        @open-product-dialog="openProductDialog"
         @click.native="handleAppMenuClick"
       >
         <app-logo-button slot="head" class="app-logo--menu" :theme="libraryTheme" @click="goToSwap" />
@@ -24,7 +24,7 @@
     <app-footer />
     <referrals-confirm-invite-user :visible.sync="showConfirmInviteUser" />
     <bridge-transfer-notification />
-    <app-mobile-popup :visible.sync="showMobilePopup" />
+    <app-mobile-popup :visible.sync="showSoraMobilePopup" />
     <app-browser-notifs-enable-dialog :visible.sync="showBrowserNotifPopup" @set-dark-page="setDarkPage" />
     <app-browser-notifs-blocked-dialog :visible.sync="showBrowserNotifBlockedPopup" />
     <notification-enabling-page v-if="showNotifsDarkPage">
@@ -93,9 +93,10 @@ import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
   },
 })
 export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin) {
+  /** Product-based class fields should be like show${product}Popup */
+  showSoraMobilePopup = false;
   menuVisibility = false;
   showConfirmInviteUser = false;
-  showMobilePopup = false;
   showNotifsDarkPage = false;
   responsiveClass = BreakpointClass.LargeDesktop;
 
@@ -363,8 +364,12 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
     }
   }
 
-  openDownloadDialog(): void {
-    this.showMobilePopup = true;
+  openProductDialog(product: string): void {
+    // Product-based class fields should be like show${product}Popup (like showSoraMobilePopup)
+    const fieldName = `show${product[0].toUpperCase() + product.slice(1)}Popup`;
+    if (typeof this[fieldName] === 'boolean') {
+      this[fieldName] = true;
+    }
   }
 
   async beforeDestroy(): Promise<void> {
@@ -510,6 +515,8 @@ ul ul {
 .app {
   .el-loading-mask {
     background-color: var(--s-color-utility-body);
+    z-index: $app-loader-layer;
+
     .el-loading-spinner {
       background-image: url('~@/assets/img/adar-loader.svg');
       background-repeat: no-repeat;
@@ -608,34 +615,11 @@ ul ul {
     animation: none;
   }
 }
+
 .el-form--actions {
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  $swap-input-class: '.el-input';
-  .s-input--token-value,
-  .s-input-amount {
-    #{$swap-input-class} {
-      #{$swap-input-class}__inner {
-        padding-top: 0;
-      }
-    }
-    #{$swap-input-class}__inner {
-      @include text-ellipsis;
-      height: var(--s-size-small);
-      padding-right: 0;
-      padding-left: 0;
-      border-radius: 0 !important;
-      color: var(--s-color-base-content-primary);
-      font-size: var(--s-font-size-large);
-      line-height: var(--s-line-height-small);
-      font-weight: 800;
-    }
-    .s-placeholder {
-      display: none;
-    }
-  }
 }
 
 .el-message-box {
@@ -675,7 +659,15 @@ i.icon-divider {
   .app-main {
     &.app-main--swap.app-main--has-charts {
       .app-menu {
-        position: relative;
+        &:not(.collapsed) {
+          position: relative;
+        }
+
+        &.collapsed {
+          & + .app-body {
+            margin-left: 74px;
+          }
+        }
       }
     }
   }
@@ -746,7 +738,6 @@ i.icon-divider {
   &-main {
     display: flex;
     align-items: stretch;
-    overflow: hidden;
     height: calc(100vh - #{$header-height} - #{$footer-height});
     position: relative;
   }

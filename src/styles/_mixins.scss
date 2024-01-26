@@ -16,24 +16,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   width: calc((100% / $columns) - ((#{$gap} * (#{$columns} - 1)) / $columns));
 }
 
-@mixin token-styles {
-  .token {
-    display: flex;
-    align-items: center;
-    &-logo {
-      margin-right: $inner-spacing-mini;
-    }
-    &-balance {
-      margin-left: auto;
-    }
-    &-balance-value {
-      margin-left: $inner-spacing-tiny;
-      letter-spacing: var(--s-letter-spacing-big);
-      word-break: break-all;
-    }
-  }
-}
-
 @mixin element-size($className: '', $width: 40px, $height: $width) {
   .#{$className} {
     height: $height;
@@ -143,13 +125,13 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
       }
     }
 
-    .el-button {
-      &--max {
-        &.neumorphic {
-          box-shadow: $button-custom-shadow;
-        }
-      }
-    }
+    // .el-button {
+    //   &--max {
+    //     &.neumorphic {
+    //       box-shadow: $button-custom-shadow;
+    //     }
+    //   }
+    // }
   }
 }
 
@@ -172,77 +154,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   }
 }
 
-@mixin info-line($class: 'swap-info') {
-  .#{$class} {
-    display: flex;
-    align-items: center;
-    margin-top: $inner-spacing-mini;
-    width: 100%;
-    padding-right: $inner-spacing-mini;
-    padding-left: $inner-spacing-mini;
-    color: var(--s-color-base-content-secondary);
-    &-container {
-      width: 100%;
-    }
-    > span:first-of-type {
-      margin-right: $inner-spacing-small;
-      word-break: keep-all;
-    }
-    &-value {
-      margin-left: auto;
-      text-align: right;
-      word-break: break-all;
-    }
-    // TODO: Check this part
-    .asset-title {
-      word-break: keep-all;
-      white-space: nowrap;
-    }
-    .el-tooltip {
-      margin-right: $inner-spacing-mini;
-      flex-shrink: 0;
-    }
-    &-icon {
-      position: relative;
-      height: var(--s-size-mini);
-      width: var(--s-size-mini);
-      background-color: var(--s-color-base-background);
-      border-radius: var(--s-border-radius-small);
-      &:hover {
-        background-color: var(--s-color-base-background-hover);
-        cursor: pointer;
-      }
-      &:before {
-        position: absolute;
-        display: block;
-        height: var(--s-icon-font-size-mini);
-        width: var(--s-icon-font-size-mini);
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-        font-size: var(--s-icon-font-size-mini);
-      }
-    }
-  }
-}
-
-@mixin search-item($class: 'el-form-item--search') {
-  .#{$class} {
-    margin-bottom: 0;
-    position: relative;
-    .s-button--clear {
-      width: 32px;
-      margin-right: -8px;
-      padding: 0;
-      background-color: transparent;
-      border-radius: 0;
-      border: none;
-    }
-  }
-}
-
 @mixin bridge-container {
   max-width: $bridge-width;
   width: 100%;
@@ -257,12 +168,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   width: 100%;
 }
 
-@mixin input-font-styles {
-  height: var(--s-size-small);
-  font-size: $s-font-size-input;
-  line-height: var(--s-line-height-small);
-}
-
 @mixin svg-icon($url: '', $width: var(--s-icon-font-size-mini), $height: $width) {
   display: block;
   width: $width;
@@ -275,28 +180,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   background-size: 100%;
 }
 
-@mixin status-icon($withLoading: false) {
-  &-icon {
-    align-self: center;
-    @include svg-icon;
-    &--waiting,
-    &--pending {
-      @if $withLoading == true {
-        @include loading;
-      }
-      background-image: url('~@/assets/img/status-pending.svg');
-      height: var(--s-font-size-mini);
-      width: var(--s-font-size-mini);
-    }
-    &--error {
-      background-image: url('~@/assets/img/status-error.svg');
-    }
-    &--success {
-      background-image: url('~@/assets/img/status-success.svg');
-    }
-  }
-}
-
 @mixin loading {
   animation: rotation 2s infinite linear;
   @keyframes rotation {
@@ -307,33 +190,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
       transform: rotate(359deg);
     }
   }
-}
-
-// TODO 4 alexnatalia: Check these styles later
-@mixin button-styles {
-  font-weight: 600 !important;
-  text-transform: uppercase;
-  font-size: $s-font-size-button;
-  line-height: var(--s-line-height-small);
-}
-
-@mixin next-button {
-  width: 100%;
-  letter-spacing: var(--s-letter-spacing-big);
-}
-
-@mixin bottom-button {
-  padding: 0;
-  max-width: $bridge-width;
-  @include button-styles;
-  &:active {
-    border: 1px solid var(--s-color-theme-accent);
-    color: var(--s-color-theme-accent);
-  }
-}
-
-@mixin empty-search {
-  color: var(--s-color-base-content-tertiary);
 }
 
 @mixin exchange-tabs {
@@ -475,7 +331,7 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   font-weight: 600;
 }
 
-@mixin scrollbar($marginOffset: 0, $verticalRight: 2px) {
+@mixin scrollbar($marginOffset: 0, $verticalRight: 2px, $isLeft: false) {
   &.el-scrollbar {
     margin-left: $marginOffset;
     margin-right: $marginOffset;
@@ -495,6 +351,10 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     & > .el-scrollbar__bar {
       &.is-vertical {
         right: $verticalRight;
+
+        @if $isLeft == true {
+          left: 0;
+        }
       }
     }
   }
@@ -532,6 +392,11 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     width: 3ch;
   }
 
+  .input-title {
+    line-height: var(--s-line-height-big);
+    font-weight: 600;
+  }
+
   .s-input__content {
     .percent {
       font-size: var(--s-heading1-font-size);
@@ -543,13 +408,14 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   }
 
   .el-input__inner {
-    font-size: var(--s-heading1-font-size) !important;
-    line-height: var(--s-line-height-mini) !important;
-    letter-spacing: var(--s-letter-spacing-mini) !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: none !important;
-    height: auto !important;
+    font-size: var(--s-heading1-font-size);
+    font-weight: 800;
+    line-height: var(--s-line-height-mini);
+    letter-spacing: var(--s-letter-spacing-mini);
+    border: 0;
+    border-radius: 0;
+    background: none;
+    height: auto;
     min-width: 1ch;
     max-width: 3ch;
   }
@@ -865,4 +731,31 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   box-shadow: var(--s-shadow-dialog);
   color: var(--s-color-base-content-primary);
   padding: $inner-spacing-medium;
+}
+
+@mixin mobile-app-logos {
+  .logo {
+    font-size: 12px;
+
+    &__app-store {
+      background: url('@/assets/img/mobile/app-store-logo.svg') no-repeat !important;
+      background-position: 10% center !important;
+      background-size: 12px !important;
+      color: var(--s-color-base-content-secondary) !important;
+      width: 110px;
+      height: var(--s-size-small) !important;
+      margin-right: $inner-spacing-mini;
+      padding-left: 30px !important;
+    }
+
+    &__google-play {
+      background: url('@/assets/img/mobile/google-play-logo.svg') no-repeat !important;
+      background-position: 10% center !important;
+      background-size: 12px !important;
+      color: var(--s-color-base-content-secondary) !important;
+      width: 128px;
+      padding-left: 30px !important;
+      height: var(--s-size-small) !important;
+    }
+  }
 }
