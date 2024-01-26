@@ -28,17 +28,41 @@
         <s-divider />
         <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.totalUsdToRoute') }}</div>
-          <div class="field__value usd">{{ usdToBeRouted }}</div>
+          <div class="field__value usd-appr">{{ usdToBeRouted }}</div>
         </div>
         <s-divider />
-        <div class="field">
-          <div class="field__label">
+
+        <div class="transfer-assets-section">
+          <p class="transfer-assets-section__title">
             {{ t('adar.routeAssets.stages.reviewDetails.adarFee', { adarFee: adarFeePercent }) }}
+          </p>
+          <div>
+            <info-line
+              :label="inputToken.symbol"
+              :value="formatNumber(adarFee)"
+              class="transfer-assets-section__adar-fee-info-line"
+              is-formatted
+            >
+              <template #info-line-prefix>
+                <token-logo class="token-logo" :token="inputToken" />
+              </template>
+            </info-line>
           </div>
-          <div class="field__value">
-            {{ formatNumber(adarFee) }} <token-logo class="token-logo" :token="inputToken" />
+
+          <div v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered" :key="idx">
+            <info-line
+              :label="tokenData.asset.symbol"
+              :value="tokenData.adarFee.toLocaleString()"
+              class="transfer-assets-section__adar-fee-info-line"
+              is-formatted
+            >
+              <template #info-line-prefix>
+                <token-logo class="token-logo" :token="tokenData.asset" />
+              </template>
+            </info-line>
           </div>
         </div>
+
         <s-divider />
         <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.networkFee') }}</div>
@@ -139,7 +163,7 @@
                     <div class="field__value">
                       {{ tokenData.totalAmount.toLocaleString() }}
                       <token-logo class="token-logo" :token="tokenData.asset" />
-                      <div class="usd">{{ tokenData.usd.dp(2).toLocaleString() }}</div>
+                      <div class="usd-appr">{{ tokenData.usd.dp(2).toLocaleString() }}</div>
                     </div>
                   </div>
                 </template>
@@ -227,7 +251,7 @@
         <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.routingDetails.amount') }}</div>
           <div class="field__value">{{ formatNumberJs(assetData.total) }}</div>
-          <div class="field__value usd">{{ formatNumberJs(assetData.usd) }}</div>
+          <div class="field__value usd">{{ assetData.usd.dp(2).toLocaleString() }}</div>
         </div>
       </div>
     </div>
@@ -554,6 +578,13 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
       width: 100%;
     }
 
+    &__adar-fee-info-line {
+      margin-bottom: $inner-spacing-medium;
+      .info-line-label {
+        font-weight: 600;
+      }
+    }
+
     .el-collapse.neumorphic .el-icon-arrow-right {
       transition: transform 0.3s;
 
@@ -620,8 +651,15 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 .usd {
   color: var(--s-color-fiat-value);
   &::before {
-    content: '~ $';
+    content: '$';
     display: inline;
+  }
+  &-appr {
+    color: var(--s-color-fiat-value);
+    &::before {
+      content: '~ $';
+      display: inline;
+    }
   }
 }
 
