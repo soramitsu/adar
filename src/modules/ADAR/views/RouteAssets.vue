@@ -42,20 +42,31 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
   @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
   @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
+  @getter.routeAssets.pricesAreUpdated private pricesAreUpdated!: boolean;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
 
+  timerId: Nullable<NodeJS.Timeout> = null;
+
   created() {
     this.withApi(async () => {
       this.subscribeOnReserves();
+      this.initTimer();
       this.setFeatureFlags({ charts: false, moonpay: false });
     });
   }
 
   beforeDestroy(): void {
     this.cleanSwapReservesSubscription();
+    if (this.timerId) clearInterval(this.timerId);
+  }
+
+  initTimer() {
+    this.timerId = setInterval(() => {
+      if (this.pricesAreUpdated) this.subscribeOnReserves();
+    }, 120_000);
   }
 
   get adarDataLoaded() {

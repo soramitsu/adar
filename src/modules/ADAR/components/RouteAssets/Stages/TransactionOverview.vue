@@ -81,7 +81,7 @@
           </template>
           <template v-slot="{ row }">
             <div>
-              <span class="usd-column__data">{{ formatNumber(row.usd) }}</span>
+              <span class="usd-column__data">{{ formatNumber(row.usd, 2) }}</span>
             </div>
           </template>
         </s-table-column>
@@ -155,6 +155,7 @@
 </template>
 
 <script lang="ts">
+import { FPNumber } from '@sora-substrate/util';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -254,8 +255,8 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
       .join('');
   }
 
-  formatNumber(num) {
-    return num.dp(4).toLocaleString();
+  formatNumber(num: FPNumber, dp = 4) {
+    return num.toLocaleString(dp);
   }
 
   handleResetSearch(): void {

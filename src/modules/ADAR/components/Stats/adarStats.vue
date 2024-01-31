@@ -45,9 +45,7 @@
               </s-tooltip>
             </div>
           </template>
-          <div v-if="showUsdVolume" class="stats-card__value text-animation">
-            ${{ usdVolume.dp(2).toLocaleString() }}
-          </div>
+          <div v-if="showUsdVolume" class="stats-card__value text-animation">${{ usdVolume.toLocaleString(2) }}</div>
           <div v-else>
             <spinner />
           </div>

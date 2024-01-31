@@ -9,6 +9,7 @@ import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
 import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
+import { firstValueFrom } from 'rxjs';
 
 import { adarFee } from '@/modules/ADAR/consts';
 import { routeAssetsActionContext } from '@/store/routeAssets';
@@ -114,8 +115,9 @@ const actions = defineActions({
     commit.deleteRecipient(id);
   },
 
-  async subscribeOnReserves(context, tkn: Asset = XOR): Promise<void> {
+  async subscribeOnReserves(context): Promise<void> {
     const { commit, getters, dispatch } = routeAssetsActionContext(context);
+    if (!getters.recipients.length) return;
     dispatch.cleanSwapReservesSubscription();
     const sourceToken = getters.inputToken;
     const tokens = [...new Set<Asset>(getters.recipients.filter((item) => item.asset).map((item) => item.asset))]
@@ -133,26 +135,15 @@ const actions = defineActions({
         const observableQuote = api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress);
         commit.addSubscription({ assetAddress: tokenAddress });
         if (observableQuote) {
-          const quoteSubscription = observableQuote.subscribe((quoteData) => {
+          firstValueFrom(observableQuote).then((quoteData) => {
             dispatch.setSubscriptionPayload({
               data: quoteData,
               outputAssetId: tokenAddress,
             });
             resolve();
           });
-          commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
+          // commit.addSubscribeObjectToSubscription({ quoteSubscription: undefined, outputAssetId: tokenAddress });
         }
-        // api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress).then((observableQuote) => {
-        //   commit.addSubscription({ assetAddress: tokenAddress });
-        //   const quoteSubscription = observableQuote.subscribe((quoteData) => {
-        //     dispatch.setSubscriptionPayload({
-        //       data: quoteData,
-        //       outputAssetId: tokenAddress,
-        //     });
-        //     resolve();
-        //   });
-        //   commit.addSubscribeObjectToSubscription({ quoteSubscription, outputAssetId: tokenAddress });
-        // });
       });
     });
     Promise.allSettled(tokensPromises).then(() => {
