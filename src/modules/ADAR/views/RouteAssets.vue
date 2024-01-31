@@ -66,7 +66,7 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   initTimer() {
     this.timerId = setInterval(() => {
       if (this.pricesAreUpdated) this.subscribeOnReserves();
-    }, 120_000);
+    }, 60_000);
   }
 
   get adarDataLoaded() {
