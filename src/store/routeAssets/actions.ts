@@ -142,7 +142,6 @@ const actions = defineActions({
             });
             resolve();
           });
-          // commit.addSubscribeObjectToSubscription({ quoteSubscription: undefined, outputAssetId: tokenAddress });
         }
       });
     });
