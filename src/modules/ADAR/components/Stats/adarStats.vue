@@ -45,7 +45,7 @@
               </s-tooltip>
             </div>
           </template>
-          <div v-if="showUsdVolume" class="stats-card__value text-animation">${{ usdVolume.toLocaleString() }}</div>
+          <div v-if="showUsdVolume" class="stats-card__value text-animation">${{ usdVolume.toLocaleString(2) }}</div>
           <div v-else>
             <spinner />
           </div>
@@ -169,6 +169,10 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
       &-sketeton {
         width: 230px;
         height: 94px;
+      }
+
+      &.s-card.neumorphic.s-size-big {
+        padding: 16px 24px;
       }
     }
   }

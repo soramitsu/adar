@@ -246,7 +246,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 .usd {
   color: var(--s-color-fiat-value);
   &::before {
-    content: '~ $';
+    content: '$';
     display: inline;
   }
 }

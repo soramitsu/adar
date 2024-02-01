@@ -82,7 +82,7 @@
         <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.stages.done.routingDetails.amount') }}</div>
           <div class="field__value">{{ formatNumber(assetData.total) }}</div>
-          <div class="field__value usd">{{ formatNumber(assetData.usd) }}</div>
+          <div class="field__value usd">{{ formatNumber(assetData.usd, 2) }}</div>
         </div>
         <s-divider />
         <div class="field">
@@ -234,8 +234,8 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     );
   }
 
-  formatNumber(num) {
-    return new FPNumber(num).dp(4).toLocaleString();
+  formatNumber(num: number, dp = 4) {
+    return new FPNumber(num).toLocaleString(dp);
   }
 
   openFinishRoutingDialog() {
@@ -448,7 +448,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 .usd {
   color: var(--s-color-fiat-value);
   &::before {
-    content: '~ $';
+    content: '$';
     display: inline;
   }
 }

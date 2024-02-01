@@ -227,6 +227,10 @@ const getters = defineGetters<RouteAssetsState>()({
       };
     });
   },
+  pricesAreUpdated(...args): boolean {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.pricesAreUpdated;
+  },
 });
 
 export default getters;
