@@ -167,7 +167,7 @@ export default class AppHeaderMenu extends Mixins(TranslationMixin) {
         value: HeaderMenuType.Disclaimer,
         icon: 'info-16',
         text: this.disclaimerText,
-        disabled: this.discalimerDisabled,
+        disabled: this.disclaimerDisabled,
       },
     ];
   }
@@ -180,7 +180,7 @@ export default class AppHeaderMenu extends Mixins(TranslationMixin) {
     return this.getHeaderMenuItems(true);
   }
 
-  get discalimerDisabled(): boolean {
+  get disclaimerDisabled(): boolean {
     return this.disclaimerVisibility && !this.userDisclaimerApprove;
   }
 
@@ -205,7 +205,7 @@ export default class AppHeaderMenu extends Mixins(TranslationMixin) {
         this.setLanguageDialogVisibility(true);
         break;
       case HeaderMenuType.Disclaimer:
-        if (this.discalimerDisabled) return;
+        if (this.disclaimerDisabled) return;
         this.toggleDisclaimerDialogVisibility();
         break;
     }

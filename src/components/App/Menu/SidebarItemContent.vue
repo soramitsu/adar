@@ -4,7 +4,7 @@
       <adar-about-icon class="sora-card-sidebar-icon" />
     </div>
     <div v-else-if="icon" class="icon-container">
-      <s-icon :name="icon" size="28" />
+      <s-icon :name="icon" size="28" :tooltip-text="title" />
     </div>
     <span>{{ title }}</span>
   </component>

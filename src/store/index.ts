@@ -16,6 +16,7 @@ import routeAssets from './routeAssets';
 import router from './router';
 import settings from './settings';
 import soraCard from './soraCard';
+import staking from './staking';
 import swap from './swap';
 import web3 from './web3';
 
@@ -39,6 +40,7 @@ const modules = {
   rewards,
   demeterFarming,
   routeAssets,
+  staking,
   soraCard,
 };
 

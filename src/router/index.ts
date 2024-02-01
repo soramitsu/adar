@@ -6,8 +6,10 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import { PageNames, BridgeChildPages } from '@/consts';
 import { AdarPageNames } from '@/modules/ADAR/consts';
 import { adarLazyView } from '@/modules/ADAR/router';
-import { DemeterPageNames } from '@/modules/demeterFarming/consts';
-import { demeterLazyView } from '@/modules/demeterFarming/router';
+import { StakingPageNames } from '@/modules/staking/consts';
+import { DemeterStakingPageNames } from '@/modules/staking/demeter/consts';
+import { demeterStakingLazyView, soraStakingLazyView, stakingLazyView } from '@/modules/staking/router';
+import { SoraStakingPageNames } from '@/modules/staking/sora/consts';
 import store from '@/store';
 import { updateDocumentTitle } from '@/utils';
 
@@ -115,52 +117,72 @@ const routes: Array<RouteConfig> = [
     ],
   },
   // {
-  //   path: '/pool',
-  //   component: lazyView(PageNames.PoolContainer),
+  //   path: '',
+  //   component: demeterStakingLazyView(DemeterStakingPageNames.DataContainer),
   //   children: [
   //     {
-  //       path: '',
-  //       component: demeterLazyView(DemeterPageNames.DataContainer),
+  //       path: '/pool',
+  //       component: lazyView(PageNames.PoolContainer),
   //       children: [
   //         {
   //           path: '',
-  //           name: DemeterPageNames.Pool,
-  //           component: demeterLazyView(DemeterPageNames.Pool),
+  //           name: DemeterStakingPageNames.Pool,
+  //           component: demeterStakingLazyView(DemeterStakingPageNames.Pool),
   //           props: { isFarmingPage: true },
   //         },
   //         {
-  //           path: 'add/:firstAddress?/:secondAddress?',
+  //           path: 'add/:first?/:second?',
   //           name: PageNames.AddLiquidity,
   //           component: lazyView(PageNames.AddLiquidity),
   //           meta: { requiresAuth: true },
   //         },
   //         {
-  //           path: 'remove/:firstAddress/:secondAddress',
+  //           path: 'remove/:first/:second',
   //           name: PageNames.RemoveLiquidity,
   //           component: lazyView(PageNames.RemoveLiquidity),
   //           meta: { requiresAuth: true },
   //         },
   //       ],
   //     },
-  //   ],
-  // },
-  // {
-  //   path: '/staking',
-  //   name: PageNames.StakingContainer,
-  //   component: lazyView(PageNames.StakingContainer),
-  //   redirect: { name: DemeterPageNames.Staking },
-  //   children: [
   //     {
-  //       path: 'demeter',
-  //       component: demeterLazyView(DemeterPageNames.DataContainer),
+  //       path: '/staking',
+  //       name: PageNames.StakingContainer,
+  //       component: lazyView(PageNames.StakingContainer),
+  //       redirect: { name: StakingPageNames.Staking },
   //       children: [
   //         {
-  //           path: '',
-  //           name: DemeterPageNames.Staking,
-  //           component: demeterLazyView(DemeterPageNames.Staking),
+  //           path: 'list',
+  //           name: StakingPageNames.Staking,
+  //           component: stakingLazyView(StakingPageNames.Staking),
   //           props: { isFarmingPage: false },
   //         },
   //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: '',
+  //   component: soraStakingLazyView(SoraStakingPageNames.DataContainer),
+  //   children: [
+  //     {
+  //       path: '/staking/sora',
+  //       name: SoraStakingPageNames.Overview,
+  //       component: soraStakingLazyView(SoraStakingPageNames.Overview),
+  //     },
+  //     {
+  //       path: '/staking/sora/new',
+  //       name: SoraStakingPageNames.NewStake,
+  //       component: soraStakingLazyView(SoraStakingPageNames.NewStake),
+  //     },
+  //     {
+  //       path: '/staking/sora/validators/type',
+  //       name: SoraStakingPageNames.ValidatorsType,
+  //       component: soraStakingLazyView(SoraStakingPageNames.ValidatorsType),
+  //     },
+  //     {
+  //       path: '/staking/sora/validators/select',
+  //       name: SoraStakingPageNames.SelectValidators,
+  //       component: soraStakingLazyView(SoraStakingPageNames.SelectValidators),
   //     },
   //   ],
   // },
@@ -172,7 +194,7 @@ const routes: Array<RouteConfig> = [
   //   children: [
   //     {
   //       path: 'demeter',
-  //       component: demeterLazyView(DemeterPageNames.DataContainer),
+  //       component: demeterStakingLazyView(DemeterStakingPageNames.DataContainer),
   //       children: [
   //         {
   //           path: 'staking',
@@ -208,8 +230,28 @@ const routes: Array<RouteConfig> = [
   // },
   // {
   //   path: '/rewards',
-  //   name: PageNames.Rewards,
   //   component: lazyView(PageNames.RewardsTabs),
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: PageNames.Rewards,
+  //       component: lazyView(PageNames.Rewards),
+  //     },
+  //     {
+  //       path: '/referral', // because of leading slash, path will be absolute: #/referral
+  //       name: PageNames.ReferralProgram,
+  //       component: lazyView(PageNames.ReferralProgram),
+  //       children: [
+  //         {
+  //           path: ':referrerAddress?',
+  //           meta: {
+  //             isInvitationRoute: true,
+  //             requiresAuth: true,
+  //           },
+  //         },
+  //       ],
+  //     },
+  //   ],
   // },
   // {
   //   path: '/referral/bond',
@@ -228,33 +270,22 @@ const routes: Array<RouteConfig> = [
   //   },
   // },
   // {
-  //   path: '/referral',
-  //   name: PageNames.Referral,
-  //   component: lazyView(PageNames.RewardsTabs),
-  //   meta: { isReferralProgram: true },
-  //   children: [
-  //     {
-  //       path: ':referrerAddress?',
-  //       meta: {
-  //         isInvitationRoute: true,
-  //         requiresAuth: true,
-  //       },
-  //     },
-  //   ],
+  //   path: '/fiat-deposit',
+  //   name: PageNames.FiatDepositOptions,
+  //   component: lazyView(PageNames.FiatDepositOptions),
   // },
   // {
-  //   path: '/moonpay-history',
-  //   name: PageNames.MoonpayHistory,
-  //   component: lazyView(PageNames.MoonpayHistory),
-  //   meta: { requiresAuth: true },
+  //   path: '/fiat-deposit/history',
+  //   name: PageNames.FiatTxHistory,
+  //   component: lazyView(PageNames.FiatTxHistory),
+  //   meta: {
+  //     requiresAuth: true,
+  //   },
   // },
   // {
   //   path: '/stats',
   //   name: PageNames.Stats,
-  // },
-  // {
-  //   path: '/support',
-  //   name: PageNames.Support,
+  //   component: lazyView(PageNames.Stats),
   // },
   {
     path: '*',
