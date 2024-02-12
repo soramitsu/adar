@@ -78,7 +78,7 @@ export default class RouteAssetsNavigation extends Mixins(TranslationMixin) {
 }
 
 .active {
-  background: #2a171f;
+  background: var(--s-color-utility-body--dark);
   /* neo/drop */
 
   box-shadow: var(--s-shadow-element);
@@ -88,10 +88,13 @@ export default class RouteAssetsNavigation extends Mixins(TranslationMixin) {
   color: white;
   @include flex-center;
   white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: 600;
 
   .circle {
     background: var(--s-color-theme-accent);
     color: white;
+    box-shadow: none;
   }
 }
 
