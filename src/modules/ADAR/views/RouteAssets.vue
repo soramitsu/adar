@@ -9,7 +9,6 @@
 import { Operation } from '@sora-substrate/util';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
-import { delay } from 'lodash';
 import isEmpty from 'lodash/fp/isEmpty';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
@@ -49,6 +48,7 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @state.wallet.account.address private address!: string;
   @getter.routeAssets.pricesAreUpdated private pricesAreUpdated!: boolean;
   @state.wallet.transactions.externalHistory private externalHistory!: AccountHistory<HistoryItem>;
+  @state.wallet.transactions.externalHistoryUpdates private externalHistoryUpdates!: AccountHistory<HistoryItem>;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
 
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
@@ -94,6 +94,10 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     return this.currentStageComponentName;
   }
 
+  get allowFetchHistory() {
+    return this.txHistoryData?.status === 'finalized' && !this.txHistoryStoreItem;
+  }
+
   async getHistoryElement() {
     await this.updateExternalHistory({
       page: 1,
@@ -112,13 +116,11 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     this.updateTxHistoryData(value);
   }
 
-  @Watch('batchTxStatus')
+  @Watch('allowFetchHistory')
   private onStatusChanged(value) {
-    if (value === SwapTransferBatchStatus.SUCCESS) {
-      delay(() => {
-        this.resetExternalHistory();
-        this.getHistoryElement();
-      }, 7000);
+    if (value) {
+      this.resetExternalHistory();
+      this.getHistoryElement();
     }
   }
 }
