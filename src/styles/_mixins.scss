@@ -285,6 +285,7 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     text-align: center;
     &.is-active {
       background: var(--s-color-base-background);
+      box-shadow: var(--s-shadow-element);
     }
     @if $withBottomMargin == true {
       &:last-child {
@@ -304,10 +305,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
       margin-right: 0;
       flex-shrink: 0;
       position: relative;
-    }
-
-    &.is-active {
-      box-shadow: var(--s-shadow-element);
     }
 
     .el-collapse-item__header {
@@ -331,16 +328,22 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
   font-weight: 600;
 }
 
-@mixin scrollbar($marginOffset: 0, $verticalRight: 2px, $isLeft: false) {
+@mixin scrollbar(
+  $marginOffset: 0,
+  $verticalRight: 2px,
+  $isLeft: false,
+  $withHorizontalScroll: false,
+  $hideVerticalScroll: false
+) {
   &.el-scrollbar {
     margin-left: $marginOffset;
     margin-right: $marginOffset;
 
     & > .el-scrollbar__wrap {
-      overflow-x: hidden;
-      margin-bottom: 0px !important; // to disable element-ui negative margin
-    }
-    & > .el-scrollbar__wrap {
+      @if $withHorizontalScroll == false {
+        overflow-x: hidden;
+        margin-bottom: 0px !important; // to disable element-ui negative margin
+      }
       &,
       & > .el-scrollbar__view {
         display: flex;
@@ -348,13 +351,15 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
         flex-flow: column nowrap;
       }
     }
-    & > .el-scrollbar__bar {
-      &.is-vertical {
-        right: $verticalRight;
+    & > .el-scrollbar__bar.is-vertical {
+      right: $verticalRight;
 
-        @if $isLeft == true {
-          left: 0;
-        }
+      @if $isLeft == true {
+        left: 0;
+      }
+
+      @if $hideVerticalScroll == true {
+        width: 0;
       }
     }
   }
@@ -635,20 +640,6 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     &-address {
       display: flex;
       font-size: var(--s-font-size-extra-mini);
-    }
-    &-tokens {
-      display: flex;
-      flex-flow: column nowrap;
-      align-items: flex-end;
-    }
-    &-price {
-      font-size: var(--s-font-size-medium);
-      white-space: nowrap;
-    }
-    &-amount.formatted-amount--fiat-value {
-      color: var(--s-color-base-content-primary) !important;
-    }
-    &-address {
       .tokens-item-address__value {
         &.token-address {
           font-size: var(--s-font-size-extra-mini);
@@ -656,6 +647,21 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
           color: var(--s-color-base-content-primary);
         }
       }
+    }
+    &-tokens {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: flex-end;
+    }
+    &-token {
+      font-size: var(--s-font-size-small);
+    }
+    &-price {
+      font-size: var(--s-font-size-medium);
+      white-space: nowrap;
+    }
+    &-amount.formatted-amount--fiat-value {
+      color: var(--s-color-base-content-primary) !important;
     }
   }
 }
@@ -699,12 +705,8 @@ $primary-button-box-shadow: 0px 0px 20px #99910d;
     &#{$tabs-class} {
       #{$tabs-class}__header {
         width: 100%;
-      }
-      #{$tabs-class} {
-        &__header {
-          #{$tabs-class}__item {
-            font-weight: 600;
-          }
+        #{$tabs-class}__item {
+          font-weight: 600;
         }
       }
     }

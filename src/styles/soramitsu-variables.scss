@@ -1,4 +1,4 @@
-$s-color-brand-day: #A19A9D; // 0d0248
+$s-color-brand-day: #a19a9d; // 0d0248
 // Primary theme colors
 $s-color-theme-accent: #E81932; // NEU bright pink fluro
 $s-color-theme-accent-hover: #FF95A2;// NEU pale quartz pink
@@ -56,6 +56,7 @@ $s-color-status-error: #FE5360;
 $s-color-status-success-background: #B9EBDB;
 $s-color-status-warning-background: #C1D2E3;
 $s-color-status-error-background: #FFD8EB;
+$s-color-status-info-background: #c6e2ff;
 // Fiat colors
 $s-color-fiat-value: #479AEF !default;
 $s-color-rewards: #c0e2ff !default;
@@ -75,7 +76,7 @@ $s-size-big: 58px;
 // Shadows
 $s-shadow-surface: 1px 1px 5px var(--s-shadow-color-dark), inset 1px 1px 1px var(--s-shadow-color-dark);
 $s-shadow-tooltip: 0px 1px 4px rgba(13, 2, 72, 0.35);
-$s-shadow-tab: 1px 1px 2px #FFFFFF, inset 1px 1px 2px rgba(0, 0, 0, 0.1); // 0px 1px 1px rgba(0, 0, 0, 0.1);
+$s-shadow-tab: 1px 1px 2px #ffffff, inset 1px 1px 2px rgba(0, 0, 0, 0.1); // 0px 1px 1px rgba(0, 0, 0, 0.1);
 $s-shadow-dropdown: 0px 4px 8px rgba(19, 19, 19, 0.15);
 $s-shadow-mobile-tap-bar: 0px -4px 8px rgba(19, 19, 19, 0.15);
 $s-shadow-mobile-side-menu: -4px 4px 8px rgba(19, 19, 19, 0.15);
@@ -95,8 +96,8 @@ $s-border-radius-small: $s-border-radius-base * 1.5;
 $s-border-radius-medium: $s-border-radius-base * 2;
 $s-border-radius-big: $s-border-radius-base * 3;
 // Fonts paths
-$s-font-family-default-path: '~@soramitsu/soramitsu-js-ui/lib/assets/fonts/Sora-VariableFont_wght.ttf' !default;
-$s-font-family-mono-path: '~@soramitsu/soramitsu-js-ui/lib/assets/fonts/JetBrainsMono-Regular.woff' !default;
+$s-font-family-default-path: '~@soramitsu-ui/ui-vue2/lib/assets/fonts/Sora-VariableFont_wght.ttf' !default;
+$s-font-family-mono-path: '~@soramitsu-ui/ui-vue2/lib/assets/fonts/JetBrainsMono-Regular.woff' !default;
 $s-font-family-icons-path: '~@/assets/fonts/polkaswap_icons.ttf' !default;
 // Font Feature Settings
 $s-font-feature-settings-common: normal;
@@ -117,9 +118,9 @@ $neu-button-primary-box-shadow-hover--dark: 1px 1px 5px rgba(0, 0, 0, 0.7), -1px
 $s-asset-item-height: 71px;
 $s-asset-item-height--fiat: 86px;
 // override dark theme on disabled
-$s-color-base-on-disabled--dark: #C29AB7;
+$s-color-base-on-disabled--dark: #c29ab7;
 
-@import "../../node_modules/@soramitsu/soramitsu-js-ui/lib/styles/index";
+@import '../../node_modules/@soramitsu-ui/ui-vue2/lib/styles/index';
 
 :root {
   --s-color-brand-day: #{$s-color-brand-day};
