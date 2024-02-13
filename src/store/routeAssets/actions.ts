@@ -18,7 +18,7 @@ import { delay } from '@/utils';
 import { RecipientStatus, SwapTransferBatchStatus } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
-import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import type { WhitelistArrayItem, Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const actions = defineActions({
   processingNextStage(context) {
@@ -47,7 +47,7 @@ const actions = defineActions({
     }
     const assetsTable = rootState.wallet.account.whitelistArray;
     const findAsset = (assetName: string) => {
-      return assetsTable.find((item: Asset) => item.symbol === assetName.toUpperCase());
+      return assetsTable.find((item: WhitelistArrayItem) => item.symbol === assetName.toUpperCase());
     };
 
     const data: Array<any> = [];
@@ -346,7 +346,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
   const assetsTable = rootState.wallet.account.whitelistArray;
   const findAsset = (assetName: string) => {
-    return assetsTable.find((item: Asset) => item.address === assetName);
+    return assetsTable.find((item: WhitelistArrayItem) => item.address === assetName);
   };
   let inputTokenAmount: FPNumber = FPNumber.ZERO;
   const swapTransferData = groupedData.map((entry) => {
@@ -358,7 +358,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       }
       return receiver.useTransfer ? sum : sum.add(new FPNumber(receiver.usd));
     }, FPNumber.ZERO);
-    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as Asset, approxSum);
+    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as unknown as Asset, approxSum);
     inputTokenAmount = inputTokenAmount.add(dexIdData?.amountFrom);
     const dexId = dexIdData?.bestDexId;
     return {
