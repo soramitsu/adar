@@ -56,8 +56,8 @@
 </template>
 
 <script lang="ts">
-import Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
-import { switchTheme } from '@soramitsu/soramitsu-js-ui/lib/utils';
+import Theme from '@soramitsu-ui/ui-vue2/lib/types/Theme';
+import { switchTheme } from '@soramitsu-ui/ui-vue2/lib/utils';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import AppAccountButton from '@/components/App/Header/AppAccountButton.vue';

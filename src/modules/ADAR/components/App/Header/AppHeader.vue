@@ -30,7 +30,7 @@ import { getter } from '@/store/decorators';
 
 import AppHeaderMenu from './AppHeaderMenu.vue';
 
-import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
+import type Theme from '@soramitsu-ui/ui-vue2/lib/types/Theme';
 
 @Component({
   components: {

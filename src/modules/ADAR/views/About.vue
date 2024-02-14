@@ -34,10 +34,9 @@ import { FPNumber } from '@sora-substrate/util';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { app } from '@/consts';
 import { getter } from '@/store/decorators';
 
-import type Theme from '@soramitsu/soramitsu-js-ui/lib/types/Theme';
+import type Theme from '@soramitsu-ui/ui-vue2/lib/types/Theme';
 
 @Component({
   components: {},

@@ -265,7 +265,7 @@ import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-subst
 import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import { Components } from '@/consts';
 import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTolerance.vue';
@@ -459,6 +459,12 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   swapData: Nullable<PresetSwapData> = null;
 
+  get totalAmountRequired() {
+    return this.outcomeAssetsAmountsListFiltered
+      .reduce((acc, item) => acc.add(item.amountRequired), this.remainingAmountRequired.add(this.xorFeeRequired))
+      .toString();
+  }
+
   onAddFundsClick(action: 'fee' | 'routing') {
     this.swapData = action === 'fee' ? this.xorFeeSwapData : this.routingSwapData;
     this.showSwapDialog = true;
@@ -520,6 +526,11 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
   onContinueClick() {
     this.runAssetsRouting();
     this.nextStage();
+  }
+
+  @Watch('totalAmountRequired')
+  onTransferTokenRequiredChanged() {
+    this.showSwapDialog = false;
   }
 }
 </script>

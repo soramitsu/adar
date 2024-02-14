@@ -6,10 +6,6 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import { PageNames, BridgeChildPages } from '@/consts';
 import { AdarPageNames } from '@/modules/ADAR/consts';
 import { adarLazyView } from '@/modules/ADAR/router';
-import { StakingPageNames } from '@/modules/staking/consts';
-import { DemeterStakingPageNames } from '@/modules/staking/demeter/consts';
-import { demeterStakingLazyView, soraStakingLazyView, stakingLazyView } from '@/modules/staking/router';
-import { SoraStakingPageNames } from '@/modules/staking/sora/consts';
 import store from '@/store';
 import { updateDocumentTitle } from '@/utils';
 
@@ -287,6 +283,11 @@ const routes: Array<RouteConfig> = [
   //   name: PageNames.Stats,
   //   component: lazyView(PageNames.Stats),
   // },
+  {
+    path: '/trade/:first?/:second?',
+    name: PageNames.OrderBook,
+    component: lazyView(PageNames.OrderBook),
+  },
   {
     path: '*',
     redirect: '/route-assets',

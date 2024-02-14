@@ -169,8 +169,8 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return this.txHistoryData?.amount;
   }
 
-  get txHistoryDataTransfers() {
-    return this.txHistoryData?.payload?.transfers || [];
+  get txHistoryDataReceivers() {
+    return this.txHistoryData?.payload?.receivers || [];
   }
 
   get finalAmountFormatted() {
@@ -229,8 +229,9 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   getRecipientTransferAmount(address: string, assetAddress: string): FPNumber {
     const formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
     return new FPNumber(
-      this.txHistoryDataTransfers.find((item) => item.to === formattedAddress && item.assetId === assetAddress)
-        ?.amount ?? '0'
+      this.txHistoryDataReceivers.find(
+        (item) => item.accountId === formattedAddress && item.asset.address === assetAddress
+      )?.amount ?? '0'
     );
   }
 

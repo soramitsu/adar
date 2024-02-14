@@ -57,8 +57,8 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util';
-import { SSkeleton, SSkeletonItem } from '@soramitsu/soramitsu-js-ui/lib/components/Skeleton';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
+import { SSkeleton, SSkeletonItem } from '@soramitsu-ui/ui-vue2/lib/components/Skeleton';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
