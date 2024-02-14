@@ -36,7 +36,7 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
   }
 
   get networkSwapFee(): number {
-    return FPNumber.fromCodecValue(this.networkFees[Operation.Swap]).toNumber() * 2;
+    return FPNumber.fromCodecValue(this.networkFees[Operation.Swap]).toNumber();
   }
 
   @Watch('visible')
