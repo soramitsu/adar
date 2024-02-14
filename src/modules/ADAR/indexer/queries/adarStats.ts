@@ -3,11 +3,11 @@ import { SubqueryIndexer } from '@soramitsu/soraneo-wallet-web/lib/services/inde
 import { gql } from '@urql/core';
 
 import type { HistoryItem } from '@sora-substrate/util';
-import type { SubqueryConnectionQueryResponse } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/subquery/types';
+import type { ConnectionQueryResponse } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/subquery/types';
 
 const { IndexerType } = WALLET_CONSTS;
 
-const SubqueryStatsQuery = gql<SubqueryConnectionQueryResponse<any>>`
+const SubqueryStatsQuery = gql<ConnectionQueryResponse<any>>`
   query SubqueryHistoryElements(
     $first: Int = null
     $last: Int = null

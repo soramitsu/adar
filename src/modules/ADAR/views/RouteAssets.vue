@@ -6,7 +6,9 @@
 </template>
 
 <script lang="ts">
+import { Operation } from '@sora-substrate/util';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
+import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import isEmpty from 'lodash/fp/isEmpty';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
@@ -14,11 +16,12 @@ import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { getter, action, mutation, state } from '@/store/decorators';
+import { SwapTransferBatchStatus } from '@/store/routeAssets/types';
 import { FeatureFlags } from '@/store/settings/types';
 
 import AdarStats from '../components/Stats/adarStats.vue';
 
-import type { HistoryItem } from '@sora-substrate/util';
+import type { AccountHistory, HistoryItem } from '@sora-substrate/util';
 import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
 import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
@@ -42,7 +45,17 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
   @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
   @state.wallet.account.fiatPriceObject private fiatPriceObject!: FiatPriceObject;
+  @state.wallet.account.address private address!: string;
   @getter.routeAssets.pricesAreUpdated private pricesAreUpdated!: boolean;
+  @state.wallet.transactions.externalHistory private externalHistory!: AccountHistory<HistoryItem>;
+  @state.wallet.transactions.externalHistoryUpdates private externalHistoryUpdates!: AccountHistory<HistoryItem>;
+  @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
+
+  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
+  @mutation.wallet.transactions.resetExternalHistory private resetExternalHistory!: FnWithoutArgs;
+  @action.wallet.transactions.getExternalHistory private updateExternalHistory!: (
+    args?: ExternalHistoryParams
+  ) => Promise<void>;
 
   @getter.routeAssets.currentStageComponentName currentStageComponentName!: string;
   @action.routeAssets.processingNextStage nextStage!: any;
@@ -81,10 +94,34 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     return this.currentStageComponentName;
   }
 
+  get allowFetchHistory() {
+    return this.txHistoryData?.status === 'finalized' && !this.txHistoryStoreItem;
+  }
+
+  async getHistoryElement() {
+    await this.updateExternalHistory({
+      page: 1,
+      address: this.address,
+      query: {
+        operationNames: [Operation.SwapTransferBatch],
+      },
+    });
+    const historyElement = this.externalHistory[this.txHistoryData.id as string];
+    this.updateTxHistoryData(historyElement);
+  }
+
   @Watch('txHistoryStoreItem', { deep: true, immediate: true })
   private handleTxHistoryItem(value: HistoryItem): void {
     if (!value) return;
     this.updateTxHistoryData(value);
+  }
+
+  @Watch('allowFetchHistory')
+  private onStatusChanged(value) {
+    if (value) {
+      this.resetExternalHistory();
+      this.getHistoryElement();
+    }
   }
 }
 </script>
