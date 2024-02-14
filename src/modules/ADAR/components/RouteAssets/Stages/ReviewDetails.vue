@@ -461,7 +461,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   get totalAmountRequired() {
     return this.outcomeAssetsAmountsListFiltered
-      .reduce((acc, item) => acc.add(item.amountRequired), FPNumber.ZERO)
+      .reduce((acc, item) => acc.add(item.amountRequired), this.remainingAmountRequired.add(this.xorFeeRequired))
       .toString();
   }
 

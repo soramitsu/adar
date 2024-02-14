@@ -55,13 +55,6 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
       });
     }
   }
-
-  @Watch('presetDataValueTo', { deep: true })
-  onValueToChanged(newVal) {
-    if (newVal <= 0) {
-      this.$emit('update:visible', false);
-    }
-  }
 }
 </script>
 
