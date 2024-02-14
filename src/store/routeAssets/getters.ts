@@ -119,7 +119,7 @@ const getters = defineGetters<RouteAssetsState>()({
       ).map((assetArray: Array<Recipient>) => {
         const reduceData = assetArray.reduce(
           (acc, item) => {
-            const swapless = item.useTransfer && item.asset.address !== token.address;
+            const swapless = item.useTransfer;
             return {
               usd: new FPNumber(item.usd).add(acc.usd),
               usdSwap: swapless ? acc.usdSwap : new FPNumber(item.usd).add(acc.usdSwap),
@@ -194,7 +194,7 @@ const getters = defineGetters<RouteAssetsState>()({
   outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
     const { getters, rootState } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipients
-      .filter((item) => item.useTransfer && item.asset.address !== getters.inputToken.address)
+      .filter((item) => item.useTransfer)
       .map((item) => ({ symbol: item.asset.symbol, ...item }));
     return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
       const reduceData = assetArray.reduce(
