@@ -36,7 +36,7 @@
           <p class="transfer-assets-section__title">
             {{ t('adar.routeAssets.stages.reviewDetails.adarFee', { adarFee: adarFeePercent }) }}
           </p>
-          <div>
+          <!-- <div>
             <info-line
               :label="inputToken.symbol"
               :value="formatNumber(adarFee)"
@@ -47,9 +47,9 @@
                 <token-logo class="token-logo" :token="inputToken" />
               </template>
             </info-line>
-          </div>
+          </div> -->
 
-          <div v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered" :key="idx">
+          <div v-for="(tokenData, idx) in adarFeesList" :key="idx">
             <info-line
               :label="tokenData.asset.symbol"
               :value="tokenData.adarFee.toLocaleString()"
@@ -331,6 +331,24 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   get slippages() {
     return ['1', '2', '3'];
+  }
+
+  get adarFeesList() {
+    const inputToken = {
+      asset: this.inputToken,
+      adarFee: this.adarFee,
+    };
+    const adarFeeList = this.outcomeAssetsAmountsList.map((amountData) => ({
+      asset: amountData.asset,
+      adarFee: amountData.adarFee,
+    }));
+    const inputTokenTransferData = adarFeeList.find((item) => item.asset.address === inputToken.asset.address);
+    if (inputTokenTransferData) {
+      inputTokenTransferData.adarFee = inputTokenTransferData.adarFee.add(inputToken.adarFee);
+    } else {
+      adarFeeList.push(inputToken);
+    }
+    return adarFeeList;
   }
 
   get outcomeAssetsAmountsListFiltered() {
