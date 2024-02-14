@@ -36,19 +36,6 @@
           <p class="transfer-assets-section__title">
             {{ t('adar.routeAssets.stages.reviewDetails.adarFee', { adarFee: adarFeePercent }) }}
           </p>
-          <!-- <div>
-            <info-line
-              :label="inputToken.symbol"
-              :value="formatNumber(adarFee)"
-              class="transfer-assets-section__adar-fee-info-line"
-              is-formatted
-            >
-              <template #info-line-prefix>
-                <token-logo class="token-logo" :token="inputToken" />
-              </template>
-            </info-line>
-          </div> -->
-
           <div v-for="(tokenData, idx) in adarFeesList" :key="idx">
             <info-line
               :label="tokenData.asset.symbol"
