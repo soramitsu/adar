@@ -175,9 +175,14 @@ export default class UploadTemplate extends Mixins(TranslationMixin) {
 .file-upload {
   text-transform: uppercase;
   max-width: 300px;
+  border-width: 2px;
   input {
     overflow: hidden;
     width: 0;
+  }
+  &:hover {
+    box-shadow: var(--neu-button-primary-box-shadow-hover);
+    border-color: var(--s-color-utility-surface);
   }
 }
 </style>
