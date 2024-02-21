@@ -231,6 +231,96 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.pricesAreUpdated;
   },
+
+  // ________________________________________________________NEW________________________________________________________
+
+  recipientsTransfer(...args): Array<Recipient> {
+    const { state, getters } = routeAssetsGetterContext(args);
+    return getters.recipients.filter((item) => item.useTransfer);
+  },
+
+  recipientsSwap(...args): Array<Recipient> {
+    const { state, getters } = routeAssetsGetterContext(args);
+    return getters.recipients.filter((item) => !item.useTransfer);
+  },
+
+  transferTxsAmountInfo(...args): Array<OutcomeAssetsAmount> {
+    const { getters, rootState } = routeAssetsGetterContext(args);
+    const recipientsWithUsingExistingTokens = getters.recipientsTransfer.map((item) => ({
+      symbol: item.asset.symbol,
+      ...item,
+    }));
+    return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
+      const reduceData = assetArray.reduce(
+        (acc, item) => {
+          return {
+            usd: new FPNumber(item.usd).add(acc.usd),
+            totalAmount: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalAmount),
+          };
+        },
+        {
+          usd: FPNumber.ZERO,
+          totalAmount: FPNumber.ZERO,
+        }
+      );
+      const { usd, totalAmount: amount } = reduceData;
+      const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
+      const asset = assetArray[0].asset;
+      const accountAsset = rootState.wallet.account.accountAssets.find((item) => item.address === asset.address);
+      const userBalance = FPNumber.fromCodecValue(getAssetBalance(accountAsset), accountAsset?.decimals);
+      const totalAmount = amount.add(adarFee);
+      const amountRequired = totalAmount.sub(userBalance);
+      return {
+        asset,
+        usd: usd,
+        amount: totalAmount,
+        adarFee: adarFee,
+        totalAmount: totalAmount.add(adarFee),
+        amountRequired: amountRequired,
+        userBalance: userBalance,
+        recipientsNumber: assetArray.length,
+      };
+    });
+  },
+
+  swapTxsAmountInfo(...args): Array<OutcomeAssetsAmount> {
+    const { getters, rootState } = routeAssetsGetterContext(args);
+    const recipientsWithUsingExistingTokens = getters.recipientsSwap.map((item) => ({
+      symbol: item.asset.symbol,
+      ...item,
+    }));
+    return Object.values(groupBy(recipientsWithUsingExistingTokens, 'symbol')).map((assetArray: Array<Recipient>) => {
+      const reduceData = assetArray.reduce(
+        (acc, item) => {
+          return {
+            usd: new FPNumber(item.usd).add(acc.usd),
+            totalAmount: (item.amount ? new FPNumber(item.amount) : FPNumber.ZERO).add(acc.totalAmount),
+          };
+        },
+        {
+          usd: FPNumber.ZERO,
+          totalAmount: FPNumber.ZERO,
+        }
+      );
+      const { usd, totalAmount: amount } = reduceData;
+      const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
+      const asset = assetArray[0].asset;
+      const accountAsset = rootState.wallet.account.accountAssets.find((item) => item.address === asset.address);
+      const userBalance = FPNumber.fromCodecValue(getAssetBalance(accountAsset), accountAsset?.decimals);
+      const totalAmount = amount.add(adarFee);
+      const amountRequired = totalAmount.sub(userBalance);
+      return {
+        asset,
+        usd: usd,
+        amount: totalAmount,
+        adarFee: adarFee,
+        totalAmount: totalAmount.add(adarFee),
+        amountRequired: amountRequired,
+        userBalance: userBalance,
+        recipientsNumber: assetArray.length,
+      };
+    });
+  },
 });
 
 export default getters;

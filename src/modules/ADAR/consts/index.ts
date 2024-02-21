@@ -11,7 +11,7 @@ export enum AdarPageNames {
 export enum AdarComponents {
   RouteAssetsAuthorize = 'RouteAssets/Stages/Authorize',
   RouteAssetsDone = 'RouteAssets/Stages/Done',
-  RouteAssetsProcessTemplate = 'RouteAssets/Stages/ProcessTemplate',
+  RouteAssetsProcessTemplate = 'RouteAssets/Stages/ProcessTemplate2',
   RouteAssetsReviewDetails = 'RouteAssets/Stages/ReviewDetails',
   RouteAssetsRouting = 'RouteAssets/Stages/Routing',
   RouteAssetsTransactionOverview = 'RouteAssets/Stages/TransactionOverview',
