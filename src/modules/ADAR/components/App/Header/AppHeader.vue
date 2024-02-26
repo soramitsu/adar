@@ -114,6 +114,9 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
     @media (max-width: 1200px) {
       display: none;
     }
+    @media (max-width: 1600px) and (min-width: 1440px) {
+      display: none;
+    }
   }
 }
 
