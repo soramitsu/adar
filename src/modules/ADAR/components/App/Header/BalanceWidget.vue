@@ -31,7 +31,7 @@ export default class BalanceWidget extends Vue {
   }
 
   get formattedBalance(): string {
-    return this.fpBalance.dp(6).toLocaleString();
+    return this.fpBalance.toLocaleString(2);
   }
 
   get fpBalance(): FPNumber {
@@ -50,7 +50,7 @@ export default class BalanceWidget extends Vue {
 <style lang="scss" scoped>
 .balance-widget {
   display: flex;
-  max-width: 250px;
+  max-width: 200px;
   height: 42px;
   padding: 0px 4px;
   justify-content: center;
