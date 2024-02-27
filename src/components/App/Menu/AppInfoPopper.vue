@@ -115,6 +115,10 @@ export default class AppInfoPopper extends Mixins(TranslationMixin, mixins.Loadi
         title: this.t('helpDialog.termsOfService'),
         href: AdarLinks.terms,
       },
+      {
+        title: this.t('mainMenu.About'),
+        href: AdarLinks.about,
+      },
     ];
   }
 
