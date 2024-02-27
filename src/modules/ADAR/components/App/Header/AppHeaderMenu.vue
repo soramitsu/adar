@@ -302,11 +302,6 @@ $adar-app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 }
 
 .adar-app-controls-group {
-  filter: $adar-app-controls-filter;
-  > button.el-button.neumorphic.s-action:not(.s-primary) {
-    box-shadow: none;
-  }
-
   .mobile-menu {
     @include large-desktop {
       display: none;

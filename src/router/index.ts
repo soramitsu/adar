@@ -54,11 +54,11 @@ const routes: Array<RouteConfig> = [
     name: PageNames.Swap,
     component: lazyView(PageNames.Swap),
   },
-  {
-    path: '/about',
-    name: AdarPageNames.About,
-    component: adarLazyView(AdarPageNames.About),
-  },
+  // {
+  //   path: '/about',
+  //   name: AdarPageNames.About,
+  //   component: adarLazyView(AdarPageNames.About),
+  // },
   {
     path: '/wallet',
     name: PageNames.Wallet,
