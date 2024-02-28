@@ -25,47 +25,52 @@
           <div class="tx-type-label">Transfer Transactions</div>
           <div v-for="(amountInfo, idx) in transferTxsAmountInfo" :key="idx" class="amount-info">
             <div class="amount-info__asset-symbol">
-              <span>{{ amountInfo.asset.symbol }}</span>
-              <token-logo class="token-logo" :token="amountInfo.asset" size="small" />
+              <token-logo class="token-logo" :token="amountInfo.asset" size="big" />
+              <div>
+                <div>{{ amountInfo.asset.symbol }}</div>
+                <token-address v-bind="amountInfo.asset" class="input-value" />
+              </div>
             </div>
             <div class="amount-info__info">
               <info-line :label="'Number of txs'" :value="`${amountInfo.recipientsNumber ?? 0}`" is-formatted />
               <info-line
                 :label="`Total amount ${amountInfo.asset.symbol}`"
                 :value="amountInfo.totalAmount.toLocaleString(2)"
+                :fiat-value="amountInfo.usd.toLocaleString(2)"
                 is-formatted
               />
-              <info-line :label="'Total amount USD'" :value="amountInfo.usd.toLocaleString(2)" is-formatted />
             </div>
           </div>
         </div>
         <div>
           <div class="tx-type-label">Swap Transactions</div>
           <div class="amount-info">
-            <div
-              class="amount-info__asset-symbol pointer"
-              @click="
-                () => {
-                  showSelectInputAssetDialog = true;
-                }
-              "
-            >
-              <div>{{ inputToken.symbol }}</div>
-              <div>
-                <token-logo class="token-logo" :token="inputToken" size="small" />
-              </div>
-              <div>
-                <s-icon name="arrows-chevron-down-rounded-24" size="20" />
+            <div class="amount-info__token-selection">
+              <div>Select input token for swap transactions</div>
+              <div
+                class="amount-info__asset-symbol pointer"
+                @click="
+                  () => {
+                    showSelectInputAssetDialog = true;
+                  }
+                "
+              >
+                <token-logo class="token-logo" :token="inputToken" size="big" />
+                <div>{{ inputToken.symbol }}</div>
+                <div>
+                  <s-icon name="arrows-chevron-down-rounded-24" size="20" />
+                </div>
               </div>
             </div>
+
             <div class="amount-info__info">
               <info-line :label="'Number of txs'" :value="`${swapDataInfo.recipientsNumber ?? 0}`" is-formatted />
               <info-line
                 :label="`Total amount ${inputToken.symbol}`"
                 :value="maxInputAmount.totalAmount.toLocaleString(2)"
+                :fiat-value="swapDataInfo.usd.toLocaleString(2)"
                 is-formatted
               />
-              <info-line :label="'Total amount USD'" :value="swapDataInfo.usd.toLocaleString(2)" is-formatted />
             </div>
           </div>
         </div>
@@ -115,6 +120,7 @@ import validate from '@/store/routeAssets/utils';
     TokenLogo: components.TokenLogo,
     InfoLine: components.InfoLine,
     SelectToken: lazyComponent(Components.SelectToken),
+    TokenAddress: components.TokenAddress,
   },
 })
 export default class ProcessTemplate extends Mixins(TranslationMixin) {
@@ -365,19 +371,31 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
     .amount-info {
       &__asset-symbol {
-        font-weight: 600;
+        font-weight: 800;
+        font-size: 18px;
         @include flex-start;
-        gap: 2px;
+        gap: 8px;
       }
       &__info {
-        margin: 12px 16px;
+        margin: 12px auto;
 
         &-line {
           @include flex-center;
           justify-content: space-between;
         }
       }
+
+      &__token-selection {
+        font-weight: 600;
+        font-size: var(--s-font-size-medium);
+        @include flex-center;
+        justify-content: space-between;
+      }
       margin: 16px auto;
+      box-shadow: var(--s-shadow-element);
+      border-radius: 30px;
+      background: var(--s-color-utility-body);
+      padding: 16px;
     }
   }
 }

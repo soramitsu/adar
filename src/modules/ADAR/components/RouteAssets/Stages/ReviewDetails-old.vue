@@ -138,17 +138,19 @@
             <s-collapse>
               <s-collapse-item v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered" :key="idx">
                 <template #title>
-                  <div class="amount-info__asset-symbol">
-                    <token-logo :token="tokenData.asset" size="big" />
-                    <div class="amount-info__asset-info">
-                      <div class="amount-info__asset-info-line amount-info__asset-info-line_upper">
-                        <div class="amount-info__asset-label">{{ tokenData.asset.symbol }}</div>
-                        <div class="amount-info__tx-type">transfer</div>
-                      </div>
-                      <div class="amount-info__asset-info-line">
-                        <span>{{ `${tokenData.totalAmount.toLocaleString()} ${tokenData.asset.symbol}  ` }}</span>
-                        <span class="usd">{{ tokenData.usd.toLocaleString(2) }}</span>
-                      </div>
+                  <div class="field transfer-assets-section__asset-title">
+                    <div class="field__label">
+                      <s-icon
+                        v-if="!isTransferAssetBalanceOk(tokenData)"
+                        class="icon-status"
+                        name="basic-clear-X-xs-24"
+                      />
+                      {{ tokenData.asset.symbol }}
+                    </div>
+                    <div class="field__value">
+                      {{ tokenData.totalAmount.toLocaleString() }}
+                      <token-logo class="token-logo" :token="tokenData.asset" />
+                      <div class="usd">{{ tokenData.usd.toLocaleString(2) }}</div>
                     </div>
                   </div>
                 </template>
@@ -177,22 +179,8 @@
                     is-formatted
                   >
                   </info-line>
-                  <div class="transfer-assets-section__required-amount required-amount">
-                    <div>
-                      <div>{{ t('adar.routeAssets.stages.reviewDetails.swapless.required') }}</div>
-                      <div class="required-amount__amount">{{ tokenData.amountRequired.toLocaleString() }}</div>
-                    </div>
-                    <s-button
-                      type="primary"
-                      class="s-typography-button--mini add-button"
-                      @click.stop="onTransferAddFundsClick(tokenData)"
-                    >
-                      {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-                    </s-button>
-                  </div>
-                  <!-- v-if="!isTransferAssetBalanceOk(tokenData)" -->
-                  <!-- <info-line
-                    v-if="true"
+                  <info-line
+                    v-if="!isTransferAssetBalanceOk(tokenData)"
                     :asset-symbol="tokenData.asset.symbol"
                     :label="t('adar.routeAssets.stages.reviewDetails.swapless.required')"
                     :value="tokenData.amountRequired.toLocaleString()"
@@ -209,7 +197,7 @@
                         {{ t('adar.routeAssets.stages.reviewDetails.add') }}
                       </s-button>
                     </template>
-                  </info-line> -->
+                  </info-line>
                 </div>
               </s-collapse-item>
             </s-collapse>
@@ -613,22 +601,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
       }
     }
 
-    &__required-amount {
-      border-radius: 24px;
-      padding: 12px;
-      @include flex-between;
-      text-transform: uppercase;
-      background-color: var(--s-color-base-on-accent);
-      margin-top: 20px;
-
-      &.required-amount {
-        .required-amount__amount {
-          font-size: 16px;
-          font-weight: 600;
-        }
-      }
-    }
-
     .el-collapse.neumorphic .el-icon-arrow-right {
       transition: transform 0.3s;
 
@@ -645,7 +617,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     }
 
     .el-collapse-item__header {
-      height: 64px;
+      height: 36px;
       position: relative;
       margin-bottom: 12px;
     }
@@ -685,68 +657,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 </style>
 
 <style scoped lang="scss">
-.amount-info {
-  &__asset-symbol {
-    font-weight: 800;
-    font-size: 18px;
-    @include flex-start;
-    gap: 8px;
-    margin-right: auto;
-    // margin-bottom: 16px;
-  }
-  &__info {
-    margin: 12px auto;
-
-    &-line {
-      @include flex-center;
-      justify-content: space-between;
-    }
-  }
-
-  &__token-selection {
-    font-weight: 600;
-    font-size: var(--s-font-size-medium);
-    @include flex-center;
-    justify-content: space-between;
-  }
-
-  &__asset-info-line {
-    font-style: normal;
-    font-weight: 300;
-    &_upper {
-      font-weight: 600;
-      @include flex-start;
-      gap: 4px;
-    }
-  }
-
-  &__asset-info {
-    @include flex-center;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: start;
-    line-height: var(--s-line-height-base);
-    font-size: 12px;
-  }
-
-  &__tx-type {
-    text-align: center;
-    font-weight: 600;
-    text-transform: uppercase;
-    background-color: var(--s-color-base-on-accent);
-    border-radius: 4px;
-    padding: 2px 4px;
-  }
-  &__asset-label {
-    font-size: 18px;
-    font-weight: 800;
-  }
-  margin: 16px auto;
-  box-shadow: var(--s-shadow-element);
-  border-radius: 30px;
-  background: var(--s-color-utility-body);
-  padding: 16px;
-}
 .fields-container {
   .el-divider {
     margin-bottom: $inner-spacing-medium;
