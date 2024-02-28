@@ -290,7 +290,6 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     border-radius: 100%;
     position: relative;
     background-color: var(--s-color-theme-accent);
-    box-shadow: 1px 1px 10px 0px rgba(255, 255, 255, 1) inset;
     & > div {
       position: absolute;
       left: 50%;
@@ -316,6 +315,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         text-transform: uppercase;
         color: var(--s-color-brand-day);
         font-weight: 600;
+        margin-bottom: $inner-spacing-small;
       }
     }
   }
