@@ -405,8 +405,8 @@
         "StakingContainer": "Staking",
         "Explore\/Container": "Explorer",
         "SoraCard": "{Sora} Carte",
-        "RouteAssets": "Itinéraire des actifs",
-        "RoutingHistory": "Historique de routage",
+        "RouteAssets": "Trajet Actif",
+        "RoutingHistory": "Hist. Route",
         "OrderBook": "Commerce"
     },
     "social": {

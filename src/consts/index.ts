@@ -364,10 +364,10 @@ const OtherPagesMenu: Array<SidebarMenuItem> = [
   //   icon: 'sora-card',
   //   title: PageNames.SoraCard,
   // },
-  {
-    icon: 'adar-about',
-    title: AdarPageNames.About,
-  },
+  // {
+  //   icon: 'adar-about',
+  //   title: AdarPageNames.About,
+  // },
 ];
 
 export const SocialNetworkLinks: Array<SidebarMenuItemLink> = [

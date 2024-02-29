@@ -13,13 +13,10 @@
         </div>
       </div>
       <div class="routing-history__page-header-title">{{ t('adar.routingHistory.title') }}</div>
-      <!-- <div class="routing-history__page-header-description">
-        {{ t('adar.routingHistory.description') }}
-      </div> -->
       <div class="routing-history__period period">
         <div class="period__label">{{ t('adar.routingHistory.periodLabel') }}</div>
         <s-dropdown type="button" :button-type="'link'" placement="bottom-start" @select="handleSelectPeriodMenu">
-          {{ selectedPeriod.title }}
+          {{ currentPeriodLabel }}
           <template #menu>
             <s-dropdown-item
               v-for="(periodItem, idx) in dropdownPeriodMenuItems"
@@ -27,7 +24,7 @@
               :value="periodItem"
               class="period__menu-item"
             >
-              {{ periodItem.title }}
+              {{ t(`adar.routingHistory.dropdownItems.${periodItem.title}`) }}
             </s-dropdown-item>
           </template>
         </s-dropdown>
@@ -76,29 +73,33 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     date: new Date(),
   };
 
+  get currentPeriodLabel() {
+    return this.t(`adar.routingHistory.dropdownItems.${this.selectedPeriod.title}`);
+  }
+
   dropdownPeriodMenuItems = [
     {
-      title: this.t('adar.routingHistory.dropdownItems.thisWeek'),
+      title: 'thisWeek',
       action: () => this.getStartDate(0),
     },
     {
-      title: this.t('adar.routingHistory.dropdownItems.lastWeek'),
+      title: 'lastWeek',
       action: () => this.getStartDate(1),
     },
     {
-      title: this.t('adar.routingHistory.dropdownItems.thisMonth'),
+      title: 'thisMonth',
       action: () => this.getStartDate(undefined, 0),
     },
     {
-      title: this.t('adar.routingHistory.dropdownItems.3Months'),
+      title: '3Months',
       action: () => this.getStartDate(undefined, 2),
     },
     {
-      title: this.t('adar.routingHistory.dropdownItems.6Months'),
+      title: '6Months',
       action: () => this.getStartDate(undefined, 5),
     },
     {
-      title: this.t('adar.routingHistory.dropdownItems.year'),
+      title: 'year',
       action: () => this.getStartDate(undefined, undefined, 0),
     },
   ];
@@ -290,7 +291,6 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     border-radius: 100%;
     position: relative;
     background-color: var(--s-color-theme-accent);
-    box-shadow: 1px 1px 10px 0px rgba(255, 255, 255, 1) inset;
     & > div {
       position: absolute;
       left: 50%;
@@ -316,6 +316,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         text-transform: uppercase;
         color: var(--s-color-brand-day);
         font-weight: 600;
+        margin-bottom: $inner-spacing-small;
       }
     }
   }
