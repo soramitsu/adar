@@ -233,12 +233,12 @@ const getters = defineGetters<RouteAssetsState>()({
   },
 
   recipientsTransfer(...args): Array<Recipient> {
-    const { state, getters } = routeAssetsGetterContext(args);
+    const { getters } = routeAssetsGetterContext(args);
     return getters.recipients.filter((item) => item.useTransfer || item.asset.address === getters.inputToken.address);
   },
 
   recipientsSwap(...args): Array<Recipient> {
-    const { state, getters } = routeAssetsGetterContext(args);
+    const { getters } = routeAssetsGetterContext(args);
     return getters.recipients.filter((item) => !item.useTransfer && item.asset.address !== getters.inputToken.address);
   },
 

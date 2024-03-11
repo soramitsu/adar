@@ -233,7 +233,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   }
 
   get outcomeAssetsAmountsListFiltered() {
-    // return this.outcomeAssetsAmountsList;
     return [...this.transferTxsAmountInfo.map((item) => ({ transfer: true, ...item }))];
   }
 
@@ -571,7 +570,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     @include flex-start;
     gap: 8px;
     margin-right: auto;
-    // margin-bottom: 16px;
   }
   &__info {
     margin: 12px auto;

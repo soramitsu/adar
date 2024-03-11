@@ -110,7 +110,7 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
-import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import { Asset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 

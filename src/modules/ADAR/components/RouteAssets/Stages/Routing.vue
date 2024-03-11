@@ -58,7 +58,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { getErrorMessage } from '@/modules/ADAR/utils';
-import { action, getter, state } from '@/store/decorators';
+import { action, getter } from '@/store/decorators';
 import {
   MaxInputAmountInfo,
   OutcomeAssetsAmount,
