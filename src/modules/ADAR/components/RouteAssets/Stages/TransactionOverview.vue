@@ -124,7 +124,7 @@
           <template v-slot="{ row }">
             <div>
               <!-- <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" /> -->
-              <p>{{ row.useTransfer ? 'TRANSFER' : 'SWAP' }}</p>
+              <p class="tx-type">{{ row.useTransfer ? t('operations.Transfer') : t('operations.Swap') }}</p>
             </div>
           </template>
         </s-table-column>
@@ -446,5 +446,9 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
       display: inline;
     }
   }
+}
+
+.tx-type {
+  text-transform: uppercase;
 }
 </style>

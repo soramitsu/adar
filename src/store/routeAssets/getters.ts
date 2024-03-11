@@ -232,16 +232,14 @@ const getters = defineGetters<RouteAssetsState>()({
     return state.processingState.pricesAreUpdated;
   },
 
-  // ________________________________________________________NEW________________________________________________________
-
   recipientsTransfer(...args): Array<Recipient> {
     const { state, getters } = routeAssetsGetterContext(args);
-    return getters.recipients.filter((item) => item.useTransfer);
+    return getters.recipients.filter((item) => item.useTransfer || item.asset.address === getters.inputToken.address);
   },
 
   recipientsSwap(...args): Array<Recipient> {
     const { state, getters } = routeAssetsGetterContext(args);
-    return getters.recipients.filter((item) => !item.useTransfer);
+    return getters.recipients.filter((item) => !item.useTransfer && item.asset.address !== getters.inputToken.address);
   },
 
   transferTxsAmountInfo(...args): Array<OutcomeAssetsAmount> {

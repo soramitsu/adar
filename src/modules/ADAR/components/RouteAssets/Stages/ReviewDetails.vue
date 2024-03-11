@@ -31,191 +31,75 @@
           <div class="field__value usd">{{ usdToBeRouted }}</div>
         </div>
         <s-divider />
-
         <div class="transfer-assets-section">
           <p class="transfer-assets-section__title">
-            {{ t('adar.routeAssets.stages.reviewDetails.adarFee', { adarFee: adarFeePercent }) }}
+            <s-icon v-if="transferBalanceErrors" class="icon-status" name="basic-clear-X-xs-24" />
+            {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
           </p>
-          <div v-for="(tokenData, idx) in adarFeesList" :key="idx">
-            <info-line
-              :label="tokenData.asset.symbol"
-              :value="tokenData.adarFee.toLocaleString()"
-              class="transfer-assets-section__adar-fee-info-line"
-              is-formatted
-            >
-              <template #info-line-prefix>
-                <token-logo class="token-logo" :token="tokenData.asset" />
-              </template>
-            </info-line>
-          </div>
-        </div>
-
-        <s-divider />
-        <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.networkFee') }}</div>
-          <div class="field__value">{{ formatNumber(networkFee) }} <token-logo class="token-logo" :token="xor" /></div>
-        </div>
-        <s-divider />
-        <div class="field">
-          <div class="field__label">{{ t('swap.liquidityProviderFee') }}</div>
-          <div class="field__value">
-            {{ formatNumber(maxInputAmount.totalLiquidityProviderFee) }} <token-logo class="token-logo" :token="xor" />
-          </div>
-        </div>
-        <s-divider />
-        <div class="field">
-          <div class="field__label">
-            {{ t('adar.routeAssets.stages.reviewDetails.priceImpact', { priceImpact: priceImpactPercent }) }}
-          </div>
-          <div class="field__value">
-            {{ formatNumber(estimatedPriceImpact) }} <token-logo class="token-logo" :token="inputToken" />
-          </div>
-        </div>
-        <s-divider />
-        <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.totalTokensRequired') }}</div>
-          <div class="field__value">
-            {{ formatNumber(estimatedAmountWithFees) }} <token-logo class="token-logo" :token="inputToken" />
-          </div>
-        </div>
-        <s-divider />
-        <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.tokensAvailable') }}</div>
-          <div class="field__value">
-            {{ totalTokensAvailable }} <token-logo class="token-logo" :token="inputToken" />
-          </div>
-          <warning-message
-            class="warning-message"
-            :text="
-              !amountBalanceError
-                ? `${t('adar.routeAssets.stages.reviewDetails.okBalance')}`
-                : `${t('adar.routeAssets.stages.reviewDetails.badBalance')}`
-            "
-            :isError="amountBalanceError"
-          />
-        </div>
-        <template v-if="amountBalanceError">
-          <s-divider />
-          <div class="field">
-            <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.remainingAmount') }}</div>
-            <div class="field__value">
-              <s-button
-                type="primary"
-                class="s-typography-button--mini add-button"
-                @click.stop="onAddFundsClick('routing')"
-              >
-                {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-              </s-button>
-              {{ formatNumber(remainingAmountRequired) }}
-              <token-logo class="token-logo" :token="inputToken" />
-            </div>
-          </div>
-        </template>
-        <template v-if="xorFeeBalanceError">
-          <s-divider />
-          <div class="field">
-            <div class="field__label">XOR fee required</div>
-            <div class="field__value">
-              <s-button
-                type="primary"
-                class="s-typography-button--mini add-button"
-                @click.stop="onAddFundsClick('fee')"
-              >
-                {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-              </s-button>
-              {{ formatNumber(xorFeeRequired) }}
-              <token-logo class="token-logo" :token="xor" />
-            </div>
-          </div>
-        </template>
-        <s-divider />
-        <template v-if="outcomeAssetsAmountsListFiltered.length">
-          <div class="transfer-assets-section">
-            <p class="transfer-assets-section__title">
-              <s-icon v-if="transferBalanceErrors" class="icon-status" name="basic-clear-X-xs-24" />
-              {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
-            </p>
-            <s-collapse>
-              <s-collapse-item v-for="(tokenData, idx) in outcomeAssetsAmountsListFiltered" :key="idx">
-                <template #title>
-                  <div class="amount-info__asset-symbol">
-                    <token-logo :token="tokenData.asset" size="big" />
-                    <div class="amount-info__asset-info">
-                      <div class="amount-info__asset-info-line amount-info__asset-info-line_upper">
-                        <div class="amount-info__asset-label">{{ tokenData.asset.symbol }}</div>
-                        <div class="amount-info__tx-type">transfer</div>
-                      </div>
-                      <div class="amount-info__asset-info-line">
-                        <span>{{ `${tokenData.totalAmount.toLocaleString()} ${tokenData.asset.symbol}  ` }}</span>
-                        <span class="usd">{{ tokenData.usd.toLocaleString(2) }}</span>
+          <s-collapse>
+            <s-collapse-item v-for="(tokenData, idx) in assetsList" :key="idx">
+              <template #title>
+                <div class="amount-info__asset-symbol">
+                  <token-logo :token="tokenData.asset" size="big" />
+                  <div class="amount-info__asset-info">
+                    <div class="amount-info__asset-info-line amount-info__asset-info-line_upper">
+                      <div class="amount-info__asset-label">{{ tokenData.asset.symbol }}</div>
+                      <div class="amount-info__tx-type">
+                        {{ tokenData.transfer ? t('operations.Transfer') : t('operations.Swap') }}
                       </div>
                     </div>
-                  </div>
-                </template>
-                <div>
-                  <info-line
-                    :asset-symbol="tokenData.asset.symbol"
-                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.adarFee')"
-                    :value="tokenData.adarFee.toLocaleString()"
-                    class="transfer-assets-section__asset-data"
-                    is-formatted
-                  >
-                  </info-line>
-                  <info-line
-                    :asset-symbol="tokenData.asset.symbol"
-                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.amount')"
-                    :value="tokenData.amount.toLocaleString()"
-                    class="transfer-assets-section__asset-data"
-                    is-formatted
-                  >
-                  </info-line>
-                  <info-line
-                    :asset-symbol="tokenData.asset.symbol"
-                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
-                    :value="tokenData.userBalance.toLocaleString()"
-                    class="transfer-assets-section__asset-data"
-                    is-formatted
-                  >
-                  </info-line>
-                  <div class="transfer-assets-section__required-amount required-amount">
-                    <div>
-                      <div>{{ t('adar.routeAssets.stages.reviewDetails.swapless.required') }}</div>
-                      <div class="required-amount__amount">{{ tokenData.amountRequired.toLocaleString() }}</div>
+                    <div class="amount-info__asset-info-line">
+                      <span>{{ `${tokenData.totalAmount.toLocaleString()} ${tokenData.asset.symbol}  ` }}</span>
+                      <span class="usd">{{ tokenData.usd.toLocaleString(2) }}</span>
                     </div>
-                    <s-button
-                      type="primary"
-                      class="s-typography-button--mini add-button"
-                      @click.stop="onTransferAddFundsClick(tokenData)"
-                    >
-                      {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-                    </s-button>
                   </div>
-                  <!-- v-if="!isTransferAssetBalanceOk(tokenData)" -->
-                  <!-- <info-line
-                    v-if="true"
-                    :asset-symbol="tokenData.asset.symbol"
-                    :label="t('adar.routeAssets.stages.reviewDetails.swapless.required')"
-                    :value="tokenData.amountRequired.toLocaleString()"
-                    class="transfer-assets-section__asset-data"
-                    :class="{ 'transfer-assets-section__asset-data_error': !isTransferAssetBalanceOk(tokenData) }"
-                    is-formatted
-                  >
-                    <template>
-                      <s-button
-                        type="primary"
-                        class="s-typography-button--mini add-button"
-                        @click.stop="onTransferAddFundsClick(tokenData)"
-                      >
-                        {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-                      </s-button>
-                    </template>
-                  </info-line> -->
                 </div>
-              </s-collapse-item>
-            </s-collapse>
-          </div>
-          <s-divider />
-        </template>
+              </template>
+              <div>
+                <info-line
+                  :asset-symbol="tokenData.asset.symbol"
+                  :label="t('adar.routeAssets.stages.reviewDetails.swapless.adarFee')"
+                  :value="tokenData.adarFee.toLocaleString()"
+                  class="transfer-assets-section__asset-data"
+                  is-formatted
+                >
+                </info-line>
+                <info-line
+                  :asset-symbol="tokenData.asset.symbol"
+                  :label="t('adar.routeAssets.stages.reviewDetails.swapless.amount')"
+                  :value="tokenData.amount.toLocaleString()"
+                  class="transfer-assets-section__asset-data"
+                  is-formatted
+                >
+                </info-line>
+                <info-line
+                  :asset-symbol="tokenData.asset.symbol"
+                  :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
+                  :value="tokenData.userBalance.toLocaleString()"
+                  class="transfer-assets-section__asset-data"
+                  is-formatted
+                >
+                </info-line>
+                <div
+                  v-if="!isTransferAssetBalanceOk(tokenData)"
+                  class="transfer-assets-section__required-amount required-amount"
+                >
+                  <div>
+                    <div>{{ t('adar.routeAssets.stages.reviewDetails.swapless.required') }}</div>
+                    <div class="required-amount__amount">{{ tokenData.amountRequired.toLocaleString() }}</div>
+                  </div>
+                  <s-button
+                    type="primary"
+                    class="s-typography-button--mini add-button"
+                    @click.stop="onTransferAddFundsClick(tokenData)"
+                  >
+                    {{ t('adar.routeAssets.stages.reviewDetails.add') }}
+                  </s-button>
+                </div>
+              </div>
+            </s-collapse-item>
+          </s-collapse>
+        </div>
         <slippage-tolerance
           :slippages="slippages"
           :slippageTolerance="currentSlippage"
@@ -229,28 +113,25 @@
             {{ t('adar.routeAssets.cancelProcessing') }}
           </s-button>
         </div>
-      </div>
-    </div>
-    <div class="container routing-details-section">
-      <div class="route-assets__page-header-title">
-        {{ t('adar.routeAssets.stages.reviewDetails.routingDetails.title') }}
-      </div>
-      <div v-for="(assetData, idx) in recipientsData" :key="idx" class="asset-data-container fields-container">
-        <div class="asset-title">
-          <div>
-            <token-logo class="token-logo" :token="assetData.asset" />
-          </div>
-          <div>{{ assetData.asset.symbol }}</div>
-        </div>
-        <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.recipients') }}</div>
-          <div class="field__value">{{ assetData.recipientsNumber }}</div>
-        </div>
         <s-divider />
-        <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.routingDetails.amount') }}</div>
-          <div class="field__value">{{ formatNumberJs(assetData.total) }}</div>
-          <div class="field__value usd">{{ assetData.usd.toLocaleString(2) }}</div>
+
+        <div class="fields-container">
+          <info-line
+            v-if="isLoggedIn"
+            :label="t('networkFeeText')"
+            :label-tooltip="t('networkFeeTooltipText')"
+            :value="formatNumber(networkFee)"
+            :asset-symbol="xorSymbol"
+            :fiat-value="getFiatAmountByFPNumber(networkFee)"
+            is-formatted
+          />
+          <info-line
+            :label="t('swap.liquidityProviderFee')"
+            :label-tooltip="t('swap.liquidityProviderFeeTooltip')"
+            :value="formatNumber(maxInputAmount.totalLiquidityProviderFee)"
+            :asset-symbol="xorSymbol"
+            is-formatted
+          />
         </div>
       </div>
     </div>
@@ -294,11 +175,10 @@ import WarningMessage from '../WarningMessage.vue';
     SelectToken: lazyComponent(Components.SelectToken),
   },
 })
-export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
+export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixins.FormattedAmountMixin) {
   @getter.routeAssets.inputToken inputToken!: Asset;
   @action.routeAssets.processingNextStage nextStage!: () => void;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
-  @state.wallet.account.fiatPriceObject private fiatPriceObject!: any;
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
@@ -310,6 +190,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
 
+  @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
+  @getter.routeAssets.swapTxsAmountInfo swapTxsAmountInfo!: Array<OutcomeAssetsAmount>;
+
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.slippageTolerance slippageMultiplier!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
@@ -318,6 +201,8 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
+
+  xorSymbol = XOR.symbol;
 
   onInputAssetSelected(asset) {
     this.setInputToken(asset);
@@ -332,26 +217,24 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
     return ['1', '2', '3'];
   }
 
-  get adarFeesList() {
-    const inputToken = {
+  get assetsList() {
+    const swapTx = {
       asset: this.inputToken,
       adarFee: this.adarFee,
+      amount: this.estimatedAmount,
+      amountRequired: this.remainingAmountRequired,
+      totalAmount: this.estimatedAmountWithFees,
+      userBalance: this.fpBalance,
+      usd: this.swapTxsAmountInfo.reduce((acc, item) => acc.add(item.usd), FPNumber.ZERO),
+      priceImpact: this.estimatedPriceImpact.toLocaleString(4),
+      transfer: false,
     };
-    const adarFeeList = this.outcomeAssetsAmountsList.map((amountData) => ({
-      asset: amountData.asset,
-      adarFee: amountData.adarFee,
-    }));
-    const inputTokenTransferData = adarFeeList.find((item) => item.asset.address === inputToken.asset.address);
-    if (inputTokenTransferData) {
-      inputTokenTransferData.adarFee = inputTokenTransferData.adarFee.add(inputToken.adarFee);
-    } else {
-      adarFeeList.push(inputToken);
-    }
-    return adarFeeList;
+    return [...this.transferTxsAmountInfo.map((item) => ({ transfer: true, ...item })), swapTx];
   }
 
   get outcomeAssetsAmountsListFiltered() {
-    return this.outcomeAssetsAmountsList;
+    // return this.outcomeAssetsAmountsList;
+    return [...this.transferTxsAmountInfo.map((item) => ({ transfer: true, ...item }))];
   }
 
   get currentSlippage() {
@@ -513,10 +396,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin) {
 
   get formattedBalance(): string {
     return this.fpBalance.dp(6).toLocaleString();
-  }
-
-  getAssetUSDPrice(asset: Asset) {
-    return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, asset.decimals);
   }
 
   getTokenBalance(asset): CodecString {
