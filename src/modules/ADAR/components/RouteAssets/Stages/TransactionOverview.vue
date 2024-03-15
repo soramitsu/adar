@@ -123,7 +123,7 @@
           </template>
           <template v-slot="{ row }">
             <div>
-              <p class="tx-type">{{ row.useTransfer ? t('operations.Transfer') : t('operations.Swap') }}</p>
+              <s-checkbox size="small" :value="row.useTransfer" class="checkbox-no-actions" />
             </div>
           </template>
         </s-table-column>
@@ -213,7 +213,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 
   onContinueClick() {
     if (this.isLoggedIn) {
-      this.nextStage();
+      this.showSelectInputAssetDialog = true;
       return;
     }
     this.handleConnectWallet();
@@ -443,9 +443,5 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
       display: inline;
     }
   }
-}
-
-.tx-type {
-  text-transform: uppercase;
 }
 </style>

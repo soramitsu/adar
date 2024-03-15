@@ -20,67 +20,22 @@
           <div class="metadata">{{ `${lastModified} &#183; ${fileSize} kb` }}</div>
         </div>
       </div>
-      <div class="route-assets-processing-template__amount-info-container">
-        <div>
-          <div class="tx-type-label">{{ t('operations.Transfer') }}</div>
-          <div v-for="(amountInfo, idx) in transferTxsAmountInfo" :key="idx" class="amount-info">
-            <div class="amount-info__asset-symbol">
-              <token-logo class="token-logo" :token="amountInfo.asset" size="big" />
+      <div class="fields-container">
+        <div v-for="(item, idx) in fields" :key="idx">
+          <div class="field">
+            <p class="field__label">{{ item.title }}</p>
+            <div class="field__status" :class="item.status.correct ? 'field__status_success' : 'field__status_error'">
+              <div>{{ item.status.title }}</div>
               <div>
-                <div>{{ amountInfo.asset.symbol }}</div>
-                <token-address v-bind="amountInfo.asset" class="input-value" />
+                <s-icon
+                  class="icon-status"
+                  :name="item.status.correct ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'"
+                />
               </div>
             </div>
-            <div class="amount-info__info">
-              <info-line
-                :label="t('adar.routeAssets.recipients')"
-                :value="`${amountInfo.recipientsNumber ?? 0}`"
-                is-formatted
-              />
-              <info-line
-                :label="`${t('adar.routeAssets.stages.routing.amountText.default')} ${amountInfo.asset.symbol}`"
-                :value="amountInfo.totalAmount.toLocaleString(2)"
-                :fiat-value="amountInfo.usd.toLocaleString(2)"
-                is-formatted
-              />
-            </div>
+            <!-- <p class="field__status">{{ item.status }}</p> -->
           </div>
-        </div>
-        <div>
-          <div class="tx-type-label">{{ t('operations.Swap') }}</div>
-          <div class="amount-info">
-            <div class="amount-info__token-selection">
-              <div>{{ t('adar.routeAssets.dialogs.selectInputAssetDialog.title') }}</div>
-              <div
-                class="amount-info__asset-symbol pointer"
-                @click="
-                  () => {
-                    showSelectInputAssetDialog = true;
-                  }
-                "
-              >
-                <token-logo class="token-logo" :token="inputToken" size="big" />
-                <div>{{ inputToken.symbol }}</div>
-                <div>
-                  <s-icon name="arrows-chevron-down-rounded-24" size="20" />
-                </div>
-              </div>
-            </div>
-
-            <div class="amount-info__info">
-              <info-line
-                :label="t('adar.routeAssets.recipients')"
-                :value="`${swapDataInfo.recipientsNumber ?? 0}`"
-                is-formatted
-              />
-              <info-line
-                :label="`${t('adar.routeAssets.stages.routing.amountText.default')} ${inputToken.symbol}`"
-                :value="maxInputAmount.totalAmount.toLocaleString(2)"
-                :fiat-value="swapDataInfo.usd.toLocaleString(2)"
-                is-formatted
-              />
-            </div>
-          </div>
+          <s-divider />
         </div>
       </div>
       <div class="buttons-container">
@@ -104,55 +59,34 @@
       :totalIssuesCount="incorrectRecipients.length"
       @changeIssueIdx="changeIssueIdx"
     ></fix-issues-dialog>
-    <select-token :visible.sync="showSelectInputAssetDialog" :connected="isLoggedIn" @select="onInputAssetSelected" />
   </div>
 </template>
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
-import { Asset } from '@sora-substrate/util/build/assets/types';
-import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
-import { Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
-import { lazyComponent } from '@/router';
 import { action, getter } from '@/store/decorators';
-import { MaxInputAmountInfo, OutcomeAssetsAmount, Recipient } from '@/store/routeAssets/types';
+import { Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 @Component({
   components: {
     FixIssuesDialog: adarLazyComponent(AdarComponents.RouteAssetsFixIssuesDialog),
-    TokenLogo: components.TokenLogo,
-    InfoLine: components.InfoLine,
-    SelectToken: lazyComponent(Components.SelectToken),
-    TokenAddress: components.TokenAddress,
   },
 })
 export default class ProcessTemplate extends Mixins(TranslationMixin) {
   @getter.routeAssets.file private file!: Nullable<File>;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
-  @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
-  @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @action.routeAssets.processingNextStage nextStage!: () => void;
   @action.routeAssets.processingPreviousStage previousStage!: () => void;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
-  @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
-  @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
-  @getter.routeAssets.inputToken inputToken!: Asset;
 
   fixIssuesDialog = false;
   isSpinner = true;
   currentIssueIdx = 0;
-
-  showSelectInputAssetDialog = false;
-
-  onInputAssetSelected(asset) {
-    this.setInputToken(asset);
-    this.showSelectInputAssetDialog = false;
-  }
 
   created() {
     setTimeout(() => {
@@ -273,24 +207,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
       : `${this.t('adar.routeAssets.continue')}`;
   }
 
-  get swapDataInfo() {
-    return this.recipients.reduce(
-      (acc, recipient) => {
-        if (recipient.useTransfer || recipient.asset.address === this.inputToken.address) return acc;
-        return {
-          recipientsNumber: ++acc.recipientsNumber,
-          amount: acc.amount.add(recipient.amount ?? FPNumber.ZERO),
-          usd: acc.usd.add(recipient.usd ?? FPNumber.ZERO),
-        };
-      },
-      {
-        recipientsNumber: 0,
-        amount: FPNumber.ZERO,
-        usd: FPNumber.ZERO,
-      }
-    );
-  }
-
   nextButtonAction() {
     if (this.incorrectRecipients.length > 0) this.fixIssuesDialog = true;
     else this.nextStage();
@@ -369,43 +285,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
       color: var(--s-color-base-content-secondary);
     }
   }
-
-  &__amount-info-container {
-    text-align: left;
-
-    > div {
-      margin: 24px auto;
-    }
-
-    .amount-info {
-      &__asset-symbol {
-        font-weight: 800;
-        font-size: 18px;
-        @include flex-start;
-        gap: 8px;
-      }
-      &__info {
-        margin: 12px auto;
-
-        &-line {
-          @include flex-center;
-          justify-content: space-between;
-        }
-      }
-
-      &__token-selection {
-        font-weight: 600;
-        font-size: var(--s-font-size-medium);
-        @include flex-center;
-        justify-content: space-between;
-      }
-      margin: 16px auto;
-      box-shadow: var(--s-shadow-element);
-      border-radius: 30px;
-      background: var(--s-color-utility-body);
-      padding: 16px;
-    }
-  }
 }
 </style>
 
@@ -458,16 +337,5 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
 .content-container {
   margin-bottom: 0;
-}
-
-.pointer {
-  cursor: pointer;
-}
-
-.tx-type-label {
-  font-weight: 600;
-  font-size: var(--s-font-size-big);
-  text-align: center;
-  text-transform: uppercase;
 }
 </style>

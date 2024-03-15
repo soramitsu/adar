@@ -125,5 +125,4 @@ export type OutcomeAssetsAmount = {
   totalAmount: FPNumber;
   userBalance: FPNumber;
   amountRequired: FPNumber;
-  recipientsNumber?: number;
 };
