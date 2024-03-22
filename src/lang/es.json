@@ -63,7 +63,9 @@
             "StakingSetPayee": "Establecer beneficiario {address}",
             "OrderBookPlaceLimitOrder": "{side} {amount} {symbol} a {price} {symbol2} colocado",
             "OrderBookCancelLimitOrder": "Orden límite cancelada",
-            "OrderBookCancelLimitOrders": "Limitar órdenes canceladas"
+            "OrderBookCancelLimitOrders": "Limitar órdenes canceladas",
+            "Burn": "Quemado {amount} {symbol}",
+            "Mint": "Acuñado {amount} {symbol} a {address}"
         },
         "error": {
             "Transfer": "Fallo en {action} {amount} {symbol} {direction} {address}",
@@ -98,7 +100,9 @@
             "StakingSetPayee": "No se pudo establecer el beneficiario {address}",
             "OrderBookPlaceLimitOrder": "No se pudo realizar la orden limitada de {amount} {symbol} a {price} {symbol2}",
             "OrderBookCancelLimitOrders": "No se pudieron cancelar las órdenes limitadas",
-            "OrderBookCancelLimitOrder": "No se pudo cancelar la orden límite"
+            "OrderBookCancelLimitOrder": "No se pudo cancelar la orden límite",
+            "Burn": "No se pudo grabar {amount} {symbol}",
+            "Mint": "No se pudo acuñar {amount} {symbol} en {address}"
         },
         "ReferralReserveXor": "Vincular XOR",
         "ReferralUnreserveXor": "Desvincular XOR",
@@ -125,7 +129,9 @@
         "StakingSetPayee": "Establecer beneficiario",
         "OrderBookPlaceLimitOrder": "Realizar pedido",
         "OrderBookCancelLimitOrder": "Cancelar orden",
-        "OrderBookCancelLimitOrders": "Cancelar pedidos"
+        "OrderBookCancelLimitOrders": "Cancelar pedidos",
+        "Burn": "Quemar",
+        "Mint": "menta"
     },
     "polkadotjs": {
         "noExtensions": "No se encontró la extensión {PolkadotJs}. Por favor instálela y vuelva a cargar esta página.\n https:\/\/polkadot.js.org\/extension\/",
@@ -390,7 +396,8 @@
         "Explore\/Farming": "Agricultura",
         "Staking": "Staking",
         "OrderBook": "Comercio",
-        "Explore\/Books": "@:pageTitle.OrderBook"
+        "Explore\/Books": "@:pageTitle.OrderBook",
+        "Kensetsu": "Kensetsu"
     },
     "mainMenu": {
         "Swap": "Intercambio",
@@ -407,7 +414,8 @@
         "SoraCard": "{Sora} Tarjeta",
         "RouteAssets": "Ruta de activos",
         "RoutingHistory": "Historia Ruta",
-        "OrderBook": "Comercio"
+        "OrderBook": "Comercio",
+        "Kensetsu": "Kensetsu"
     },
     "social": {
         "twitter": "Twitter",
@@ -1289,7 +1297,9 @@
         "actions": {
             "claim": "Reclamar premios",
             "remove": "Quitar estaca",
-            "more": "Apuesta más"
+            "more": "Apuesta más",
+            "confirm": "Confirmar apuesta",
+            "withdraw": "Retirar"
         },
         "overview": {
             "title": "{Sora} Staking",
@@ -1306,7 +1316,8 @@
             "change": "Cambiar validadores",
             "select": "Seleccionar validadores",
             "next": "Siguiente",
-            "alreadyNominated": "Validadores seleccionados ya nominados"
+            "alreadyNominated": "Validadores seleccionados ya nominados",
+            "tooManyValidators": "Demasiados validadores seleccionados ( {Max} {max} )"
         },
         "validatorsList": {
             "search": "Buscar...",
@@ -1314,10 +1325,10 @@
             "noNominatedValidators": "No tienes ningún validador nominado.",
             "noValidators": "No hay validadores que cumplan el filtro especificado.",
             "commission": "Comisión",
-            "commissionTooltip": "La comisión se refiere a la tarifa que cobran los validadores por sus servicios en el proceso de apuesta. Esta tarifa, expresada como porcentaje, se deduce de las recompensas obtenidas por los nominadores antes de la distribución. Es importante tener en cuenta que los validadores pueden ajustar sus tasas de comisión en cualquier momento."
+            "commissionTooltip": "La comisión se refiere a la tarifa que cobran los validadores por sus servicios en el proceso de apuesta. Esta tarifa, expresada como porcentaje, se deduce de las recompensas obtenidas por los nominadores antes de la distribución. Es importante tener en cuenta que los validadores pueden ajustar sus tasas de comisión en cualquier momento.",
+            "return": "Devolver"
         },
         "info": {
-            "redeemable": "Redimible",
             "unstaking": "Desestacar",
             "stakingBalance": "Equilibrio de apuesta",
             "rewarded": "Recompensado",
@@ -1396,6 +1407,26 @@
             "title": "Reclamar premios",
             "checkRewards": "Consultar recompensas por era y validador.",
             "rewardsDestination": "Dirección de destino de recompensas"
+        },
+        "selectedValidators": "{count} ( {Max} {max} )",
+        "withdraw": {
+            "withdrawable": "Retirable",
+            "beingWithdrawn": "siendo retirado",
+            "seeAll": "Ver todo",
+            "nextWithdrawal": "Próximo retiro",
+            "countdownLeft": "quedan"
+        },
+        "stakeDialog": {
+            "toStake": "Apostar",
+            "toRemove": "Para eliminar"
+        },
+        "withdrawDialog": {
+            "title": "Retirar fondos no apostados",
+            "showAllWithdraws": "Mostrar todos los retiros"
+        },
+        "allWithdrawsDialog": {
+            "title": "Actividad desestacada",
+            "information": "Una vez que retiras los tokens, existe un período obligatorio de retirada de tokens de 7 días. Después de este período, sus tokens no se devolverán automáticamente a su billetera. Debes completar el proceso retirando manualmente tus tokens."
         }
     },
     "collapseText": "Colapso",
@@ -1444,7 +1475,6 @@
             "placeLimit": "Realizar orden límite",
             "askCancel": "¿Está seguro de que desea cancelar todos sus pedidos abiertos?",
             "cancelAll": "Sí, cancelar todo",
-            "noCancel": "No, no lo canceles",
             "buy": "Comprar {amount} {symbol}",
             "sell": "Vender {amount} {symbol}",
             "at": "a {price} {symbol}"
@@ -1494,7 +1524,7 @@
             },
             "marketNotAvailable": {
                 "reason": "No hay suficientes pedidos disponibles para completar este pedido",
-                "reading": "Limitación de orden de mercado: no hay suficientes órdenes disponibles para cumplir con esta orden de límite de mercado. Ajuste el tamaño de su pedido o espere a que se realicen más pedidos."
+                "reading": "Limitación de la orden de mercado: no hay suficientes órdenes disponibles para cumplir con esta orden de mercado. Ajuste el tamaño de su pedido o espere a que se realicen más pedidos."
             },
             "exceedsSpread": {
                 "reason": "El precio superó el diferencial",
@@ -1515,6 +1545,10 @@
             "outOfBounds": {
                 "reading": "Se excedió el rango de la cadena de bloques: el monto ingresado está fuera del rango permitido de la cadena de bloques. Mín: {min} ; Máximo: {max}",
                 "reason": "La cantidad no cumple con el rango de blockchain"
+            },
+            "multipleOf": {
+                "reading": "Para procesar su pedido, ingrese un precio que sea múltiplo de {value}",
+                "reason": "El precio introducido es demasiado específico."
             }
         },
         "orderStatus": {
@@ -1522,6 +1556,8 @@
             "canceled": "Cancelado",
             "expired": "Venció",
             "filled": "Completado"
-        }
-    }
+        },
+        "pricePerToken": "Precio por 1 {token}"
+    },
+    "calculatingText": "Calculando"
 }
