@@ -54,7 +54,9 @@
           "waiting": "en attente",
           "title": "Modèle de routage de processus",
           "description": "Notre système traite votre Modèle de Routage de Processus téléversé",
-          "fixButton": "corriger les problèmes"
+          "fixButton": "corriger les problèmes",
+          "swapNotNecessary": "Cette section comprend toutes les transactions pour lesquelles un échange n'est pas nécessaire, ou qui ont été indiquées comme un transfert dans le fichier téléchargé.",
+          "swapNecessary": "Cette section comprend toutes les transactions pour lesquelles un échange sera nécessaire et qui n'ont pas été indiquées comme un transfert dans le fichier téléchargé."
         },
         "transactionOverview": {
           "title": "Aperçu des transactions",

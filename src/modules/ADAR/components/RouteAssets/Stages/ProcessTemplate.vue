@@ -21,8 +21,14 @@
         </div>
       </div>
       <div class="route-assets-processing-template__amount-info-container">
-        <div>
-          <div class="tx-type-label">{{ t('operations.Transfer') }}</div>
+        <div v-if="transferTxsAmountInfo.length">
+          <div class="tx-type-title">
+            <div class="tx-type-label">{{ t('operations.Transfer') }}</div>
+            <s-tooltip :content="t('adar.routeAssets.stages.processTemplate.swapNotNecessary')" border-radius="mini">
+              <s-icon name="info-16" size="16px" />
+            </s-tooltip>
+          </div>
+
           <div v-for="(amountInfo, idx) in transferTxsAmountInfo" :key="idx" class="amount-info">
             <div class="amount-info__asset-symbol">
               <token-logo class="token-logo" :token="amountInfo.asset" size="big" />
@@ -46,8 +52,13 @@
             </div>
           </div>
         </div>
-        <div>
-          <div class="tx-type-label">{{ t('operations.Swap') }}</div>
+        <div v-if="!hideSwapSection">
+          <div class="tx-type-title">
+            <div class="tx-type-label">{{ t('operations.Swap') }}</div>
+            <s-tooltip :content="t('adar.routeAssets.stages.processTemplate.swapNecessary')" border-radius="mini">
+              <s-icon name="info-16" size="16px" />
+            </s-tooltip>
+          </div>
           <div class="amount-info">
             <div class="amount-info__token-selection">
               <div>{{ t('adar.routeAssets.dialogs.selectInputAssetDialog.title') }}</div>
@@ -291,6 +302,10 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
     );
   }
 
+  get hideSwapSection() {
+    return this.recipients.every((recipient) => recipient.useTransfer);
+  }
+
   nextButtonAction() {
     if (this.incorrectRecipients.length > 0) this.fixIssuesDialog = true;
     else this.nextStage();
@@ -469,5 +484,10 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   font-size: var(--s-font-size-big);
   text-align: center;
   text-transform: uppercase;
+}
+
+.tx-type-title {
+  @include flex-center;
+  gap: 4px;
 }
 </style>

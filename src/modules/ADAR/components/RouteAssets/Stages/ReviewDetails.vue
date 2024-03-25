@@ -6,26 +6,21 @@
         {{ t('adar.routeAssets.stages.reviewDetails.description') }}
       </div>
       <div class="fields-container">
-        <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
-          <div
-            class="field__value pointer"
-            @click="
-              () => {
-                showSelectInputAssetDialog = true;
-              }
-            "
-          >
-            <div>{{ inputToken.symbol }}</div>
-            <div>
-              <token-logo class="token-logo" :token="inputToken" />
-            </div>
-            <div>
-              <s-icon name="arrows-chevron-down-rounded-24" size="20" />
+        <template v-if="!hideSwapSection">
+          <div class="field">
+            <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
+            <div class="field__value pointer" @click="onSelectInputAssetClick">
+              <div>{{ inputToken.symbol }}</div>
+              <div>
+                <token-logo class="token-logo" :token="inputToken" />
+              </div>
+              <div>
+                <s-icon name="arrows-chevron-down-rounded-24" size="20" />
+              </div>
             </div>
           </div>
-        </div>
-        <s-divider />
+          <s-divider />
+        </template>
         <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.totalUsdToRoute') }}</div>
           <div class="field__value usd">{{ usdToBeRouted }}</div>
@@ -105,16 +100,6 @@
           :slippageTolerance="currentSlippage"
           @onSlippageChanged="updatePriceImpact"
         />
-        <div class="buttons-container">
-          <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
-            {{ t('adar.routeAssets.continue') }}
-          </s-button>
-          <s-button type="secondary" class="s-typography-button--big" @click.stop="cancelButtonAction">
-            {{ t('adar.routeAssets.cancelProcessing') }}
-          </s-button>
-        </div>
-        <s-divider />
-
         <div class="fields-container">
           <info-line
             v-if="isLoggedIn"
@@ -132,6 +117,14 @@
             :asset-symbol="xorSymbol"
             is-formatted
           />
+        </div>
+        <div class="buttons-container">
+          <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
+            {{ t('adar.routeAssets.continue') }}
+          </s-button>
+          <s-button type="secondary" class="s-typography-button--big" @click.stop="cancelButtonAction">
+            {{ t('adar.routeAssets.cancelProcessing') }}
+          </s-button>
         </div>
       </div>
     </div>
@@ -209,12 +202,20 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     this.showSelectInputAssetDialog = false;
   }
 
+  onSelectInputAssetClick() {
+    this.showSelectInputAssetDialog = true;
+  }
+
   updatePriceImpact(slippage: string) {
     this.setSlippageTolerance(slippage);
   }
 
   get slippages() {
     return ['1', '2', '3'];
+  }
+
+  get hideSwapSection() {
+    return this.recipients.every((recipient) => recipient.useTransfer);
   }
 
   get assetsList() {
@@ -625,9 +626,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   padding: 16px;
 }
 .fields-container {
-  .el-divider {
-    margin-bottom: $inner-spacing-medium;
-    margin-top: $inner-spacing-medium;
+  margin: $inner-spacing-big 0;
+
+  .field {
+    padding: 2px 4px;
   }
 }
 
