@@ -54,7 +54,9 @@
             "waiting": "esperando",
             "title": "Plantilla de enrutamiento de procesos",
             "description": "Nuestro sistema está procesando su Plantilla de Enrutamiento de Procesos cargada",
-            "fixButton": "solucionar problemas"
+            "fixButton": "solucionar problemas",
+            "swapNotNecessary": "Esta sección incluye cualquier transacción para la cual no sea necesaria un intercambio, o que se haya indicado como una transferencia en el archivo cargado.",
+            "swapNecessary": "Esta sección incluye cualquier transacción para la cual será necesario un intercambio y que no se haya indicado como una transferencia en el archivo cargado."
           },
           "transactionOverview": {
             "title": "Resumen de transacciones",

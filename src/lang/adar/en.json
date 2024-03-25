@@ -54,7 +54,9 @@
           "waiting": "waiting",
           "title": "Process routing template",
           "description": "Our system is processing your uploaded Routing Template",
-          "fixButton": "fix issues"
+          "fixButton": "fix issues",
+          "swapNotNecessary": "This section includes any transactions for which a swap is not necessary, or that was indicated as a transfer in the uploaded file.",
+          "swapNecessary": "This section includes any transactions for which a swap will be necessary and that was not indicated as a transfer in the uploaded file."
         },
         "transactionOverview": {
           "title": "transaction overview",
