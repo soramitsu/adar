@@ -119,7 +119,7 @@ const getters = defineGetters<RouteAssetsState>()({
       ).map((assetArray: Array<Recipient>) => {
         const reduceData = assetArray.reduce(
           (acc, item) => {
-            const swapless = item.useTransfer;
+            const swapless = item.useTransfer || item.asset.address === getters.inputToken.address;
             return {
               usd: new FPNumber(item.usd).add(acc.usd),
               usdSwap: swapless ? acc.usdSwap : new FPNumber(item.usd).add(acc.usdSwap),
