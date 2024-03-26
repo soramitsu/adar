@@ -6,7 +6,7 @@
         {{ t('adar.routeAssets.stages.reviewDetails.description') }}
       </div>
       <div class="fields-container">
-        <template v-if="!hideSwapSection">
+        <template v-if="!allTxsAreTransfers">
           <div class="field">
             <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
             <div class="field__value pointer" @click="onSelectInputAssetClick">
@@ -100,6 +100,23 @@
           :slippageTolerance="currentSlippage"
           @onSlippageChanged="updatePriceImpact"
         />
+        <template v-if="xorFeeBalanceError">
+          <div class="field">
+            <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.feeRequired') }}</div>
+            <div class="field__value">
+              <s-button
+                type="primary"
+                class="s-typography-button--mini add-button"
+                @click.stop="onAddFundsClick('fee')"
+              >
+                {{ t('adar.routeAssets.stages.reviewDetails.add') }}
+              </s-button>
+              {{ formatNumber(xorFeeRequired) }}
+              <token-logo class="token-logo" :token="xor" />
+            </div>
+          </div>
+          <s-divider />
+        </template>
         <div class="fields-container">
           <info-line
             v-if="isLoggedIn"
@@ -214,7 +231,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     return ['1', '2', '3'];
   }
 
-  get hideSwapSection() {
+  get allTxsAreTransfers() {
     return this.recipients.every((recipient) => recipient.useTransfer);
   }
 
@@ -230,7 +247,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
       priceImpact: this.estimatedPriceImpact.toLocaleString(4),
       transfer: false,
     };
-    return [...this.transferTxsAmountInfo.map((item) => ({ transfer: true, ...item })), swapTx];
+    const list = this.transferTxsAmountInfo.map((item) => ({ transfer: true, ...item }));
+    if (!this.allTxsAreTransfers) list.push(swapTx);
+    return list;
   }
 
   get outcomeAssetsAmountsListFiltered() {

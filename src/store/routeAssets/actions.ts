@@ -92,7 +92,8 @@ const actions = defineActions({
           }
         },
         complete: ({ errors }) => {
-          if (errors.length < 1) {
+          const allAssetsAreOk = data.every((item) => item.asset);
+          if (errors.length < 1 && allAssetsAreOk) {
             resolve();
             commit.setData({ file, recipients: data });
             commit.setTxStatus(SwapTransferBatchStatus.INITIAL);
