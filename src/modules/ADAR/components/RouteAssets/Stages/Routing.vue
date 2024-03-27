@@ -8,28 +8,29 @@
       </div>
       <div class="route-assets-routing-process__status-text">{{ statusText }}</div>
     </div>
-    <div class="fields-container">
-      <div class="field">
-        <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
-        <div class="field__value">
-          <div>{{ inputToken.symbol }}</div>
-          <div>
-            <token-logo class="token-logo" :token="inputToken" />
-          </div>
-        </div>
-      </div>
-      <s-divider />
+    <div>
       <div v-if="transactionFailed" class="error-message">
         <s-icon class="icon-status" name="basic-clear-X-xs-24" />
         <div>{{ errorMessage }}</div>
       </div>
-      <div v-else-if="finalAmount" class="field">
-        <div class="field__label">{{ amountText }}</div>
-        <div class="field__value">
-          {{ finalAmountFormatted }} <span>{{ inputToken.symbol.toUpperCase() }}</span>
-          <span class="usd">{{ totalUSD }}</span>
+      <template v-else-if="finalAmount">
+        <div class="assets-section">
+          <div v-for="(amountInfo, idx) in assetsInfo" :key="idx" class="asset">
+            <div class="asset__asset-info">
+              <token-logo :token="amountInfo.asset" size="big" />
+              <div>
+                <div>{{ amountInfo.asset.symbol }}</div>
+                <token-address v-bind="amountInfo.asset" class="input-value" />
+              </div>
+            </div>
+            <div class="asset__amount-info">
+              <div class="amount">{{ amountInfo.amount }}</div>
+              <div class="usd">{{ amountInfo.usd || '' }}</div>
+            </div>
+          </div>
         </div>
-      </div>
+        <info-line :label="amountText" value=" " :fiatValue="totalUSD" />
+      </template>
       <div v-else>
         <spinner />
       </div>
@@ -51,19 +52,28 @@
 import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
+import { groupBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { getErrorMessage } from '@/modules/ADAR/utils';
 import { action, getter } from '@/store/decorators';
-import { MaxInputAmountInfo, SwapTransferBatchStatus } from '@/store/routeAssets/types';
+import {
+  MaxInputAmountInfo,
+  OutcomeAssetsAmount,
+  SummaryAssetRecipientsInfo,
+  SwapTransferBatchStatus,
+} from '@/store/routeAssets/types';
 
 import type { HistoryItem } from '@sora-substrate/util';
+
 @Component({
   components: {
     TokenLogo: components.TokenLogo,
     Spinner,
+    TokenAddress: components.TokenAddress,
+    InfoLine: components.InfoLine,
   },
 })
 export default class RoutingAssets extends Mixins(TranslationMixin) {
@@ -74,6 +84,12 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
+  @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
+  @getter.routeAssets.swapTxsAmountInfo swapTxsAmountInfo!: Array<OutcomeAssetsAmount>;
+  @getter.routeAssets.recipientsTokens tokens!: Array<Asset>;
+  @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
+    asset?: Asset | AccountAsset
+  ) => SummaryAssetRecipientsInfo[];
 
   get continueButtonDisabled() {
     return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
@@ -81,6 +97,49 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 
   onContinueClick() {
     this.nextStage();
+  }
+
+  get assetsInfoHistory() {
+    if (!this.txHistoryData?.payload?.receivers) return [];
+    return Object.values(groupBy(this.txHistoryData?.payload?.receivers, 'symbol')).map((receivers) => {
+      return {
+        asset: receivers[0].asset,
+        amount: receivers
+          .reduce((sum: FPNumber, receiver) => {
+            return sum.add(new FPNumber(receiver.amount));
+          }, FPNumber.ZERO)
+          .toLocaleString(2),
+      };
+    });
+  }
+
+  // get assetsInfo() {
+  //   return this.recipientsGroupedByToken().map((item) => {
+  //     return {
+  //       asset: item.asset,
+  //       amount: item.total.toLocaleString(4),
+  //       usd: item.usd.toLocaleString(2),
+  //     };
+  //   });
+  // }
+
+  get assetsInfo() {
+    if (!this.txHistoryData?.amount) return [];
+    const totalUsd = this.swapTxsAmountInfo.reduce((acc, item) => acc.add(item.usd), FPNumber.ZERO);
+    return [
+      ...this.transferTxsAmountInfo.map((item) => {
+        return {
+          asset: item.asset,
+          amount: item.amount.toLocaleString(4),
+          usd: item.usd.toLocaleString(2),
+        };
+      }),
+      {
+        asset: this.inputToken,
+        amount: new FPNumber(this.txHistoryData?.amount || 0).toLocaleString(4),
+        usd: totalUsd,
+      },
+    ];
   }
 
   get transactionFailed() {
@@ -192,47 +251,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.fields-container {
-  .field {
-    &__label {
-      &_failed {
-        color: var(--s-color-status-error);
-        font-weight: 600;
-        fill: var(--s-color-status-error);
-        &::after {
-          margin-left: 4px;
-          content: '✕';
-          display: inline;
-          color: var(--s-color-status-error);
-        }
-      }
-      &_routed {
-        color: var(--s-color-status-success);
-        font-weight: 600;
-        fill: var(--s-color-status-success);
-        &::after {
-          margin-left: 4px;
-          content: '✓';
-          display: inline;
-          color: var(--s-color-status-success);
-        }
-      }
-      &_waiting,
-      &_passed {
-        color: var(--s-color-status-warning);
-        font-weight: 600;
-        fill: var(--s-color-status-warning);
-        &::after {
-          margin-left: 4px;
-          content: '...';
-          display: inline;
-          color: var(--s-color-status-warning);
-        }
-      }
-    }
-  }
-}
-
 .buttons-container {
   // margin-top: 150px;
 
@@ -259,6 +277,39 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   i {
     font-size: 16px !important;
     color: inherit;
+  }
+}
+
+div.assets-section {
+  padding: 8px 16px;
+  border-radius: 30px;
+  background: var(--s-color-utility-body);
+  margin-bottom: 16px;
+
+  /* neo/inset */
+  box-shadow: var(--s-shadow-element);
+
+  .asset {
+    @include flex-between;
+    padding: 12px 0;
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--s-color-base-border-secondary);
+    }
+    &__asset-info {
+      font-weight: 800;
+      font-size: 18px;
+      @include flex-start;
+      gap: 8px;
+      text-align: start;
+    }
+    &__amount-info {
+      text-align: end;
+
+      .amount {
+        font-weight: 800;
+        font-size: 18px;
+      }
+    }
   }
 }
 </style>

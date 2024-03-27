@@ -92,7 +92,8 @@ const actions = defineActions({
           }
         },
         complete: ({ errors }) => {
-          if (errors.length < 1) {
+          const allAssetsAreOk = data.every((item) => item.asset);
+          if (errors.length < 1 && allAssetsAreOk) {
             resolve();
             commit.setData({ file, recipients: data });
             commit.setTxStatus(SwapTransferBatchStatus.INITIAL);
@@ -333,7 +334,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   commit.setPricesAreUpdated(false);
   const inputAsset = getters.inputToken;
   const newData = data.map((item) => {
-    const targetAmount = item.swapAndSendData.targetAmount.toCodecString();
+    const targetAmount = item.swapAndSendData.targetAmount;
     return {
       accountId: item.swapAndSendData.address,
       targetAmount,
@@ -365,31 +366,20 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       outcomeAssetId,
       receivers,
       dexId,
-      outcomeAssetReuse: outcomeAssetReuse
-        .add(outcomeAssetReuse.mul(new FPNumber(adarFee).div(FPNumber.HUNDRED)))
-        .toCodecString(),
+      outcomeAssetReuse: outcomeAssetReuse.add(outcomeAssetReuse.mul(new FPNumber(adarFee).div(FPNumber.HUNDRED))),
     };
   });
 
-  const maxInputAmount = inputTokenAmount
-    .add(inputTokenAmount.mul(new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED)))
-    .toCodecString();
-  const params = calcTxParams(inputAsset, maxInputAmount, undefined);
+  const maxInputAmount = inputTokenAmount.add(
+    inputTokenAmount.mul(new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED))
+  );
+  // const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
     try {
       await rootDispatch.wallet.transactions.beforeTransactionSign();
       const time = Date.now();
-      await api
-        .submitExtrinsic(
-          (api.api.tx.liquidityProxy as any).swapTransferBatch(swapTransferData, ...params.args),
-          api.account.pair,
-          {
-            symbol: inputAsset.symbol,
-            assetAddress: inputAsset.address,
-            to: api.account.pair.address,
-            type: Operation.SwapTransferBatch,
-          }
-        )
+      await api.swap
+        .executeSwapTransferBatch(swapTransferData, inputAsset, maxInputAmount)
         .then(async () => {
           const lastTx = await getLastTransaction(time);
           rootCommit.wallet.transactions.addActiveTx(lastTx.id as string);

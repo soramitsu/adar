@@ -200,7 +200,6 @@ export default class AdarSlippageTolerance extends Mixins(mixins.NumberFormatter
     font-size: 14px !important;
     font-weight: 300;
     border: none !important;
-    padding-left: 0;
 
     &-value {
       color: var(--s-color-theme-accent);
