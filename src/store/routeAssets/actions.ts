@@ -355,7 +355,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     let outcomeAssetReuse = FPNumber.ZERO;
     const approxSum = receivers.reduce((sum, receiver) => {
       if (receiver.useTransfer) {
-        outcomeAssetReuse = outcomeAssetReuse.add(FPNumber.fromCodecValue(receiver.targetAmount));
+        outcomeAssetReuse = outcomeAssetReuse.add(receiver.targetAmount);
       }
       return receiver.useTransfer ? sum : sum.add(new FPNumber(receiver.usd));
     }, FPNumber.ZERO);
