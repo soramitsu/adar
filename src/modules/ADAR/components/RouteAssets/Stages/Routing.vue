@@ -15,7 +15,7 @@
       </div>
       <template v-else-if="finalAmount">
         <div class="assets-section">
-          <div v-for="(amountInfo, idx) in assetsInfo" :key="idx" class="asset">
+          <div v-for="(amountInfo, idx) in assetsInfoHistory" :key="idx" class="asset">
             <div class="asset__asset-info">
               <token-logo :token="amountInfo.asset" size="big" />
               <div>
@@ -62,6 +62,7 @@ import { action, getter } from '@/store/decorators';
 import {
   MaxInputAmountInfo,
   OutcomeAssetsAmount,
+  Recipient,
   SummaryAssetRecipientsInfo,
   SwapTransferBatchStatus,
 } from '@/store/routeAssets/types';
@@ -87,6 +88,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
   @getter.routeAssets.swapTxsAmountInfo swapTxsAmountInfo!: Array<OutcomeAssetsAmount>;
   @getter.routeAssets.recipientsTokens tokens!: Array<Asset>;
+  @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
@@ -102,6 +104,9 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   get assetsInfoHistory() {
     if (!this.txHistoryData?.payload?.receivers) return [];
     return Object.values(groupBy(this.txHistoryData?.payload?.receivers, 'symbol')).map((receivers) => {
+      const usd = this.recipientsGroupedByToken().find(
+        (item) => item.asset.address === receivers[0]?.asset.address
+      )?.usd;
       return {
         asset: receivers[0].asset,
         amount: receivers
@@ -109,6 +114,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
             return sum.add(new FPNumber(receiver.amount));
           }, FPNumber.ZERO)
           .toLocaleString(2),
+        usd,
       };
     });
   }
