@@ -28,7 +28,7 @@
         <s-divider />
         <div class="transfer-assets-section">
           <p class="transfer-assets-section__title">
-            <s-icon v-if="transferBalanceErrors" class="icon-status" name="basic-clear-X-xs-24" />
+            <s-icon v-if="transferBalanceErrors || amountBalanceError" class="icon-status" name="basic-clear-X-xs-24" />
             {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
           </p>
           <s-collapse>
