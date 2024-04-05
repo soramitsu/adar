@@ -13,6 +13,27 @@
         </div>
       </div>
       <div class="routing-history__page-header-title">{{ t('adar.routingHistory.title') }}</div>
+      <div class="select-address-panel">
+        <s-input :placeholder="t('adar.routeAssets.wallet')" v-model="address" />
+        <div class="error-message" :class="validAddress ? 'error-message_valid' : 'error-message_invalid'">
+          <div>
+            {{
+              `${t('adar.routeAssets.dialogs.fixIssuesDialog.walletAddress')} ${
+                !validAddress
+                  ? `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusIncorrect')}`
+                  : `${t('adar.routeAssets.dialogs.fixIssuesDialog.fieldStatusCorrect')}`
+              }`
+            }}
+          </div>
+          <div>
+            <s-icon
+              class="icon-status"
+              :name="validAddress ? 'basic-check-marks-24' : 'basic-clear-X-xs-24'"
+              size="12px"
+            />
+          </div>
+        </div>
+      </div>
       <div class="routing-history__period period">
         <div class="period__label">{{ t('adar.routingHistory.periodLabel') }}</div>
         <s-dropdown type="button" :button-type="'link'" placement="bottom-start" @select="handleSelectPeriodMenu">
@@ -50,11 +71,11 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
-import { mixins } from '@soramitsu/soraneo-wallet-web';
+import { api, components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears, isAfter } from 'date-fns';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { fetchData } from '@/modules/ADAR/indexer/queries/adarStats';
@@ -63,10 +84,12 @@ import { state } from '@/store/decorators';
 import type { HistoryItem } from '@sora-substrate/util';
 
 @Component({
-  components: {},
+  components: {
+    AddressBookInput: components.AddressBookInput,
+  },
 })
 export default class RoutingHistory extends Mixins(mixins.LoadingMixin, TranslationMixin) {
-  @state.wallet.account.address private address!: string;
+  @state.wallet.account.address private userAddress!: string;
 
   selectedPeriod = {
     title: '',
@@ -125,11 +148,25 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   adarTxs: Array<HistoryItem> = [];
 
+  address = '';
+
   created() {
     this.withApi(async () => {
       this.handleSelectPeriodMenu(this.dropdownPeriodMenuItems[0]);
-      if (this.address) this.adarTxs = await fetchData(this.address);
+      this.address = this.userAddress ?? '';
     });
+  }
+
+  @Watch('address')
+  private async addressUpdated(newAddress: string) {
+    if (this.validAddress) {
+      this.adarTxs = [];
+      this.adarTxs = await fetchData(this.address);
+    }
+  }
+
+  get validAddress(): boolean {
+    return api.validateAddress(this.address);
   }
 
   readonly datetime = this.formatDate(new Date().getTime(), 'D-MMM-YYYY--HH-mm-ss');
@@ -190,7 +227,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
             'adar.routeAssets.stages.done.report.blockNumber'
           )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
           '\n' +
-          tx.outputTxs.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n') +
+          tx.outputTxs?.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n') +
           '\n\n';
         csvContent = csvContent + txContent;
       });
@@ -335,6 +372,33 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
   &__menu-item {
     text-transform: capitalize;
     padding: 4px 32px;
+  }
+}
+
+.select-address-panel {
+  margin-bottom: $inner-spacing-medium;
+  .error-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: left;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+
+    &_invalid {
+      color: var(--s-color-status-error);
+      fill: var(--s-color-status-error);
+    }
+
+    &_valid {
+      color: var(--s-color-status-success);
+      fill: var(--s-color-status-success);
+    }
+
+    i {
+      color: inherit;
+    }
   }
 }
 </style>
