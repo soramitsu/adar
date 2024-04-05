@@ -87,7 +87,13 @@ export const historyElementsFilter = ({ address = '' }: any = {}): any => {
 export async function fetchData(address = ''): Promise<Array<HistoryItem>> {
   const indexer = getCurrentIndexer();
   if (indexer.type !== IndexerType.SUBQUERY) return [];
-  const formattedAddress = address ? (address.startsWith('cn') ? address : api.formatAddress(address)) : '';
+  let formattedAddress: string;
+  if (address) {
+    formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
+  } else {
+    formattedAddress = '';
+  }
+  // const formattedAddress = address ? (address.startsWith('cn') ? address : api.formatAddress(address)) : '';
   const filter = historyElementsFilter({
     address: formattedAddress,
   });
