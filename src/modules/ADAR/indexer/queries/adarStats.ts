@@ -93,7 +93,6 @@ export async function fetchData(address = ''): Promise<Array<HistoryItem>> {
   } else {
     formattedAddress = '';
   }
-  // const formattedAddress = address ? (address.startsWith('cn') ? address : api.formatAddress(address)) : '';
   const filter = historyElementsFilter({
     address: formattedAddress,
   });
