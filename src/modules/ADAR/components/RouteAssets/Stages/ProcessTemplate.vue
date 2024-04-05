@@ -49,6 +49,12 @@
                 :fiat-value="amountInfo.usd.toLocaleString(2)"
                 is-formatted
               />
+              <info-line
+                :asset-symbol="amountInfo.asset.symbol"
+                :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
+                :value="amountInfo.userBalance.toLocaleString()"
+                is-formatted
+              />
             </div>
           </div>
         </div>
@@ -90,6 +96,12 @@
                 :fiat-value="swapDataInfo.usd.toLocaleString(2)"
                 is-formatted
               />
+              <info-line
+                :asset-symbol="inputToken.symbol"
+                :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
+                :value="fpBalance.toLocaleString()"
+                is-formatted
+              />
             </div>
           </div>
         </div>
@@ -120,8 +132,8 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
-import { Asset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber, CodecString } from '@sora-substrate/util/build';
+import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
@@ -130,9 +142,10 @@ import { Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent } from '@/router';
-import { action, getter } from '@/store/decorators';
+import { action, getter, state } from '@/store/decorators';
 import { MaxInputAmountInfo, OutcomeAssetsAmount, Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
+import { getAssetBalance } from '@/utils';
 @Component({
   components: {
     FixIssuesDialog: adarLazyComponent(AdarComponents.RouteAssetsFixIssuesDialog),
@@ -153,6 +166,7 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.inputToken inputToken!: Asset;
+  @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
 
   fixIssuesDialog = false;
   isSpinner = true;
@@ -304,6 +318,18 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
   get hideSwapSection() {
     return this.recipients.every((recipient) => recipient.useTransfer);
+  }
+
+  get fpBalance(): FPNumber {
+    const balance = this.getTokenBalance(this.inputToken);
+    if (!balance) return FPNumber.ZERO;
+
+    return FPNumber.fromCodecValue(balance, this.inputToken.decimals);
+  }
+
+  getTokenBalance(asset: Asset): CodecString {
+    const accountAsset = this.accountAssets.find((item) => item.address === asset.address);
+    return getAssetBalance(accountAsset);
   }
 
   nextButtonAction() {
