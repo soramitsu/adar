@@ -61,7 +61,7 @@
                 </info-line>
                 <info-line
                   :asset-symbol="tokenData.asset.symbol"
-                  :label="t('adar.routeAssets.stages.reviewDetails.swapless.amount')"
+                  :label="getAmountLabel(tokenData.transfer)"
                   :value="tokenData.amount.toLocaleString()"
                   class="transfer-assets-section__asset-data"
                   is-formatted
@@ -225,6 +225,12 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
 
   updatePriceImpact(slippage: string) {
     this.setSlippageTolerance(slippage);
+  }
+
+  getAmountLabel(isTransfer: boolean) {
+    return `${isTransfer ? this.t('operations.Transfer') : this.t('operations.Swap')} ${this.t(
+      'adar.routeAssets.stages.reviewDetails.swapless.amount'
+    )}`;
   }
 
   get slippages() {

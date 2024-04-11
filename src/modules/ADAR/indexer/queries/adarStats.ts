@@ -1,4 +1,4 @@
-import { getCurrentIndexer, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
+import { api, getCurrentIndexer, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { SubqueryIndexer } from '@soramitsu/soraneo-wallet-web/lib/services/indexer';
 import { gql } from '@urql/core';
 
@@ -87,8 +87,14 @@ export const historyElementsFilter = ({ address = '' }: any = {}): any => {
 export async function fetchData(address = ''): Promise<Array<HistoryItem>> {
   const indexer = getCurrentIndexer();
   if (indexer.type !== IndexerType.SUBQUERY) return [];
+  let formattedAddress: string;
+  if (address) {
+    formattedAddress = address.startsWith('cn') ? address : api.formatAddress(address);
+  } else {
+    formattedAddress = '';
+  }
   const filter = historyElementsFilter({
-    address,
+    address: formattedAddress,
   });
 
   const variables = {
