@@ -81,7 +81,7 @@
             "amount": "Token amount required"
           },
           "swapless": {
-              "balance": "balance",
+              "balance": "current balance",
               "adarFee": "adar fee",
               "amount": "amount",
               "required": "tokens required"
