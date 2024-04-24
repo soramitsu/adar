@@ -124,7 +124,8 @@
             "blockNumber": "Block Number",
             "blockId": "Block Id",
             "senderWallet": "Sender wallet",
-            "datetime": "Datetime"
+            "datetime": "Datetime",
+            "timestampUTC": "Timestamp (UTC)"
           }
         }
       },

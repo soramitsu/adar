@@ -7,6 +7,7 @@ import { SwapTransferBatchStatus } from './types';
 import type { RouteAssetsState, Recipient, TransactionInfo, RouteAssetsSubscription } from './types';
 import type { PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
 import type { HistoryItem } from '@sora-substrate/util';
+import type { AccountBalance } from '@sora-substrate/util/build/assets/types';
 
 const mutations = defineMutations<RouteAssetsState>()({
   setData(state, { file, recipients }: { file: File; recipients: Array<Recipient> }): void {
@@ -77,6 +78,9 @@ const mutations = defineMutations<RouteAssetsState>()({
   },
   setInputToken(state, asset) {
     state.processingState.inputToken = asset;
+  },
+  setInputTokenBalance(state, balance: Nullable<AccountBalance>): void {
+    state.processingState.inputTokenBalance = balance;
   },
   editRecipient(state, { id, name, wallet, usd, amount, asset }) {
     const recipient = state.recipients.find((recipient) => recipient.id === id);

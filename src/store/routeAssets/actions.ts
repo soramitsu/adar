@@ -2,23 +2,46 @@
 import { assert } from '@polkadot/util';
 import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
 import { NumberLike } from '@sora-substrate/math';
-import { FPNumber, Operation } from '@sora-substrate/util/build';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { FPNumber } from '@sora-substrate/util/build';
 import { Messages } from '@sora-substrate/util/build/logger';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
 import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
 import { firstValueFrom } from 'rxjs';
+import { ActionContext } from 'vuex';
 
 import { adarFee } from '@/modules/ADAR/consts';
 import { routeAssetsActionContext } from '@/store/routeAssets';
 import { delay } from '@/utils';
+import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
 
 import { RecipientStatus, SwapTransferBatchStatus } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
-import type { WhitelistArrayItem, Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import type { WhitelistArrayItem, Asset, AccountAsset, AccountBalance } from '@sora-substrate/util/build/assets/types';
+
+enum BalanceSubscriptionKeys {
+  adarInputToken = 'adarInputToken',
+}
+
+const balanceSubscriptions = new TokenBalanceSubscriptions();
+
+function updateTokenSubscription(context: ActionContext<any, any>): void {
+  const { getters, commit, rootGetters } = routeAssetsActionContext(context);
+  const { inputToken } = getters;
+  const { setInputTokenBalance } = commit;
+
+  const updateBalance = (balance: Nullable<AccountBalance>) => setInputTokenBalance(balance);
+  balanceSubscriptions.remove(BalanceSubscriptionKeys.adarInputToken);
+  if (
+    rootGetters.wallet.account.isLoggedIn &&
+    inputToken?.address &&
+    !(inputToken.address in rootGetters.wallet.account.accountAssetsAddressTable)
+  ) {
+    balanceSubscriptions.add(BalanceSubscriptionKeys.adarInputToken, { updateBalance, token: inputToken });
+  }
+}
 
 const actions = defineActions({
   processingNextStage(context) {
@@ -34,9 +57,16 @@ const actions = defineActions({
     commit.setInputToken(asset);
     dispatch.subscribeOnReserves();
   },
+  async updateInputTokenSubscription(context): Promise<void> {
+    updateTokenSubscription(context);
+  },
+  async resetInputTokenSubscription(context): Promise<void> {
+    balanceSubscriptions.remove(BalanceSubscriptionKeys.adarInputToken);
+  },
   cancelProcessing(context) {
     const { commit, dispatch } = routeAssetsActionContext(context);
     dispatch.cleanSwapReservesSubscription();
+    dispatch.resetInputTokenSubscription();
     commit.clearData();
   },
   async updateRecipients(context, file?: File): Promise<void> {
@@ -120,6 +150,7 @@ const actions = defineActions({
     const { commit, getters, dispatch } = routeAssetsActionContext(context);
     if (!getters.recipients.length) return;
     dispatch.cleanSwapReservesSubscription();
+    dispatch.updateInputTokenSubscription();
     const sourceToken = getters.inputToken;
     const tokens = [...new Set<Asset>(getters.recipients.filter((item) => item.asset).map((item) => item.asset))]
       .map((item: Asset) => item?.address)
@@ -134,7 +165,7 @@ const actions = defineActions({
     const tokensPromises = tokens.map((tokenAddress) => {
       return new Promise<void>((resolve, reject) => {
         const observableQuote = api.swap.getDexesSwapQuoteObservable(sourceToken.address, tokenAddress);
-        commit.addSubscription({ assetAddress: tokenAddress });
+        commit.addSubscription({ assetAddress: tokenAddress, isAvailable: false, liquiditySources: [] });
         if (observableQuote) {
           firstValueFrom(observableQuote).then((quoteData) => {
             dispatch.setSubscriptionPayload({
