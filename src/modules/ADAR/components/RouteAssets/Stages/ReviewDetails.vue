@@ -137,7 +137,7 @@
         </div>
         <div class="buttons-container">
           <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
-            {{ t('adar.routeAssets.continue') }}
+            {{ continueButtonTitle }}
           </s-button>
           <s-button type="secondary" class="s-typography-button--big" @click.stop="cancelButtonAction">
             {{ t('adar.routeAssets.cancelProcessing') }}
@@ -154,7 +154,7 @@
 import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
 import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
 import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
-import { components, mixins } from '@soramitsu/soraneo-wallet-web';
+import { components, mixins, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import { Components } from '@/consts';
@@ -208,6 +208,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.outcomeAssetsAmountsList outcomeAssetsAmountsList!: Array<OutcomeAssetsAmount>;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
+  @getter.routeAssets.unavailableLiquidityAssetAddresses unavailableLiquidityAssetAddresses!: Array<string>;
+  @getter.routeAssets.isLiquidityUnavailable isLiquidityUnavailable!: boolean;
+  @getter.wallet.account.assetsDataTable private assetsDataTable!: WALLET_TYPES.AssetsTable;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -231,6 +234,16 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     return `${isTransfer ? this.t('operations.Transfer') : this.t('operations.Swap')} ${this.t(
       'adar.routeAssets.stages.reviewDetails.swapless.amount'
     )}`;
+  }
+
+  get continueButtonTitle() {
+    if (this.isLiquidityUnavailable) {
+      return this.t('swap.insufficientLiquidity');
+    }
+    if (this.amountBalanceError || this.xorFeeBalanceError || this.transferBalanceErrors) {
+      return this.t('insufficientBalanceText');
+    }
+    return this.t('adar.routeAssets.continue');
   }
 
   get slippages() {
@@ -271,7 +284,12 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   }
 
   get noIssues() {
-    return !this.amountBalanceError && !this.xorFeeBalanceError && !this.transferBalanceErrors;
+    return (
+      !this.amountBalanceError &&
+      !this.xorFeeBalanceError &&
+      !this.transferBalanceErrors &&
+      !this.isLiquidityUnavailable
+    );
   }
 
   get amountBalanceError() {
@@ -363,7 +381,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     const isInputAssetXor = this.inputToken?.symbol === XOR?.symbol;
     const assetFrom = isInputAssetXor ? VAL : XOR;
     const assetTo = this.inputToken;
-    const valueTo = this.remainingAmountRequired.toNumber();
+    const valueTo = this.remainingAmountRequired;
     return {
       assetFrom,
       assetTo,
@@ -374,7 +392,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   get xorFeeSwapData(): PresetSwapData {
     const assetFrom = VAL;
     const assetTo = XOR;
-    const valueTo = this.xorFeeRequired.toNumber();
+    const valueTo = this.xorFeeRequired;
     return {
       assetFrom,
       assetTo,
@@ -397,16 +415,26 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
 
   onTransferAddFundsClick(tokenData: OutcomeAssetsAmount) {
     const requiredAmount = this.tokenTransferAmountRequired(tokenData.asset, tokenData.amountRequired);
+    let assetFrom: Asset;
+    if (this.inputToken.address !== tokenData.asset.address) {
+      assetFrom = this.inputToken;
+    } else {
+      assetFrom = tokenData.asset.address === XOR.address ? VAL : XOR;
+    }
     this.swapData = {
-      assetFrom: this.inputToken,
+      assetFrom,
       assetTo: tokenData.asset,
-      valueTo: requiredAmount.toNumber(),
+      valueTo: requiredAmount,
     };
     this.showSwapDialog = true;
   }
 
+  get unavailableSymbols() {
+    return this.unavailableLiquidityAssetAddresses.map((assetAddress) => this.assetsDataTable[assetAddress]?.symbol);
+  }
+
   isTransferAssetBalanceOk(tokenData: OutcomeAssetsAmount) {
-    return FPNumber.lt(this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount), FPNumber.ZERO);
+    return FPNumber.lte(this.tokenTransferAmountRequired(tokenData.asset, tokenData.totalAmount), FPNumber.ZERO);
   }
 
   get fpBalance(): FPNumber {

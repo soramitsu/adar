@@ -72,7 +72,7 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
 import { api, components, mixins } from '@soramitsu/soraneo-wallet-web';
-import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears, isAfter } from 'date-fns';
+import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears, isAfter, compareDesc } from 'date-fns';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
@@ -188,30 +188,32 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
   ];
 
   getReportData(isCsv = false) {
-    return this.userTxs.map((tx) => {
-      const info = {
-        txId: tx.txId,
-        datetime: new Date((tx as any).endTime),
-        blockId: tx.blockId,
-        blockNumber: tx.blockHeight,
-        from: this.address,
-      };
-      const outputTxs = tx?.payload?.receivers.map((recipient, idx) => {
-        const fpAmount = new FPNumber(recipient.amount);
-        return [
-          `${idx + 1}`,
-          //   recipient.name,
-          recipient.accountId,
-          // isCsv ? usd.toFixed(2) : usd.toLocaleString(),
-          tx.symbol,
-          recipient.asset.symbol,
-          isCsv ? fpAmount.toFixed(7) : fpAmount.toLocaleString(),
-          //   isCsv ? rate.toFixed(7) : rate.toLocaleString(),
-          // recipient.status.toString(),
-        ];
-      });
-      return { info, outputTxs };
-    });
+    return this.userTxs
+      .map((tx) => {
+        const info = {
+          txId: tx.txId,
+          datetime: new Date((tx as any).endTime),
+          blockId: tx.blockId,
+          blockNumber: tx.blockHeight,
+          from: this.address,
+        };
+        const outputTxs = tx?.payload?.receivers.map((recipient, idx) => {
+          const fpAmount = new FPNumber(recipient.amount);
+          return [
+            `${idx + 1}`,
+            //   recipient.name,
+            recipient.accountId,
+            // isCsv ? usd.toFixed(2) : usd.toLocaleString(),
+            tx.symbol,
+            recipient.asset.symbol,
+            isCsv ? fpAmount.toFixed(7) : fpAmount.toLocaleString(),
+            //   isCsv ? rate.toFixed(7) : rate.toLocaleString(),
+            // recipient.status.toString(),
+          ];
+        });
+        return { info, outputTxs };
+      })
+      .sort((item1, item2) => compareDesc(item1.info.datetime, item2.info.datetime));
   }
 
   downloadCSV(fileName: string) {
@@ -222,6 +224,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         const { txId, from, blockNumber, datetime } = tx.info;
         const txContent =
           `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
+          `${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}\n` +
           this.headers.join(',') +
           `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
             'adar.routeAssets.stages.done.report.blockNumber'
@@ -252,10 +255,11 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         doc.text(`${this.t('adar.routeAssets.stages.done.report.blockId')} - ${blockId}`, 5, 15);
         doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
         doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
+        doc.text(`${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}`, 5, 30);
         autoTable(doc, {
           head: [this.headers],
           body: tx.outputTxs as RowInput[],
-          startY: 30,
+          startY: 35,
           rowPageBreak: 'avoid',
           margin: { top: 5, left: 5, right: 5, bottom: 5 },
           styles: {

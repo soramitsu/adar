@@ -27,7 +27,7 @@ export default class BalanceWidget extends Vue {
   @state.wallet.settings.shouldBalanceBeHidden shouldBalanceBeHidden!: boolean;
 
   get tokenSymbol() {
-    return this.inputToken.symbol;
+    return this.inputToken?.symbol;
   }
 
   get formattedBalance(): string {
@@ -37,11 +37,11 @@ export default class BalanceWidget extends Vue {
   get fpBalance(): FPNumber {
     if (!this.getTokenBalance) return FPNumber.ZERO;
 
-    return FPNumber.fromCodecValue(this.getTokenBalance, this.inputToken.decimals);
+    return FPNumber.fromCodecValue(this.getTokenBalance, this.inputToken?.decimals);
   }
 
   get getTokenBalance(): CodecString {
-    const asset = this.accountAssets.find((item) => item.address === this.inputToken.address);
+    const asset = this.accountAssets.find((item) => item.address === this.inputToken?.address);
     return getAssetBalance(asset);
   }
 }

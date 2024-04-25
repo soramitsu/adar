@@ -1,5 +1,5 @@
 import { FPNumber } from '@sora-substrate/util/build';
-import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import { Asset, AccountAsset, AccountBalance } from '@sora-substrate/util/build/assets/types';
 import { Subscription } from 'rxjs';
 
 import type { SwapQuote, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
@@ -74,6 +74,7 @@ export type MaxInputAmountInfo = {
 export type ProcessingState = {
   currentStageIndex: number;
   inputToken: Asset;
+  inputTokenBalance: Nullable<AccountBalance>;
   tokensRouted?: Array<RoutedToken>;
   txInfo?: TransactionInfo;
   txHistoryData?: HistoryItem;
@@ -101,7 +102,7 @@ export type RouteAssetsState = {
 export type PresetSwapData = {
   assetFrom: Asset;
   assetTo: Asset;
-  valueTo: number;
+  valueTo: FPNumber;
 };
 
 export type SummaryAssetRecipientsInfo = {
