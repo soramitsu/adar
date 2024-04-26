@@ -153,7 +153,7 @@
 <script lang="ts">
 import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
 import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
-import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import { AccountAsset, Asset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
@@ -186,7 +186,7 @@ import WarningMessage from '../WarningMessage.vue';
   },
 })
 export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixins.FormattedAmountMixin) {
-  @getter.routeAssets.inputToken inputToken!: Asset;
+  @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @action.routeAssets.processingNextStage nextStage!: () => void;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
@@ -438,9 +438,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   }
 
   get fpBalance(): FPNumber {
-    if (!this.getTokenBalance(this.inputToken)) return FPNumber.ZERO;
+    if (!getAssetBalance(this.inputToken)) return FPNumber.ZERO;
 
-    return FPNumber.fromCodecValue(this.getTokenBalance(this.inputToken), this.decimals);
+    return FPNumber.fromCodecValue(getAssetBalance(this.inputToken), this.decimals);
   }
 
   get decimals(): number {

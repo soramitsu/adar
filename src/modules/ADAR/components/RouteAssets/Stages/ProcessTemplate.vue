@@ -133,7 +133,7 @@
 
 <script lang="ts">
 import { FPNumber, CodecString } from '@sora-substrate/util/build';
-import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
@@ -165,7 +165,7 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
-  @getter.routeAssets.inputToken inputToken!: Asset;
+  @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
 
   fixIssuesDialog = false;
@@ -321,7 +321,7 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   }
 
   get fpBalance(): FPNumber {
-    const balance = this.getTokenBalance(this.inputToken);
+    const balance = getAssetBalance(this.inputToken);
     if (!balance) return FPNumber.ZERO;
 
     return FPNumber.fromCodecValue(balance, this.inputToken.decimals);
