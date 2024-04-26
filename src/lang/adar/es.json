@@ -124,7 +124,8 @@
               "blockNumber": "Número de bloque",
               "blockId": "ID de bloque",
               "senderWallet": "Billetera del remitente",
-              "datetime": "Fecha y hora"
+              "datetime": "Fecha y hora",
+              "timestampUTC": "Marca de tiempo (UTC)"
             }
           }
         },

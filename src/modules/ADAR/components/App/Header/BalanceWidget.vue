@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { CodecString, FPNumber } from '@sora-substrate/util/build';
-import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import { RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Vue } from 'vue-property-decorator';
 
@@ -21,13 +21,12 @@ import { getAssetBalance } from '@/utils';
   },
 })
 export default class BalanceWidget extends Vue {
-  @getter.routeAssets.inputToken inputToken!: Asset;
-  @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
+  @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @state.wallet.settings.shouldBalanceBeHidden shouldBalanceBeHidden!: boolean;
 
   get tokenSymbol() {
-    return this.inputToken.symbol;
+    return this.inputToken?.symbol;
   }
 
   get formattedBalance(): string {
@@ -37,12 +36,11 @@ export default class BalanceWidget extends Vue {
   get fpBalance(): FPNumber {
     if (!this.getTokenBalance) return FPNumber.ZERO;
 
-    return FPNumber.fromCodecValue(this.getTokenBalance, this.inputToken.decimals);
+    return FPNumber.fromCodecValue(this.getTokenBalance, this.inputToken?.decimals);
   }
 
   get getTokenBalance(): CodecString {
-    const asset = this.accountAssets.find((item) => item.address === this.inputToken.address);
-    return getAssetBalance(asset);
+    return getAssetBalance(this.inputToken);
   }
 }
 </script>

@@ -21,7 +21,7 @@ import type {
   TransactionInfo,
 } from './types';
 import type { HistoryItem } from '@sora-substrate/util';
-import type { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import type { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 
 const getters = defineGetters<RouteAssetsState>()({
   recipients(...args): Array<Recipient> {
@@ -60,9 +60,14 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return Stages[state.processingState.currentStageIndex].title;
   },
-  inputToken(...args): Asset {
-    const { state } = routeAssetsGetterContext(args);
-    return state.processingState.inputToken;
+  inputToken(...args): RegisteredAccountAsset {
+    const { state, rootGetters } = routeAssetsGetterContext(args);
+    const token = rootGetters.assets.assetDataByAddress(state.processingState.inputToken.address);
+    const balance = state.processingState.inputTokenBalance;
+    if (balance) {
+      return { ...token, balance } as RegisteredAccountAsset;
+    }
+    return token as RegisteredAccountAsset;
   },
   file(...args): Nullable<File> {
     const { state } = routeAssetsGetterContext(args);
@@ -219,9 +224,9 @@ const getters = defineGetters<RouteAssetsState>()({
       return {
         asset,
         usd: usd,
-        amount: totalAmount,
+        amount,
         adarFee: adarFee,
-        totalAmount: totalAmount.add(adarFee),
+        totalAmount,
         amountRequired: amountRequired,
         userBalance: userBalance,
       };
@@ -271,14 +276,27 @@ const getters = defineGetters<RouteAssetsState>()({
       return {
         asset,
         usd: usd,
-        amount: totalAmount,
+        amount,
         adarFee: adarFee,
-        totalAmount: totalAmount.add(adarFee),
+        totalAmount,
         amountRequired: amountRequired,
         userBalance: userBalance,
         recipientsNumber: assetArray.length,
       };
     });
+  },
+  unavailableLiquidityAssetAddresses(...args): Array<string> {
+    const { getters } = routeAssetsGetterContext(args);
+    const subscriptions = getters.subscriptions;
+    return subscriptions
+      .filter((item: RouteAssetsSubscription) => !item.isAvailable)
+      .map((item: RouteAssetsSubscription) => item.assetAddress);
+  },
+  isLiquidityUnavailable(...args): boolean {
+    const { getters } = routeAssetsGetterContext(args);
+    const subscriptions = getters.subscriptions;
+    if (!subscriptions.length) return true;
+    return subscriptions.some((item: RouteAssetsSubscription) => !item.isAvailable);
   },
 
   swapTxsAmountInfo(...args): Array<OutcomeAssetsAmount> {
@@ -310,9 +328,9 @@ const getters = defineGetters<RouteAssetsState>()({
       return {
         asset,
         usd: usd,
-        amount: totalAmount,
+        amount,
         adarFee: adarFee,
-        totalAmount: totalAmount.add(adarFee),
+        totalAmount,
         amountRequired: amountRequired,
         userBalance: userBalance,
         recipientsNumber: assetArray.length,
