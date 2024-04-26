@@ -124,7 +124,8 @@
             "blockNumber": "Numéro de bloc",
             "blockId": "Identifiant de bloc",
             "senderWallet": "Portefeuille de l'expéditeur",
-            "datetime": "Date et heure"
+            "datetime": "Date et heure",
+            "timestampUTC": "Horodatage (UTC)"
           }
         }
       },
