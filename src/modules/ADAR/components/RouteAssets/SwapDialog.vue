@@ -27,6 +27,11 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
 
   @Prop({ default: 0 }) presetSwapData!: PresetSwapData;
 
+  get roundedValueTo() {
+    const { valueTo } = this.presetSwapData;
+    return new FPNumber(Math.ceil((valueTo.toNumber() + Number.EPSILON) * 10000) / 10000);
+  }
+
   get networkSwapFee(): FPNumber {
     return FPNumber.fromCodecValue(this.networkFees[Operation.Swap]);
   }
@@ -37,9 +42,9 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
       this.$nextTick(async () => {
         const swapComponent = this.$refs.swap as any;
         if (swapComponent) {
-          const { assetFrom, assetTo, valueTo } = this.presetSwapData;
+          const { assetFrom, assetTo } = this.presetSwapData;
           const isAssetToXor = assetTo.symbol === XOR.symbol;
-          const fieldToValue = isAssetToXor ? valueTo.add(this.networkSwapFee) : valueTo;
+          const fieldToValue = isAssetToXor ? this.roundedValueTo.add(this.networkSwapFee) : this.roundedValueTo;
           await swapComponent.setData({ firstAddress: assetFrom.address, secondAddress: assetTo.address });
           swapComponent.handleInputFieldTo(`${fieldToValue.toLocaleString()}`);
           swapComponent.handleFocusField(true);

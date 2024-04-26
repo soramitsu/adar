@@ -224,9 +224,9 @@ const getters = defineGetters<RouteAssetsState>()({
       return {
         asset,
         usd: usd,
-        amount: totalAmount,
+        amount,
         adarFee: adarFee,
-        totalAmount: totalAmount.add(adarFee),
+        totalAmount,
         amountRequired: amountRequired,
         userBalance: userBalance,
       };
@@ -276,9 +276,9 @@ const getters = defineGetters<RouteAssetsState>()({
       return {
         asset,
         usd: usd,
-        amount: totalAmount,
+        amount,
         adarFee: adarFee,
-        totalAmount: totalAmount.add(adarFee),
+        totalAmount,
         amountRequired: amountRequired,
         userBalance: userBalance,
         recipientsNumber: assetArray.length,
@@ -328,9 +328,9 @@ const getters = defineGetters<RouteAssetsState>()({
       return {
         asset,
         usd: usd,
-        amount: totalAmount,
+        amount,
         adarFee: adarFee,
-        totalAmount: totalAmount.add(adarFee),
+        totalAmount,
         amountRequired: amountRequired,
         userBalance: userBalance,
         recipientsNumber: assetArray.length,
