@@ -20,6 +20,7 @@ def pipeline = new org.js.AppPipeline(steps: this,
     ipfsHashNotificationProd: false,
     ipfsHashChatIDStage: '',
     ipfsHashChatIDProd: '',
+    noIndex: true,
     // ipfsHashChatID: '-1001375555544',
     secretScannerExclusion: 'Jenkinsfile-UCAN|.*env.json\$|.*env-stage.json\$'
 )

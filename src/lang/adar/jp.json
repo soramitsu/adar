@@ -124,7 +124,8 @@
               "blockNumber": "ブロック番号",
               "blockId": "ブロック ID",
               "senderWallet": "送信者ウォレット",
-              "datetime": "日付と時刻"
+              "datetime": "日付と時刻",
+              "timestampUTC": "タイムスタンプ（UTC）"
             }
           }
         },

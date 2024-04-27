@@ -27,16 +27,13 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
 
   @Prop({ default: 0 }) presetSwapData!: PresetSwapData;
 
-  get presetDataValueTo() {
-    return this.presetSwapData?.valueTo;
+  get roundedValueTo() {
+    const { valueTo } = this.presetSwapData;
+    return new FPNumber(Math.ceil((valueTo.toNumber() + Number.EPSILON) * 10000) / 10000);
   }
 
-  roundNumber(num) {
-    return Math.ceil((num + Number.EPSILON) * 100) / 100;
-  }
-
-  get networkSwapFee(): number {
-    return FPNumber.fromCodecValue(this.networkFees[Operation.Swap]).toNumber() * 2;
+  get networkSwapFee(): FPNumber {
+    return FPNumber.fromCodecValue(this.networkFees[Operation.Swap]);
   }
 
   @Watch('visible')
@@ -45,11 +42,11 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
       this.$nextTick(async () => {
         const swapComponent = this.$refs.swap as any;
         if (swapComponent) {
-          const { assetFrom, assetTo, valueTo } = this.presetSwapData;
+          const { assetFrom, assetTo } = this.presetSwapData;
           const isAssetToXor = assetTo.symbol === XOR.symbol;
-          const fieldToValue = isAssetToXor ? valueTo + this.networkSwapFee : valueTo;
+          const fieldToValue = isAssetToXor ? this.roundedValueTo.add(this.networkSwapFee) : this.roundedValueTo;
           await swapComponent.setData({ firstAddress: assetFrom.address, secondAddress: assetTo.address });
-          swapComponent.handleInputFieldTo(`${this.roundNumber(fieldToValue)}`);
+          swapComponent.handleInputFieldTo(`${fieldToValue.toNumber()}`);
           swapComponent.handleFocusField(true);
         }
       });

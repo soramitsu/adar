@@ -7,7 +7,7 @@ import { SwapTransferBatchStatus } from './types';
 
 import type { RouteAssetsState } from './types';
 
-function initialState(): RouteAssetsState {
+export function initialState(): RouteAssetsState {
   return {
     recipients: [],
     file: null,
@@ -21,6 +21,7 @@ function initialState(): RouteAssetsState {
     processingState: {
       currentStageIndex: 0,
       inputToken: XOR,
+      inputTokenBalance: null,
       datetime: undefined,
       txInfo: undefined,
       status: SwapTransferBatchStatus.INITIAL,
