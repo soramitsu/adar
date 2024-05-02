@@ -295,6 +295,7 @@ const getters = defineGetters<RouteAssetsState>()({
   isLiquidityUnavailable(...args): boolean {
     const { getters } = routeAssetsGetterContext(args);
     const subscriptions = getters.subscriptions;
+    if (!subscriptions.length && getters.recipients.length) return false;
     if (!subscriptions.length) return true;
     return subscriptions.some((item: RouteAssetsSubscription) => !item.isAvailable);
   },
