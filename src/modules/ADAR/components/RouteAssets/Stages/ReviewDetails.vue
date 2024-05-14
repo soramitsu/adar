@@ -211,6 +211,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   @getter.routeAssets.unavailableLiquidityAssetAddresses unavailableLiquidityAssetAddresses!: Array<string>;
   @getter.routeAssets.isLiquidityUnavailable isLiquidityUnavailable!: boolean;
   @getter.wallet.account.assetsDataTable private assetsDataTable!: WALLET_TYPES.AssetsTable;
+  @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -251,6 +252,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   }
 
   get allTxsAreTransfers() {
+    if (!this.adarSwapEnabled) return true;
     return this.recipients.every((recipient) => recipient.useTransfer);
   }
 

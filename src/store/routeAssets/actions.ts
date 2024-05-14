@@ -70,7 +70,7 @@ const actions = defineActions({
     commit.clearData();
   },
   async updateRecipients(context, file?: File): Promise<void> {
-    const { commit, dispatch, rootState } = routeAssetsActionContext(context);
+    const { commit, dispatch, rootState, getters } = routeAssetsActionContext(context);
     if (!file) {
       commit.clearData();
       return;
@@ -91,8 +91,6 @@ const actions = defineActions({
         step: (row, parser) => {
           // console.log((row.meta.cursor / file.size) * 100);
           try {
-            // const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
-            // const useTransfer = row.data[5] ? row.data[5].trim().toLowerCase() === 'true' : false;
             const amountInTokens = row.data[4] ? JSON.parse(row.data[4].toLowerCase()) : false;
             const useTransfer = row.data[5] ? JSON.parse(row.data[5].toLowerCase()) : false;
             const csvAmount = row.data[2]?.replace(/,/g, '');
@@ -115,7 +113,7 @@ const actions = defineActions({
               id: (crypto as any).randomUUID(),
               isCompleted: false,
               amountInTokens,
-              useTransfer,
+              useTransfer: getters.adarSwapEnabled ? useTransfer : true,
             });
           } catch (error) {
             parser.abort();

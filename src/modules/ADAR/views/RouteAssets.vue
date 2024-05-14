@@ -67,7 +67,6 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
     this.withApi(async () => {
       this.subscribeOnReserves();
       this.initTimer();
-      this.setFeatureFlags({ charts: false, moonpay: false });
     });
   }
 
