@@ -167,6 +167,7 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
+  @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
 
   fixIssuesDialog = false;
   isSpinner = true;
@@ -317,6 +318,7 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   }
 
   get hideSwapSection() {
+    if (!this.adarSwapEnabled) return true;
     return this.recipients.every((recipient) => recipient.useTransfer);
   }
 
