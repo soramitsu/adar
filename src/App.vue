@@ -244,7 +244,6 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
       await this.setApiKeys(data?.API_KEYS);
       // __________ADAR______________________________________________________
       this.setFeatureFlags(data?.FEATURE_FLAGS);
-      // this.setFeatureFlags({ charts: false, moonpay: false });
       // ____________________________________________________________________
       await this.setEthBridgeSettings(data.ETH_BRIDGE);
       this.setSoraNetwork(data.NETWORK_TYPE);
