@@ -112,34 +112,40 @@ const actions = defineActions({
       };
     };
 
-    const parseFile = () => {
+    const parseFile = (): Promise<Array<any>> => {
       return new Promise((resolve, reject) => {
-        const data: Array<any> = [];
+        const resultArray: Array<any> = [];
 
         Papa.parse(file, {
           header: false,
           skipEmptyLines: true,
           comments: '//',
-          step: (row: ParseStepRelult, parser: Parser) => {
-            try {
-              const processedData = processRow(row);
-              data.push(processedData);
-            } catch (error) {
-              parser.abort();
-              reject(new Error('Parsing aborted due to an error in row processing.'));
-            }
-          },
-          complete: ({ errors }) => {
-            const allAssetsAreOk = data.every((item) => item.asset);
-            if (errors.length < 1 && allAssetsAreOk) {
-              resolve(data);
-            } else {
-              reject(new Error('Parsing failed due to errors in the CSV file.'));
-            }
-          },
+          step: handleStep(resultArray, reject),
+          complete: handleComplete(resultArray, resolve, reject),
         });
       });
     };
+
+    const handleStep = (resultArray, reject) => (row: ParseStepRelult, parser: Parser) => {
+      try {
+        const processedData = processRow(row);
+        resultArray.push(processedData);
+      } catch (error) {
+        parser.abort();
+        reject(new Error('Parsing aborted due to an error in row processing.'));
+      }
+    };
+
+    const handleComplete =
+      (resultArray, resolve, reject) =>
+      ({ errors }) => {
+        const allAssetsAreOk = resultArray.every((item) => item.asset);
+        if (errors.length < 1 && allAssetsAreOk) {
+          resolve(resultArray);
+        } else {
+          reject(new Error('Parsing failed due to errors in the CSV file.'));
+        }
+      };
 
     try {
       const recipientsData = await parseFile();
