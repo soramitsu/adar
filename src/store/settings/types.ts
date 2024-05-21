@@ -16,6 +16,7 @@ export type FeatureFlags = {
   charts?: boolean;
   soraCard?: boolean;
   orderBook?: boolean;
+  adarSwapEnabled?: boolean;
 };
 
 export type SettingsState = {
