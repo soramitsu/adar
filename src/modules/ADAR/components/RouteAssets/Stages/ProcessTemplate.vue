@@ -132,7 +132,7 @@
 </template>
 
 <script lang="ts">
-import { FPNumber, CodecString } from '@sora-substrate/util/build';
+import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
@@ -166,7 +166,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
   @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
-  @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
 
   fixIssuesDialog = false;
@@ -186,65 +185,8 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
     }, 1000);
   }
 
-  get fields() {
-    return [
-      { title: this.t('adar.routeAssets.recipients'), status: this.recipientsStatus },
-      { title: this.t('adar.routeAssets.stages.processTemplate.assets'), status: this.assetsStatus },
-      { title: this.t('adar.routeAssets.stages.processTemplate.usd'), status: this.usdStatus },
-      { title: this.t('adar.routeAssets.stages.processTemplate.wallets'), status: this.walletsStatus },
-      { title: this.t('adar.routeAssets.stages.processTemplate.amount'), status: this.amountsStatus },
-    ];
-  }
-
   get nextButtonDisabled() {
     return !this.recipientsCount;
-  }
-
-  get recipientsStatus() {
-    return {
-      title: `${this.recipientsCount} ${this.t('adar.routeAssets.stages.processTemplate.payeers')}`,
-      correct: true,
-    };
-  }
-
-  get assetsStatus() {
-    const areErrors = this.invalidAssetsCount > 0;
-    return {
-      title: areErrors
-        ? `${this.invalidAssetsCount} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
-        : `${this.assetsCount} ${this.t('adar.routeAssets.stages.processTemplate.assets')}`,
-      correct: !areErrors,
-    };
-  }
-
-  get usdStatus() {
-    const areErrors = this.incorrectUSD > 0;
-    return {
-      title: areErrors
-        ? `${this.incorrectUSD} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
-        : `${this.t('adar.routeAssets.stages.processTemplate.calculated')}`,
-      correct: !areErrors,
-    };
-  }
-
-  get walletsStatus() {
-    const areErrors = this.invalidWalletCount > 0;
-    return {
-      title: areErrors
-        ? `${this.invalidWalletCount} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
-        : `${this.recipientsCount} ${this.t('adar.routeAssets.stages.processTemplate.wallets')}`,
-      correct: !areErrors,
-    };
-  }
-
-  get amountsStatus() {
-    const areErrors = this.incorrectAmountCount > 0;
-    return {
-      title: areErrors
-        ? `${this.incorrectAmountCount} ${this.t('adar.routeAssets.stages.processTemplate.issues')}`
-        : `${this.t('adar.routeAssets.stages.processTemplate.calculated')}`,
-      correct: !areErrors,
-    };
   }
 
   get fileName() {
@@ -263,18 +205,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
     return this.recipients?.length;
   }
 
-  get assetsCount() {
-    return new Set(this.recipients?.map((recipient) => recipient.asset?.symbol)).size;
-  }
-
-  get invalidAssetsCount() {
-    return this.recipients?.filter((recipient) => !validate.asset(recipient.asset)).length;
-  }
-
-  get invalidWalletCount() {
-    return this.recipients?.filter((recipient) => !validate.wallet(recipient.wallet)).length;
-  }
-
   get incorrectRecipients() {
     return this.recipients
       .filter((recipient) => !this.validateRecipient(recipient))
@@ -283,14 +213,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
   get incorrectRecipientsLength() {
     return this.incorrectRecipients.length;
-  }
-
-  get incorrectUSD() {
-    return this.recipients.filter((recipient) => !validate.usd(recipient.usd)).length;
-  }
-
-  get incorrectAmountCount() {
-    return this.recipients.filter((recipient) => !validate.amount(recipient.amount)).length;
   }
 
   get nextButtonTitle() {
@@ -327,11 +249,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
     if (!balance) return FPNumber.ZERO;
 
     return FPNumber.fromCodecValue(balance, this.inputToken.decimals);
-  }
-
-  getTokenBalance(asset: Asset): CodecString {
-    const accountAsset = this.accountAssets.find((item) => item.address === asset.address);
-    return getAssetBalance(accountAsset);
   }
 
   nextButtonAction() {
@@ -453,27 +370,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 </style>
 
 <style scoped lang="scss">
-.dropping-area {
-  border: 1px dashed #d5cdd0;
-  border-radius: 24px;
-  height: 255px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 28px 22px;
-
-  &__description {
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 150%;
-  }
-
-  &.drag-over {
-    background-color: var(--s-color-brand-day);
-  }
-}
-
 .buttons-container {
   button {
     display: block;
@@ -484,19 +380,6 @@ export default class ProcessTemplate extends Mixins(TranslationMixin) {
 
 .file-icon {
   fill: #d5cdd0;
-}
-
-.spinner-container {
-  @include flex-center;
-  > div {
-    background-image: url('~@/assets/img/adar-loader.svg');
-    background-repeat: no-repeat;
-    height: var(--s-size-medium);
-    width: var(--s-size-medium);
-    > svg {
-      display: none;
-    }
-  }
 }
 
 .content-container {
