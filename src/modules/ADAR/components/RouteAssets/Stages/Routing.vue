@@ -62,7 +62,6 @@ import { action, getter } from '@/store/decorators';
 import {
   MaxInputAmountInfo,
   OutcomeAssetsAmount,
-  Recipient,
   SummaryAssetRecipientsInfo,
   SwapTransferBatchStatus,
 } from '@/store/routeAssets/types';
@@ -79,7 +78,6 @@ import type { HistoryItem } from '@sora-substrate/util';
 })
 export default class RoutingAssets extends Mixins(TranslationMixin) {
   @action.routeAssets.processingNextStage nextStage!: () => void;
-  @getter.routeAssets.recipientsTokens recipientsTokens!: Asset[];
   @getter.routeAssets.inputToken inputToken!: Asset;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
@@ -87,8 +85,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
   @getter.routeAssets.swapTxsAmountInfo swapTxsAmountInfo!: Array<OutcomeAssetsAmount>;
-  @getter.routeAssets.recipientsTokens tokens!: Array<Asset>;
-  @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
@@ -119,35 +115,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
     });
   }
 
-  // get assetsInfo() {
-  //   return this.recipientsGroupedByToken().map((item) => {
-  //     return {
-  //       asset: item.asset,
-  //       amount: item.total.toLocaleString(4),
-  //       usd: item.usd.toLocaleString(2),
-  //     };
-  //   });
-  // }
-
-  get assetsInfo() {
-    if (!this.txHistoryData?.amount) return [];
-    const totalUsd = this.swapTxsAmountInfo.reduce((acc, item) => acc.add(item.usd), FPNumber.ZERO);
-    return [
-      ...this.transferTxsAmountInfo.map((item) => {
-        return {
-          asset: item.asset,
-          amount: item.amount.toLocaleString(4),
-          usd: item.usd.toLocaleString(2),
-        };
-      }),
-      {
-        asset: this.inputToken,
-        amount: new FPNumber(this.txHistoryData?.amount || 0).toLocaleString(4),
-        usd: totalUsd,
-      },
-    ];
-  }
-
   get transactionFailed() {
     return this.batchTxStatus === SwapTransferBatchStatus.FAILED;
   }
@@ -164,14 +131,6 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   get finalAmount() {
     if (this.transactionFailed) return '0';
     return this.txHistoryData?.amount;
-  }
-
-  get finalAmountFormatted() {
-    return new FPNumber(this.finalAmount || 0).dp(4).toLocaleString();
-  }
-
-  get tokensEstimate() {
-    return this.maxInputAmount.totalAmountWithFee?.dp(4).toLocaleString();
   }
 
   get iconName() {

@@ -16,10 +16,11 @@ import { routeAssetsActionContext } from '@/store/routeAssets';
 import { delay } from '@/utils';
 import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
 
-import { RecipientStatus, SwapTransferBatchStatus } from './types';
+import { RecipientStatus, SwapTransferBatchStatus, Recipient } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
 import type { WhitelistArrayItem, Asset, AccountAsset, AccountBalance } from '@sora-substrate/util/build/assets/types';
+import type { ParseStepRelult, Parser } from 'papaparse';
 
 enum BalanceSubscriptionKeys {
   adarInputToken = 'adarInputToken',
@@ -69,71 +70,91 @@ const actions = defineActions({
     dispatch.resetInputTokenSubscription();
     commit.clearData();
   },
+
   async updateRecipients(context, file?: File): Promise<void> {
-    const { commit, dispatch, rootState } = routeAssetsActionContext(context);
+    const { commit, dispatch, rootState, getters } = routeAssetsActionContext(context);
+
     if (!file) {
       commit.clearData();
       return;
     }
+
     const assetsTable = rootState.wallet.account.whitelistArray;
+    const priceObject = rootState.wallet.account.fiatPriceObject;
+
     const findAsset = (assetName: string) => {
       return assetsTable.find((item: WhitelistArrayItem) => item.symbol === assetName.toUpperCase());
     };
 
-    const data: Array<any> = [];
-    const priceObject = rootState.wallet.account.fiatPriceObject;
+    const processRow = (row: ParseStepRelult) => {
+      const amountInTokens = row.data[4] ? JSON.parse(row.data[4].toLowerCase()) : false;
+      const useTransfer = row.data[5] ? JSON.parse(row.data[5].toLowerCase()) : false;
+      const csvAmount = row.data[2]?.replace(/,/g, '');
+      const asset = findAsset(row.data[3]);
+      const amount = amountInTokens
+        ? new FPNumber(csvAmount)
+        : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject));
+      const usd = amountInTokens
+        ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject))
+        : new FPNumber(csvAmount);
 
-    return new Promise((resolve, reject) => {
-      Papa.parse(file, {
-        header: false,
-        skipEmptyLines: true,
-        comments: '//',
-        step: (row, parser) => {
-          // console.log((row.meta.cursor / file.size) * 100);
-          try {
-            // const amountInTokens = row.data[4] ? row.data[4].trim().toLowerCase() === 'true' : false;
-            // const useTransfer = row.data[5] ? row.data[5].trim().toLowerCase() === 'true' : false;
-            const amountInTokens = row.data[4] ? JSON.parse(row.data[4].toLowerCase()) : false;
-            const useTransfer = row.data[5] ? JSON.parse(row.data[5].toLowerCase()) : false;
-            const csvAmount = row.data[2]?.replace(/,/g, '');
-            const asset = findAsset(row.data[3]);
-            const amount = amountInTokens
-              ? new FPNumber(csvAmount)
-              : new FPNumber(csvAmount).div(getAssetUSDPrice(asset, priceObject));
-            const usd = amountInTokens
-              ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject))
-              : new FPNumber(csvAmount);
-            data.push({
-              name: row.data[0],
-              wallet: row.data[1],
-              usd: usd,
-              asset: asset,
-              amount: amount,
-              status: api.validateAddress(row.data[1])
-                ? RecipientStatus.ADDRESS_VALID
-                : RecipientStatus.ADDRESS_INVALID,
-              id: (crypto as any).randomUUID(),
-              isCompleted: false,
-              amountInTokens,
-              useTransfer,
-            });
-          } catch (error) {
-            parser.abort();
-          }
-        },
-        complete: ({ errors }) => {
-          const allAssetsAreOk = data.every((item) => item.asset);
-          if (errors.length < 1 && allAssetsAreOk) {
-            resolve();
-            commit.setData({ file, recipients: data });
-            commit.setTxStatus(SwapTransferBatchStatus.INITIAL);
-            dispatch.subscribeOnReserves();
-          } else {
-            reject(new Error('Parcing failed'));
-          }
-        },
+      return {
+        name: row.data[0],
+        wallet: row.data[1],
+        usd: usd,
+        asset: asset,
+        amount: amount,
+        status: api.validateAddress(row.data[1]) ? RecipientStatus.ADDRESS_VALID : RecipientStatus.ADDRESS_INVALID,
+        id: (crypto as any).randomUUID(),
+        isCompleted: false,
+        amountInTokens,
+        useTransfer: getters.adarSwapEnabled ? useTransfer : true,
+      };
+    };
+
+    const parseFile = (): Promise<Array<any>> => {
+      return new Promise((resolve, reject) => {
+        const resultArray: Array<any> = [];
+
+        Papa.parse(file, {
+          header: false,
+          skipEmptyLines: true,
+          comments: '//',
+          step: handleStep(resultArray, reject),
+          complete: handleComplete(resultArray, resolve, reject),
+        });
       });
-    });
+    };
+
+    const handleStep = (resultArray, reject) => (row: ParseStepRelult, parser: Parser) => {
+      try {
+        const processedData = processRow(row);
+        resultArray.push(processedData);
+      } catch (error) {
+        parser.abort();
+        reject(new Error('Parsing aborted due to an error in row processing.'));
+      }
+    };
+
+    const handleComplete =
+      (resultArray, resolve, reject) =>
+      ({ errors }) => {
+        const allAssetsAreOk = resultArray.every((item) => item.asset);
+        if (errors.length < 1 && allAssetsAreOk) {
+          resolve(resultArray);
+        } else {
+          reject(new Error('Parsing failed due to errors in the CSV file.'));
+        }
+      };
+
+    try {
+      const recipientsData = await parseFile();
+      commit.setData({ file, recipients: recipientsData as Array<Recipient> });
+      commit.setTxStatus(SwapTransferBatchStatus.INITIAL);
+      dispatch.subscribeOnReserves();
+    } catch (error) {
+      console.error(error);
+    }
   },
 
   editRecipient(context, { id, name, wallet, usd, asset, amount }): void {

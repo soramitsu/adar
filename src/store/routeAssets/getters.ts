@@ -101,6 +101,10 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.txHistoryData;
   },
+  adarSwapEnabled(...args): boolean {
+    const { rootState } = routeAssetsGetterContext(args);
+    return !!rootState.settings.featureFlags.adarSwapEnabled;
+  },
   overallUSDNumber(...args): string {
     const { state } = routeAssetsGetterContext(args);
     return state.recipients

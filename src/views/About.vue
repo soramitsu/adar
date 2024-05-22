@@ -262,7 +262,6 @@ export default class About extends Mixins(TranslationMixin) {
   align-items: center;
 }
 .unselectable {
-  user-drag: none;
   user-select: none;
 }
 
