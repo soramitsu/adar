@@ -1,5 +1,5 @@
 <template>
-  <div class="route-assets-review-details">
+  <div class="route-assets-done-page">
     <div class="container routing-summary-section">
       <div class="route-assets__page-header-title">{{ t('adar.routeAssets.stages.done.title') }}</div>
       <div class="route-assets__page-header-description">
@@ -111,7 +111,6 @@ import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
 import { components, api } from '@soramitsu/soraneo-wallet-web';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
-import { groupBy, sumBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
@@ -144,13 +143,11 @@ import type { HistoryItem } from '@sora-substrate/util';
 })
 export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @getter.routeAssets.inputToken inputToken!: Asset;
-  @getter.routeAssets.completedRecipients private completedRecipients!: Array<Recipient>;
   @getter.routeAssets.incompletedRecipients private incompletedRecipients!: Array<Recipient>;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @getter.routeAssets.batchTxInfo private batchTxInfo!: TransactionInfo;
   @getter.routeAssets.batchTxDatetime private batchTxDatetime!: Nullable<Date>;
   @state.wallet.account.fiatPriceObject private fiatPriceObject!: any;
-  @state.wallet.account.accountAssets private accountAssets!: Array<AccountAsset>;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
@@ -181,10 +178,6 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return this.incompletedRecipients.length;
   }
 
-  get totalAmount() {
-    return this.maxInputAmount.totalAmountWithFee.dp(4);
-  }
-
   get totalUSD() {
     if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.overallUSDNumber;
@@ -195,31 +188,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   }
 
   get summaryData() {
-    return Object.values(
-      groupBy(
-        this.completedRecipients.map((item) => ({ symbol: item.asset.symbol, ...item })),
-        'symbol'
-      )
-    ).map((assetArray: Array<Recipient>) => {
-      return {
-        recipientsNumber: assetArray.length,
-        asset: assetArray[0].asset,
-        usd: sumBy(assetArray, (item: Recipient) => Number(item.usd)),
-        total: sumBy(assetArray, (item: Recipient) => Number(item.amount)),
-        required:
-          sumBy(assetArray, (item: Recipient) => Number(item.usd)) / Number(this.getAssetUSDPrice(this.inputToken)),
-        totalTransactions: assetArray.length,
-        status: this.getStatus(assetArray),
-      };
-    });
+    return this.recipientsGroupedByToken().map((item) => ({ status: this.getStatus(this.withErrors), ...item }));
   }
 
-  getStatus(assetArray) {
-    if (assetArray.some((recipient) => recipient.status === RecipientStatus.FAILED))
-      return this.t('adar.routeAssets.txStatus.failed');
-    return assetArray.find((recipient) => recipient.status === RecipientStatus.PENDING)
-      ? this.t('adar.routeAssets.txStatus.waiting')
-      : this.t('adar.routeAssets.txStatus.success');
+  getStatus(withErrors = false) {
+    return withErrors ? this.t('adar.routeAssets.txStatus.failed') : this.t('adar.routeAssets.txStatus.success');
   }
 
   getAssetUSDPrice(asset: Asset) {
@@ -235,8 +208,8 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     );
   }
 
-  formatNumber(num: number, dp = 4) {
-    return new FPNumber(num).toLocaleString(dp);
+  formatNumber(num: FPNumber, dp = 4) {
+    return num.toLocaleString(dp);
   }
 
   openFinishRoutingDialog() {
@@ -390,7 +363,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 </script>
 
 <style lang="scss">
-.route-assets-review-details {
+.route-assets-done-page {
   text-align: center;
   font-weight: 300;
   font-feature-settings: 'case' on;

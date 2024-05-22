@@ -156,7 +156,6 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
@@ -166,8 +165,11 @@ import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import router, { lazyComponent } from '@/router';
 import { action, getter, mutation } from '@/store/decorators';
+import { Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 import { copyToClipboard, formatAddress } from '@/utils';
+
+import type { Asset } from '@sora-substrate/util/build/assets/types';
 @Component({
   components: {
     GenericPageHeader: lazyComponent(Components.GenericPageHeader),
@@ -179,7 +181,7 @@ import { copyToClipboard, formatAddress } from '@/utils';
 })
 export default class TransactionOverview extends Mixins(TranslationMixin, mixins.PaginationSearchMixin) {
   @getter.routeAssets.recipients recipients!: Array<any>;
-  @action.routeAssets.setInputToken setInputToken!: any;
+  @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
@@ -223,31 +225,31 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
     router.push({ name: PageNames.Wallet });
   }
 
-  formatAddress(wallet) {
+  formatAddress(wallet: string) {
     return formatAddress(wallet, 10);
   }
 
-  onInputAssetSelected(asset) {
+  onInputAssetSelected(asset: Asset) {
     this.setInputToken(asset);
     this.showSelectInputAssetDialog = false;
     this.nextStage();
   }
 
-  getStatus(recipient) {
+  getStatus(recipient: Recipient) {
     return validate.wallet(recipient.wallet)
       ? this.t('adar.routeAssets.txStatus.addressValid')
       : this.t('adar.routeAssets.txStatus.addressInvalid');
   }
 
-  getStatusClass(recipient) {
+  getStatusClass(recipient: Recipient) {
     return !validate.wallet(recipient.wallet) ? 'invalid' : 'success';
   }
 
-  getAmount(recipient) {
-    return this.formatNumber(recipient.amount);
+  getAmount(recipient: Recipient) {
+    return this.formatNumber(recipient.amount ? recipient.amount : FPNumber.ZERO);
   }
 
-  getInitials(recipient) {
+  getInitials(recipient: Recipient) {
     return recipient.name
       .split(' ')
       .map((n) => n[0])
@@ -275,10 +277,6 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
 
   get tableData() {
     return this.getPageItems(this.filteredItems?.map((item, idx) => ({ num: idx + 1, ...item }))) || [];
-  }
-
-  get xor() {
-    return XOR;
   }
 }
 </script>

@@ -458,17 +458,9 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     return getAssetBalance(accountAsset);
   }
 
-  formatNumberJs(num) {
-    return new FPNumber(num).dp(4).toLocaleString();
-  }
-
   formatNumber(num: FPNumber) {
     return !num || !num.isFinity() ? '-' : num.dp(4).toLocaleString();
   }
-
-  // onAddFundsClick() {
-  //   this.showSwapDialog = true;
-  // }
 
   cancelButtonAction() {
     this.cancelProcessing();
@@ -582,37 +574,6 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
       height: 64px;
       position: relative;
       margin-bottom: 12px;
-    }
-  }
-
-  .routing-details-section {
-    text-align: left;
-
-    & > * {
-      margin-bottom: $inner-spacing-medium;
-    }
-
-    .asset-title {
-      @include flex-start;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 24px;
-      line-height: 20px;
-      margin-bottom: $inner-spacing-medium;
-
-      .token-logo {
-        > span {
-          width: 36px;
-          height: 36px;
-        }
-      }
-    }
-
-    .asset-data-container {
-      box-shadow: var(--s-shadow-element);
-      border-radius: 30px;
-      background: var(--s-color-utility-body);
-      padding: 16px;
     }
   }
 }
