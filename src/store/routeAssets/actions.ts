@@ -17,7 +17,7 @@ import { delay } from '@/utils';
 import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
 
 import { RecipientStatus, SwapTransferBatchStatus, Recipient } from './types';
-import { getTokenEquivalent, getAssetUSDPrice } from './utils';
+import validatePack, { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
 import type { WhitelistArrayItem, Asset, AccountAsset, AccountBalance } from '@sora-substrate/util/build/assets/types';
 import type { ParseStepRelult, Parser } from 'papaparse';
@@ -98,7 +98,7 @@ const actions = defineActions({
         ? new FPNumber(csvAmount).mul(getAssetUSDPrice(asset, priceObject))
         : new FPNumber(csvAmount);
 
-      return {
+      const recipient = {
         name: row.data[0],
         wallet: row.data[1],
         usd: usd,
@@ -110,6 +110,10 @@ const actions = defineActions({
         amountInTokens,
         useTransfer: getters.adarSwapEnabled ? useTransfer : true,
       };
+      if (!validatePack.validate(recipient as unknown as Recipient)) {
+        throw new Error('Row is not correct');
+      }
+      return recipient;
     };
 
     const parseFile = (): Promise<Array<any>> => {
@@ -139,7 +143,7 @@ const actions = defineActions({
     const handleComplete =
       (resultArray, resolve, reject) =>
       ({ errors }) => {
-        const allAssetsAreOk = resultArray.every((item) => item.asset);
+        const allAssetsAreOk = resultArray.every((item) => item?.asset);
         if (errors.length < 1 && allAssetsAreOk) {
           resolve(resultArray);
         } else {
@@ -154,9 +158,9 @@ const actions = defineActions({
       dispatch.subscribeOnReserves();
     } catch (error) {
       console.error(error);
+      return Promise.reject(new Error('Parsing failed'));
     }
   },
-
   editRecipient(context, { id, name, wallet, usd, asset, amount }): void {
     const { commit } = routeAssetsActionContext(context);
     commit.editRecipient({ id, name, wallet, usd, amount, asset });
