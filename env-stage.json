@@ -10,9 +10,14 @@
     "googleClientId": ""
   },
   "FEATURE_FLAGS": {
-    "moonpay": true,
-    "charts": true,
-    "soraCard": false
+    "adarSwapEnabled": false,
+    "moonpay": false,
+    "charts": false,
+    "soraCard": false,
+    "assetOwner": false,
+    "kensetsu": false,
+    "orderBook": false,
+    "x1ex": false
   },
   "DEFAULT_NETWORKS": [
     {
