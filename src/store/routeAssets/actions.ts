@@ -110,9 +110,6 @@ const actions = defineActions({
         amountInTokens,
         useTransfer: getters.adarSwapEnabled ? useTransfer : true,
       };
-      if (!validatePack.validate(recipient as unknown as Recipient)) {
-        throw new Error('Row is not correct');
-      }
       return recipient;
     };
 
@@ -135,7 +132,6 @@ const actions = defineActions({
         const processedData = processRow(row);
         resultArray.push(processedData);
       } catch (error) {
-        parser.abort();
         reject(new Error('Parsing aborted due to an error in row processing.'));
       }
     };
