@@ -13,10 +13,10 @@
     >
       <template #label>
         <span>{{ t('selectNodeConnected') }}</span>
-        <span>{{ node.name }}</span>
+        <span v-if="node">{{ node.chain || node.name }}</span>
       </template>
       <template>
-        <span>{{ node.address }}</span>
+        <span v-if="node">{{ node.address }}</span>
         <span v-if="formattedNodeLocation">
           {{ formattedNodeLocation.name }} <span class="flag-emodji">{{ formattedNodeLocation.flag }}</span>
         </span>
@@ -51,7 +51,17 @@
         <span>{{ statisticsConnectionDesc }}</span>
       </template>
     </footer-popper>
-    <select-node-dialog />
+    <div class="sora-logo">
+      <span class="sora-logo__title">{{ t('poweredBy') }}</span>
+      <a class="sora-logo__image" href="https://sora.org" title="Sora" target="_blank" rel="nofollow noopener">
+        <sora-logo :theme="libraryTheme" />
+      </a>
+    </div>
+    <select-node-dialog
+      :connection="appConnection"
+      :visibility="selectNodeDialogVisibility"
+      :set-visibility="setSelectNodeDialogVisibility"
+    />
     <statistics-dialog />
     <no-internet-dialog />
   </div>
@@ -69,9 +79,11 @@ import { Components } from '@/consts';
 import { lazyComponent } from '@/router';
 import { state, getter, mutation } from '@/store/decorators';
 import type { Node } from '@/types/nodes';
+import type { NodesConnection } from '@/utils/connection';
+
+import { formatLocation } from '../Settings/Node/utils';
 
 import FooterPopper from './FooterPopper.vue';
-import { formatLocation } from './Node/utils';
 import NoInternetDialog from './NoInternetDialog.vue';
 
 import type Theme from '@soramitsu-ui/ui-vue2/lib/types/Theme';
@@ -90,7 +102,7 @@ const MAX_INTERNET_CONNECTION_LIMIT = 10;
 })
 export default class AppFooter extends Mixins(TranslationMixin) {
   // Block explorer
-  @state.wallet.settings.soraNetwork private soraNetwork!: Nullable<WALLET_CONSTS.SoraNetwork>;
+  @state.wallet.settings.soraNetwork soraNetwork!: Nullable<WALLET_CONSTS.SoraNetwork>;
   @state.wallet.settings.indexerType private indexerType!: WALLET_CONSTS.IndexerType;
   @state.settings.blockNumber blockNumber!: number;
   @getter.libraryTheme libraryTheme!: Theme;
@@ -108,13 +120,21 @@ export default class AppFooter extends Mixins(TranslationMixin) {
   }
 
   // Node connection
-  @state.settings.node connectedNode!: Partial<Node>;
-  @getter.settings.connectingNode connectingNode!: Nullable<Node>;
-  @getter.settings.nodeIsConnected isNodeConnected!: boolean;
-  @mutation.settings.setSelectNodeDialogVisibility private setSelectNodeDialogVisibility!: (flag: boolean) => void;
-  @mutation.settings.setSelectIndexerDialogVisibility private setSelectIndexerDialogVisibility!: (
-    flag: boolean
-  ) => void;
+  @state.settings.appConnection appConnection!: NodesConnection;
+  @state.settings.selectNodeDialogVisibility selectNodeDialogVisibility!: boolean;
+  @mutation.settings.setSelectNodeDialogVisibility setSelectNodeDialogVisibility!: (flag: boolean) => void;
+
+  private get connectingNode(): Nullable<Node> {
+    const { nodeAddressConnecting, nodeList } = this.appConnection;
+
+    if (!nodeAddressConnecting) return null;
+
+    return nodeList.find((node) => node.address === nodeAddressConnecting);
+  }
+
+  get isNodeConnected(): boolean {
+    return this.appConnection.nodeIsConnected;
+  }
 
   private get isNodeConnecting(): boolean {
     return !!this.connectingNode;
@@ -136,8 +156,8 @@ export default class AppFooter extends Mixins(TranslationMixin) {
     return this.t(`footer.node.title.${this.nodeConnectionStatusKey}`);
   }
 
-  get node() {
-    return this.connectingNode ?? this.connectedNode;
+  get node(): Nullable<Node> {
+    return this.connectingNode ?? this.appConnection.node;
   }
 
   get formattedNodeLocation() {
@@ -195,6 +215,9 @@ export default class AppFooter extends Mixins(TranslationMixin) {
 
   // Statistics connection
   @state.wallet.settings.indexers private indexersData!: Record<WALLET_CONSTS.IndexerType, WALLET_TYPES.IndexerState>;
+  @mutation.settings.setSelectIndexerDialogVisibility private setSelectIndexerDialogVisibility!: (
+    flag: boolean
+  ) => void;
 
   showStatisticsDialog = false;
 
