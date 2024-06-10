@@ -48,7 +48,7 @@
       </div>
     </div>
     <span v-if="isLoggedIn" @click="loginUser" class="sora-card__user-applied">{{ t('card.alreadyAppliedTip') }}</span>
-    <x1-dialog :visible.sync="showX1Dialog" />
+    <!-- <x1-dialog :visible.sync="showX1Dialog" /> -->
     <paywings-dialog :visible.sync="showPaywingsDialog" />
     <tos-dialog :visible.sync="showListDialog" :title="t('card.unsupportedCountries')" />
   </div>
@@ -75,7 +75,7 @@ type BuyButton = { type: BuyButtonType; text: string; button: 'primary' | 'secon
 const hundred = '100';
 @Component({
   components: {
-    X1Dialog: lazyComponent(Components.X1Dialog),
+    // X1Dialog: lazyComponent(Components.X1Dialog),
     PaywingsDialog: lazyComponent(Components.PaywingsDialog),
     TosDialog: lazyComponent(Components.ToSDialog),
   },

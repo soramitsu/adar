@@ -21,6 +21,8 @@ export enum Module {
   RouteAssets = 'routeAssets',
   SoraCard = 'soraCard',
   OrderBook = 'orderBook',
+  Dashboard = 'dashboard',
+  Vault = 'vault',
 }
 
 export const Modules = [...Object.values(Module), ...WalletModules];

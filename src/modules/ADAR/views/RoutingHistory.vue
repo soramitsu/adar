@@ -84,9 +84,7 @@ import { state } from '@/store/decorators';
 import type { HistoryItem } from '@sora-substrate/util';
 
 @Component({
-  components: {
-    AddressBookInput: components.AddressBookInput,
-  },
+  components: {},
 })
 export default class RoutingHistory extends Mixins(mixins.LoadingMixin, TranslationMixin) {
   @state.wallet.account.address private userAddress!: string;
@@ -149,11 +147,13 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
   adarTxs: Array<HistoryItem> = [];
 
   address = '';
+  datetime = '';
 
   created() {
     this.withApi(async () => {
       this.handleSelectPeriodMenu(this.dropdownPeriodMenuItems[0]);
       this.address = this.userAddress ?? '';
+      this.datetime = this.formatDate(new Date().getTime(), 'D-MMM-YYYY--HH-mm-ss');
     });
   }
 
@@ -168,8 +168,6 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
   get validAddress(): boolean {
     return api.validateAddress(this.address);
   }
-
-  readonly datetime = this.formatDate(new Date().getTime(), 'D-MMM-YYYY--HH-mm-ss');
 
   onDownloadClick() {
     this.downloadCSV(`ADAR--routings--${this.selectedPeriod.title.split(' ').join('')}--${this.datetime}`);
