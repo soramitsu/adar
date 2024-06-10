@@ -183,7 +183,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
     // this.t('adar.routeAssets.inputAsset'),
     this.t('adar.routeAssets.asset'),
     this.t('adar.routeAssets.stages.transactionOverview.amount'),
-    // this.t('adar.routeAssets.stages.done.report.exchangeRate'),
+    this.t('adar.routeAssets.stages.done.report.exchangeRate'),
     // this.t('adar.routeAssets.status'),
   ];
 
@@ -199,6 +199,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         };
         const outputTxs = tx?.payload?.receivers.map((recipient, idx) => {
           const fpAmount = new FPNumber(recipient.amount);
+          const rate = tx?.payload?.comment?.rate[1] ?? '-';
           return [
             `${idx + 1}`,
             //   recipient.name,
@@ -207,7 +208,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
             // tx.symbol,
             recipient.asset.symbol,
             isCsv ? fpAmount.toFixed(7) : fpAmount.toLocaleString(),
-            //   isCsv ? rate.toFixed(7) : rate.toLocaleString(),
+            isCsv ? rate.toFixed(7) : rate.toLocaleString(),
             // recipient.status.toString(),
           ];
         });

@@ -394,6 +394,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       recipientId: item.recipient.id,
       usd: item.recipient.usd,
       useTransfer: item.recipient.useTransfer && item.recipient.asset.address !== inputAsset.address,
+      rate: item.recipient.exchangeRate,
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
@@ -402,6 +403,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     return assetsTable.find((item: WhitelistArrayItem) => item.address === assetName);
   };
   let inputTokenAmount: FPNumber = FPNumber.ZERO;
+  const rates: Array<string> = [];
   const swapTransferData = groupedData.map((entry) => {
     const [outcomeAssetId, receivers] = entry;
     let outcomeAssetReuse = FPNumber.ZERO;
@@ -414,6 +416,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as unknown as Asset, approxSum);
     inputTokenAmount = inputTokenAmount.add(dexIdData?.amountFrom);
     const dexId = dexIdData?.bestDexId;
+    rates.push(receivers[0].rate.toString());
     return {
       outcomeAssetId,
       receivers,
@@ -426,12 +429,15 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     inputTokenAmount.mul(new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED))
   );
   // const params = calcTxParams(inputAsset, maxInputAmount, undefined);
+  const additionalData = {
+    rates,
+  };
   await withLoading(async () => {
     try {
       await rootDispatch.wallet.transactions.beforeTransactionSign();
       const time = Date.now();
       await api.swap
-        .executeSwapTransferBatch(swapTransferData, inputAsset, maxInputAmount)
+        .executeSwapTransferBatch(swapTransferData, inputAsset, maxInputAmount, additionalData)
         .then(async () => {
           const lastTx = await getLastTransaction(time);
           rootCommit.wallet.transactions.addActiveTx(lastTx.id as string);
