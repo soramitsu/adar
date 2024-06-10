@@ -75,7 +75,7 @@ import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services
 
 @Component({
   components: {
-    StatsCard: lazyComponent(Components.StatsCard),
+    StatsCard: lazyComponent(Components.BaseWidget),
     SSkeleton,
     SSkeletonItem,
     Spinner,
@@ -143,6 +143,11 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
     display: flex;
     flex-direction: column;
     align-items: end;
+
+    .base-widget-header,
+    .base-widget-content {
+      padding: 0;
+    }
 
     .stats-card {
       width: 230px;
