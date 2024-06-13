@@ -65,7 +65,12 @@
             "OrderBookCancelLimitOrder": "Zlecenie limitowane anulowane",
             "OrderBookCancelLimitOrders": "Zamówienia z limitem anulowane",
             "Burn": "Spalony {amount} {symbol}",
-            "Mint": "Wybito {amount} {symbol} na {address}"
+            "Mint": "Wybito {amount} {symbol} na {address}",
+            "CreateVault": "{symbol}\/{symbol2} Pozycja utworzona",
+            "CloseVault": "{symbol}\/{symbol2} Pozycja zamknięta",
+            "DepositCollateral": "Wpłacono {amount} {symbol}",
+            "RepayVaultDebt": "Spłacono dług {amount} {symbol}",
+            "BorrowVaultDebt": "Pożyczono dług {amount} {symbol}"
         },
         "error": {
             "Transfer": "Nie udało się {action} {amount} {symbol} {direction} {address}",
@@ -102,7 +107,12 @@
             "OrderBookCancelLimitOrders": "Nie udało się anulować zleceń z limitem",
             "OrderBookCancelLimitOrder": "Nie udało się anulować zamówienia z limitem",
             "Burn": "Nie udało się nagrać {amount} {symbol}",
-            "Mint": "Nie udało się wybić {amount} {symbol} na {address}"
+            "Mint": "Nie udało się wybić {amount} {symbol} na {address}",
+            "CreateVault": "Nie udało się utworzyć pozycji {symbol}\/{symbol2}",
+            "CloseVault": "Nie udało się zamknąć pozycji {symbol}\/{symbol2}",
+            "DepositCollateral": "Nie udało się wpłacić {amount} {symbol}",
+            "RepayVaultDebt": "Nie udało się spłacić długu {amount} {symbol}",
+            "BorrowVaultDebt": "Nie udało się pożyczyć długu {amount} {symbol}"
         },
         "ReferralReserveXor": "Utwórz rezerwy XOR",
         "ReferralUnreserveXor": "Uwolnij rezerwy XOR",
@@ -131,7 +141,12 @@
         "OrderBookCancelLimitOrder": "Anuluj zamówienie",
         "OrderBookCancelLimitOrders": "Anuluj zamówienia",
         "Burn": "Oparzenie",
-        "Mint": "Mennica"
+        "Mint": "Mennica",
+        "CreateVault": "Utwórz pozycję",
+        "CloseVault": "Zamknij pozycję",
+        "DepositCollateral": "Wpłać zabezpieczenie",
+        "RepayVaultDebt": "Spłać dług skarbca",
+        "BorrowVaultDebt": "Pożycz dług skarbca"
     },
     "polkadotjs": {
         "noExtensions": "Nie znaleziono rozszerzenia {PolkadotJs}. Zainstaluj je i odśwież tę stronę\nhttps:\/\/polkadot.js.org\/extension\/",
@@ -385,9 +400,7 @@
         "About": "O giełdzie",
         "Stats": "Statystyki",
         "Wallet": "Portfel",
-        "CreatePair": "Tworzenie pary",
         "AddLiquidity": "Dodawanie płynności",
-        "AddLiquidityId": "Dodawanie płynności",
         "RemoveLiquidity": "Usuwanie płynności",
         "Rewards": "Wynagrodzenie",
         "Explore\/Tokens": "Tokeny",
@@ -397,7 +410,11 @@
         "Staking": "Staking",
         "OrderBook": "Handel",
         "Explore\/Books": "@:pageTitle.OrderBook",
-        "Kensetsu": "Kensetsu"
+        "AssetOwner": "Właściciel aktywów",
+        "AssetOwnerDetails": "@:pageTitle.AssetOwner",
+        "Vaults": "{Kensetsu}",
+        "VaultDetails": "Szczegóły pozycji",
+        "Burn": "Palić"
     },
     "mainMenu": {
         "Swap": "Wymiana",
@@ -408,12 +425,13 @@
         "Rewards": "Wynagrodzenie",
         "About": "O giełdzie",
         "Stats": "Statystyki",
-        "CreatePair": "Utwórz parę",
         "StakingContainer": "Staking",
         "Explore\/Container": "Badać",
         "SoraCard": "{Sora} Karta",
         "OrderBook": "Handel",
-        "Kensetsu": "Kensetsu"
+        "AssetOwnerContainer": "@:pageTitle.AssetOwner",
+        "VaultsContainer": "@:pageTitle.Vaults",
+        "Burn": "@:pageTitle.Burn"
     },
     "social": {
         "twitter": "Twitter",
@@ -464,13 +482,12 @@
         }
     },
     "selectNodeDialog": {
-        "title": "Wybór węzła sieci {Sora}",
+        "title": "Wybór węzła sieci",
         "addNode": "Dodaj niestandardowy węzeł",
         "customNode": "Węzeł niestandardowy",
         "howToSetupOwnNode": "Jak ustawić własny węzeł sieci {Sora}",
         "select": "Wybierz",
         "connected": "Połączono",
-        "selectNodeForEnvironment": "Wybierz węzeł dla środowiska {environment}:",
         "nodeTitle": "{chain} hostowany przez {name}",
         "messages": {
             "emptyName": "Wprowadź nazwę węzła",
@@ -591,7 +608,9 @@
         "ethereumAddress": "{Ethereum} adres",
         "limitMessage": "Obecnie istnieje {type} {amount} {symbol} do mostkowania, aby zapewnić stabilność i bezpieczeństwo sieci {Sora} . Doceniamy twoje zrozumienie.",
         "externalTransferFee": "Opłata {network} {XCM}",
-        "externalTransferFeeTooltip": "Kiedy wysyłasz transakcję pomostową do sieci {network} , od kwoty przelewu pobierana jest niewielka opłata"
+        "externalTransferFeeTooltip": "Kiedy wysyłasz transakcję pomostową do sieci {network} , od kwoty przelewu pobierana jest niewielka opłata",
+        "externalMinDeposit": "{network} min. depozyt",
+        "externalMinDepositTooltip": "Minimalne saldo {symbol} , które musi znajdować się na Twoim koncie {network} po przeniesieniu pomostowym"
     },
     "selectRegisteredAsset": {
         "title": "Wybierz token",
@@ -1240,10 +1259,10 @@
         "historyTitle": "Historia transakcji",
         "moonpayTitle": "Kup ETH przez MoonPay",
         "moonpayDesc": "Kup tokeny ETH na {Ethereum} i przenieś je do sieci {SORA} przez most",
-        "x1Title": "Kup XOR za pomocą swojej karty",
-        "x1Btn": "Kup XOR z kartą",
         "errorMessage": "Przepraszam za utrudnienia. Intensywnie pracujemy nad rozwiązaniem tego problemu. Spróbuj ponownie później.",
-        "x1Desc": "Kup tokeny XOR bezpośrednio w sieci {SORA} za pomocą karty debetowej lub kredytowej"
+        "cedeStoreTitle": "Przelew z {value}",
+        "cedeStoreDesc": "Przenieś dowolne tokeny z {value1} do {value2} za pośrednictwem {value3}",
+        "cedeStoreBtn": "Przelew z {value1} przez {value2}"
     },
     "acceptOnScrollText": "Przewiń, aby zaakceptować",
     "addressBook": {
@@ -1557,5 +1576,107 @@
         },
         "pricePerToken": "Cena za 1 {token}"
     },
-    "calculatingText": "Obliczanie"
+    "calculatingText": "Obliczanie",
+    "customisePageText": "Dostosuj stronę",
+    "priceChartText": "Wykres cen",
+    "editText": "Edytuj",
+    "resetText": "Resetowanie",
+    "kensetsu": {
+        "addCollateral": "Dodaj zabezpieczenie",
+        "addCollateralDescription": "Zdeponuj więcej aktywów w swojej pozycji, aby zwiększyć swój limit pożyczkowy lub poprawić wskaźnik wartości zadłużenia do wartości zabezpieczenia. To również może pomóc w zapobieganiu likwidacji.",
+        "depositCollateral": "Depozyt zabezpieczeń",
+        "totalCollateral": "Łączne zabezpieczenie",
+        "totalCollateralDescription": "Całkowita wartość wszystkich aktywów aktualnie zdeponowanych w Twojej pozycji. Ta wartość wpływa na Twoją zdolność kredytową i ryzyko likwidacji.",
+        "debtAvailable": "Dług dostępny",
+        "debtAvailableDescription": "Kwota środków, które nadal możesz wypłacić ze swojej pozycji bez przekraczania limitu pożyczkowego, na podstawie obecnego zabezpieczenia.",
+        "ltv": "Pożyczka do wartości ({LTV})",
+        "ltvDescription": "Stosunek kwoty wypłaconej do wartości zabezpieczenia w Twojej pozycji, wyrażony jako procent. Wyższy {LTV} zwiększa potencjalne zyski, ale także ryzyko, w tym możliwość likwidacji.",
+        "borrowMore": "Pożycz więcej",
+        "borrowMoreDescription": "Wypłać dodatkowe środki ze swojej pozycji do maksymalnej dostępnej kwoty. Upewnij się, że wartość Twojego zabezpieczenia wspiera zwiększone zadłużenie, aby uniknąć ryzyka likwidacji.",
+        "available": "Dostępne",
+        "outstandingDebt": "Niezapłacony dług",
+        "outstandingDebtDescription": "Całkowita kwota, którą aktualnie jesteś winien ze środków wypłaconych ze swojej pozycji, w tym naliczone odsetki. Musi to zostać spłacone, aby zamknąć Twoją pozycję lub utrzymać zdrowe wskaźniki wartości zadłużenia do wartości zabezpieczenia.",
+        "createVault": "Otwórz pozycję kredytową",
+        "createVaultDescription": "Rozpocznij nową transakcję, deponując zabezpieczenie w swojej pozycji i wypłacając środki. Tworzy to zobowiązanie dłużne, które musisz zarządzać.",
+        "createVaultAction": "Otwórz pozycję",
+        "borrowDebt": "Pożycz dług",
+        "minDepositCollateral": "Minimalny depozyt zabezpieczenia",
+        "minDepositCollateralDescription": "Minimalna kwota aktywów wymagana do otwarcia pozycji. Ten początkowy depozyt zabezpiecza środki, które chcesz pożyczyć.",
+        "maxAvailableToBorrow": "Maks. dostępne do pożyczenia",
+        "maxAvailableToBorrowDescription": "Maksymalna kwota, którą możesz wypłacić ze swojej pozycji, określona przez wartość Twojego zabezpieczenia. Ten limit dostosowuje się wraz ze zmianą wartości zabezpieczenia.",
+        "borrowTax": "Podatek od pożyczek",
+        "borrowTaxDescription": "Podatek {value} stosowany do wypożyczonej kwoty",
+        "repayDebt": "Spłać dług",
+        "repayDebtDescription": "Zwróć pożyczone środki, aby zmniejszyć swoje zadłużenie. Może to zmniejszyć koszty odsetek i obniżyć ryzyko likwidacji.",
+        "closeVault": "Zamknij moją pozycję",
+        "closeVaultDescription": "Zamknij wybraną pozycję, spłacając cały niezapłacony dług i wypłacając całe zabezpieczenie",
+        "yourCollateral": "Twoje zabezpieczenie",
+        "yourCollateralDescription": "Aktywa, które zdeponowałeś w swojej pozycji, aby zabezpieczyć wypłacone środki. Te aktywa mogą zostać zlikwidowane przez pożyczkodawcę, jeśli nie utrzymasz wymaganego wskaźnika wartości zadłużenia do wartości zabezpieczenia.",
+        "yourDebt": "Twój dług",
+        "yourDebtDescription": "Całkowita kwota obecnie niespłaconego zadłużenia w Twojej pozycji, w tym kwota wypłacona i naliczone odsetki. Ten saldo wzrasta z czasem, jeśli odsetki się gromadzą.",
+        "yourDebtTokenBalance": "Twój bilans {tokenSymbol}",
+        "requiredAmountWithSlippage": "Wymagana kwota z uwzględnieniem slippage",
+        "requiredAmountWithSlippageDescription": "Aby płynnie zamknąć swoją pozycję, kup nieco więcej {tokenSymbol}, niż wymaga {amount} z powodu możliwego poślizgu. Potrzebujesz dodatkowej ilości, aby pokryć niedobór. Zamień swoje aktywa na {tokenSymbol}, aby spełnić tę potrzebę.",
+        "openSwap": "Otwórz wymianę",
+        "introTitle": "Otwórz pozycje kredytowe & Zarabiaj dzięki {Kensetsu}",
+        "introDescription": "Doświadcz bezpiecznego i łatwego pożyczania i udzielania pożyczek. Otwórz pozycje pożyczkowe z platformą {Kensetsu}.",
+        "disclaimerDescription": "Pożyczanie aktywów cyfrowych za pośrednictwem {Polkaswap} wiąże się z znacznym ryzykiem i odbywa się całkowicie na własne ryzyko. Wartość aktywów cyfrowych jest bardzo zmienne, a zmiany cen rynkowych aktywów, które pożyczyłeś lub użyłeś jako zabezpieczenia, mogą prowadzić do znaczących strat finansowych.",
+        "availableToBorrow": "Dostępny do pożyczenia",
+        "availableToBorrowDescription": "Pozostała kwota, którą możesz wypłacić na warunkach obecnej pozycji, na podstawie zdeponowanego zabezpieczenia i istniejącego zadłużenia.",
+        "collateralDetails": "Szczegóły zabezpieczeń",
+        "debtDetails": "Szczegóły długu",
+        "positionInfo": "Informacje o pozycji",
+        "liquidationPenalty": "Kara likwidacyjna",
+        "liquidationPenaltyDescription": "Opłata nakładana, jeśli wartość twojego zabezpieczenia spadnie poniżej określonego progu, co powoduje sprzedaż aktywów w celu pokrycia długu. Kara ta zwiększa łączny dług.",
+        "positionSafe": "Pozycja bezpieczna",
+        "liquidationClose": "Zamknięcie likwidacji",
+        "highLiquidationRisk": "Wysokie ryzyko likwidacji",
+        "error": {
+            "enterCollateral": "Wprowadź zabezpieczenie",
+            "enterBorrow": "Wprowadź kwotę pożyczki",
+            "borrowMoreThanAvailable": "Dostępne zadłużenie przekroczone",
+            "insufficientCollateral": "Niewystarczające zabezpieczenie",
+            "enterRepayDebt": "Wprowadź spłacany dług",
+            "repayMoreThanDebt": "Dług przepłacony"
+        },
+        "interest": "Odsetki",
+        "interestDescription": "Opłata roczna naliczana od wypłaconej kwoty z twojego skarbca, obliczana jako procent. Ta opłata rekompensuje ryzyko i wahania rynkowe.",
+        "positionHistory": "Historia pozycji",
+        "liquidated": "Likwidacja",
+        "liquidatedMessage": "Likwidacja {amount} {symbol}",
+        "status": {
+            "Opened": "Otwarta",
+            "Closed": "Zamknięta",
+            "Liquidated": "Likwidowana"
+        },
+        "readMore": "Czytaj więcej",
+        "reopen": "Otwórz ponownie",
+        "totalCollateralReturned": "Łączna zwrócona zabezpieczenie",
+        "totalCollateralReturnedDescription": "Całkowita wartość aktywów zwróconych do Ciebie po zamknięciu Twojej pozycji, wliczając pozostałe zabezpieczenie.",
+        "overallTotalCollateral": "Łączne zabezpieczenie",
+        "overallTotalCollateralDescription": "Całkowita wartość aktywów zdeponowanych przez pożyczkobiorców w celu zabezpieczenia ich pozycji kredytowych na platformie {Kensetsu}.",
+        "overallTotalDebt": "Łączny dług",
+        "overallTotalDebtDescription": "Całkowita kwota długu obecnie niewypłacona we wszystkich pozycjach kredytowych na platformie {Kensetsu}.",
+        "overallBadDebt": "Zły dług",
+        "overallBadDebtDescription": "Część długu, która jest mało prawdopodobna do odzyskania ze względu na niewypłacalność pożyczkobiorcy lub niewystarczające zabezpieczenie.",
+        "overallBorrowTax": "Podatek od pożyczki",
+        "overallBorrowTaxDescription": "Opłata pobierana od pożyczonych środków, obliczana jako procent pożyczonej kwoty. Podatek od pożyczki jest wykorzystywany w programie zachęt do odkupu tokenów {KEN}.",
+        "ltvMaxTooltip": "Maksymalna kwota pozycji kredytowej, która może być udzielona w związku z oszacowaną wartością aktywów używanych jako zabezpieczenie."
+    },
+    "accountSettings": {
+        "title": "USTAWIENIA KONTA",
+        "hint": "Możesz włączyć tę opcję z powrotem w ustawieniach konta",
+        "disable": "Wyłącz włączone",
+        "disabled": "Niepełnosprawny dla",
+        "confirmation": {
+            "title": "Wyłącz potwierdzanie transakcji",
+            "description": "Wyskakujący ekran wyświetlający szczegóły transakcji przed podpisaniem."
+        },
+        "signature": {
+            "title": "Wyłącz potwierdzanie hasła",
+            "description": "Włącz lub wyłącz konieczność podawania hasła podczas wyskakującego okienka podpisu w transakcjach."
+        },
+        "enterPassword": "Wprowadź hasło",
+        "googleOnly": "Tylko konta {Google}"
+    }
 }

@@ -1,36 +1,15 @@
-import { connection } from '@soramitsu/soraneo-wallet-web';
 import { defineGetters } from 'direct-vuex';
 
 import { LiquiditySourceForMarketAlgorithm } from '@/consts';
 import { settingsGetterContext } from '@/store/settings';
-import type { Node } from '@/types/nodes';
 
-import type { NodesHashTable, SettingsState } from './types';
+import type { SettingsState } from './types';
 import type { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
 
 const getters = defineGetters<SettingsState>()({
-  defaultNodesHashTable(...args): NodesHashTable {
-    const { state } = settingsGetterContext(args);
-    return state.defaultNodes.reduce<NodesHashTable>((result, node: Node) => ({ ...result, [node.address]: node }), {});
-  },
-  customNodes(...args): Array<Node> {
-    const { state, getters } = settingsGetterContext(args);
-    return state.customNodes.filter((node) => !(node.address in getters.defaultNodesHashTable));
-  },
-  nodeList(...args): Array<Node> {
-    const { state, getters } = settingsGetterContext(args);
-    return [...state.defaultNodes, ...getters.customNodes];
-  },
-  connectingNode(...args): Nullable<Node> {
-    const { state, getters } = settingsGetterContext(args);
-
-    if (!state.nodeAddressConnecting) return null;
-
-    return getters.nodeList.find((node) => node.address === state.nodeAddressConnecting);
-  },
   nodeIsConnected(...args): boolean {
     const { state } = settingsGetterContext(args);
-    return !!state.node?.address && !state.nodeAddressConnecting && connection.opened;
+    return state.appConnection.nodeIsConnected;
   },
   liquiditySource(...args): LiquiditySourceTypes {
     const { state } = settingsGetterContext(args);
@@ -44,22 +23,6 @@ const getters = defineGetters<SettingsState>()({
     const { state, getters } = settingsGetterContext(args);
     return !!getters.moonpayApiKey && !!state.featureFlags.moonpay;
   },
-  x1ApiKey(...args): string {
-    const { rootState } = settingsGetterContext(args);
-    return rootState.wallet.settings.apiKeys.x1ex;
-  },
-  x1Enabled(...args): boolean {
-    const { state, getters } = settingsGetterContext(args);
-    return !!getters.x1ApiKey && !!state.featureFlags.x1ex;
-  },
-  chartsFlagEnabled(...args): boolean {
-    const { state } = settingsGetterContext(args);
-    return !!state.featureFlags.charts;
-  },
-  chartsEnabled(...args): boolean {
-    const { state } = settingsGetterContext(args);
-    return !!state.featureFlags.charts && state.chartsEnabled;
-  },
   soraCardEnabled(...args): Nullable<boolean> {
     const { state } = settingsGetterContext(args);
     return state.featureFlags.soraCard;
@@ -67,6 +30,14 @@ const getters = defineGetters<SettingsState>()({
   orderBookEnabled(...args): Nullable<boolean> {
     const { state } = settingsGetterContext(args);
     return state.featureFlags.orderBook;
+  },
+  kensetsuEnabled(...args): Nullable<boolean> {
+    const { state } = settingsGetterContext(args);
+    return state.featureFlags.kensetsu;
+  },
+  assetOwnerEnabled(...args): Nullable<boolean> {
+    const { state } = settingsGetterContext(args);
+    return state.featureFlags.assetOwner;
   },
   notificationActivated(...args): boolean {
     const { state } = settingsGetterContext(args);

@@ -1,12 +1,13 @@
 import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { Operation } from '@sora-substrate/util';
 import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
+import { EthAssetKind } from '@sora-substrate/util/build/bridgeProxy/eth/consts';
+import { SubAssetKind } from '@sora-substrate/util/build/bridgeProxy/sub/consts';
 import { defineGetters } from 'direct-vuex';
 
 import { ZeroStringValue } from '@/consts';
 import { bridgeGetterContext } from '@/store/bridge';
 import { subBridgeApi } from '@/utils/bridge/sub/api';
-import { formatSubAddress } from '@/utils/bridge/sub/utils';
 
 import type { BridgeState } from './types';
 import type { IBridgeTransaction, CodecString } from '@sora-substrate/util';
@@ -47,13 +48,23 @@ const getters = defineGetters<BridgeState>()({
 
     if (!selectedNetwork) return null;
 
-    const { symbol } = selectedNetwork.nativeCurrency;
+    const symbol = selectedNetwork.nativeCurrency?.symbol;
+
+    if (!symbol) return null;
+
     const filteredBySymbol = assets.filter((asset) => asset.symbol === symbol);
     const registered = filteredBySymbol.find((asset) => asset.address in registeredAssets);
 
     if (!registered) return null;
 
     return assetDataByAddress(registered.address);
+  },
+
+  isNativeTokenSelected(...args): boolean {
+    const { getters } = bridgeGetterContext(args);
+    const { asset, nativeToken } = getters;
+
+    return !!(nativeToken && asset && nativeToken.address === asset.address);
   },
 
   isRegisteredAsset(...args): boolean {
@@ -69,6 +80,21 @@ const getters = defineGetters<BridgeState>()({
     if (isSubBridge) return true;
 
     return !!asset?.externalAddress;
+  },
+
+  isSidechainAsset(...args): boolean {
+    const { getters, rootState } = bridgeGetterContext(args);
+    const { asset, isSubBridge } = getters;
+    const { registeredAssets } = rootState.assets;
+
+    if (!asset) return false;
+    if (!(asset.address in registeredAssets)) return false;
+
+    const registered = registeredAssets[asset.address];
+    const kind = registered.kind;
+    const sidechainKind = isSubBridge ? SubAssetKind.Sidechain : EthAssetKind.Sidechain;
+
+    return kind === sidechainKind;
   },
 
   autoselectedAssetAddress(...args): Nullable<string> {
@@ -91,24 +117,17 @@ const getters = defineGetters<BridgeState>()({
     }
   },
 
-  externalAccountFormatted(...args): string {
-    const { getters, state, rootState } = bridgeGetterContext(args);
-    const { subSS58 } = rootState.web3;
-
-    if (getters.isSubBridge && state.isSoraToEvm && getters.externalAccount) {
-      return formatSubAddress(getters.externalAccount, subSS58);
-    } else {
-      return getters.externalAccount;
-    }
-  },
-
   sender(...args): string {
     const { state, rootState, getters } = bridgeGetterContext(args);
     const { address: soraAddress } = rootState.wallet.account;
-    const { evmAddress, subSS58 } = rootState.web3;
+    const { evmAddress } = rootState.web3;
 
     if (getters.isSubBridge) {
-      return !state.isSoraToEvm && soraAddress ? formatSubAddress(soraAddress, subSS58) : soraAddress;
+      if (state.isSoraToEvm) return soraAddress;
+
+      return state.subBridgeConnector.network?.subNetworkConnection.nodeIsConnected
+        ? state.subBridgeConnector.network.formatAddress(soraAddress)
+        : soraAddress;
     }
 
     return state.isSoraToEvm ? soraAddress : evmAddress;
@@ -125,10 +144,14 @@ const getters = defineGetters<BridgeState>()({
   recipient(...args): string {
     const { state, rootState, getters } = bridgeGetterContext(args);
     const { address: soraAddress } = rootState.wallet.account;
-    const { evmAddress, subAddress, subSS58 } = rootState.web3;
+    const { evmAddress, subAddress } = rootState.web3;
 
     if (getters.isSubBridge) {
-      return state.isSoraToEvm && subAddress ? formatSubAddress(subAddress, subSS58) : subAddress;
+      if (!state.isSoraToEvm) return subAddress;
+
+      return state.subBridgeConnector.network?.subNetworkConnection.nodeIsConnected
+        ? state.subBridgeConnector.network.formatAddress(subAddress)
+        : subAddress;
     }
 
     return state.isSoraToEvm ? evmAddress : soraAddress;
@@ -199,8 +222,13 @@ const getters = defineGetters<BridgeState>()({
     const { networkSelected } = rootState.web3;
 
     if (!networkSelected) return null;
+    if (!getters.isSubBridge) return networkSelected;
 
-    return getters.isSubBridge ? subBridgeApi.getRelayChain(networkSelected as SubNetwork) : networkSelected;
+    const subNetworkId = networkSelected as SubNetwork;
+
+    return subBridgeApi.isStandalone(subNetworkId)
+      ? subNetworkId
+      : subBridgeApi.getRelayChain(networkSelected as SubNetwork);
   },
   networkHistoryLoading(...args): boolean {
     const { getters, state } = bridgeGetterContext(args);

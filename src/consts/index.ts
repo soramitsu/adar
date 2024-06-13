@@ -1,9 +1,11 @@
 import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
+import { WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import invert from 'lodash/fp/invert';
 
 import { AdarPageNames } from '@/modules/ADAR/consts';
+import { DashboardPageNames } from '@/modules/dashboard/consts';
 import { StakingPageNames } from '@/modules/staking/consts';
-import { SoraStakingPageNames } from '@/modules/staking/sora/consts';
+import { VaultPageNames } from '@/modules/vault/consts';
 
 import pkg from '../../package.json';
 
@@ -90,6 +92,8 @@ export const ObjectInit = () => null;
 
 export const ZeroStringValue = '0';
 
+export const HundredNumber = 100;
+
 export const DefaultSlippageTolerance = '0.5';
 
 export enum MarketAlgorithms {
@@ -130,8 +134,9 @@ export enum PageNames {
   BridgeTransaction = 'BridgeTransaction',
   BridgeTransactionsHistory = 'BridgeTransactionsHistory',
   Tokens = 'Tokens',
-  FiatDepositOptions = 'FiatDepositOptions',
-  FiatTxHistory = 'FiatTxHistory',
+  DepositOptions = 'DepositOptions',
+  DepositTxHistory = 'DepositTxHistory',
+  CedeStore = 'CedeStore',
   StakingContainer = 'StakingContainer',
   // just for router name & different titles
   ExploreContainer = 'Explore/Container',
@@ -141,11 +146,14 @@ export enum PageNames {
   ExploreStaking = 'Explore/Staking',
   ExplorePools = 'Explore/Pools',
   ExploreBooks = 'Explore/Books',
+  //
   OrderBook = 'OrderBook',
   LimitOrderBuy = 'OrderBook/LimitOrderBuy',
   LimitOrderSell = 'OrderBook/LimitOrderSell',
   SoraCard = 'SoraCard',
-  Kensetsu = 'Kensetsu',
+  AssetOwnerContainer = 'AssetOwnerContainer',
+  VaultsContainer = 'VaultsContainer',
+  Burn = 'Burn',
 }
 
 export enum Components {
@@ -163,10 +171,11 @@ export enum Components {
   AppDisclaimer = 'App/Header/AppDisclaimer',
   SelectIndexer = 'App/Footer/Indexer/SelectIndexer',
   StatisticsDialog = 'App/Footer/StatisticsDialog',
-  SelectNodeDialog = 'App/Footer/SelectNodeDialog',
-  SelectNode = 'App/Footer/Node/SelectNode',
-  NodeInfo = 'App/Footer/Node/NodeInfo',
   IndexerInfo = 'App/Footer/Indexer/IndexerInfo',
+  // Node select
+  SelectNodeDialog = 'App/Settings/Node/SelectNodeDialog',
+  SelectNode = 'App/Settings/Node/SelectNode',
+  NodeInfo = 'App/Settings/Node/NodeInfo',
   // SORA Card
   Dashboard = 'pages/SoraCard/Dashboard/Dashboard',
   BalanceIndicator = 'pages/SoraCard/common/BalanceIndicator',
@@ -195,25 +204,24 @@ export enum Components {
   BridgeSelectAsset = 'pages/Bridge/SelectAsset',
   BridgeSelectNetwork = 'pages/Bridge/SelectNetwork',
   BridgeSelectAccount = 'pages/Bridge/SelectAccount',
-  BridgeLinksDropdown = 'pages/Bridge/LinksDropdown',
   BridgeLimitCard = 'pages/Bridge/LimitCard',
   BridgeAccountPanel = 'pages/Bridge/AccountPanel',
+  BridgeNodeIcon = 'pages/Bridge/NodeIcon',
   // Moonpay Page
   Moonpay = 'pages/Moonpay/Moonpay',
   MoonpayNotification = 'pages/Moonpay/Notification',
   MoonpayConfirmation = 'pages/Moonpay/Confirmation',
   MoonpayHistory = 'pages/Moonpay/MoonpayHistory',
-  // X1 Page
-  X1Dialog = 'pages/X1/X1Dialog',
-  X1History = 'pages/X1/X1History',
   // Swap Page
+  SwapFormWidget = 'pages/Swap/Widget/Form',
+  SwapChartWidget = 'pages/Swap/Widget/Chart',
+  SwapTransactionsWidget = 'pages/Swap/Widget/Transactions',
+  SwapDistributionWidget = 'pages/Swap/Widget/Distribution',
   SwapConfirm = 'pages/Swap/Confirm',
-  SwapChart = 'pages/Swap/Chart',
   SwapStatusActionBadge = 'pages/Swap/StatusActionBadge',
   SwapTransactionDetails = 'pages/Swap/TransactionDetails',
   SwapSettings = 'pages/Swap/Settings/Settings',
   SwapLossWarningDialog = 'pages/Swap/LossWarningDialog',
-  SwapDistribution = 'pages/Swap/Distribution',
   // Order Book
   BookWidget = 'pages/OrderBook/BookWidget',
   SetLimitOrderWidget = 'pages/OrderBook/SetLimitOrderWidget',
@@ -240,14 +248,20 @@ export enum Components {
   WalletAboutNetworkDialog = 'pages/Wallet/AboutNetworkDialog',
   // Shared
   GenericPageHeader = 'shared/GenericPageHeader',
-  TokensRow = 'shared/TokensRow',
+  LinksDropdown = 'shared/LinksDropdown',
   PairTokenLogo = 'shared/PairTokenLogo',
-  PriceChange = 'shared/PriceChange',
-  ValueStatusWrapper = 'shared/ValueStatusWrapper',
-  TransactionDetails = 'shared/TransactionDetails',
   PoolInfo = 'shared/PoolInfo',
-  Widget = 'shared/Widget',
+  PriceChange = 'shared/PriceChange',
   StatusBadge = 'shared/StatusBadge',
+  TransactionDetails = 'shared/TransactionDetails',
+  TokensRow = 'shared/TokensRow',
+  ValueStatusWrapper = 'shared/ValueStatusWrapper',
+  ResponsiveTabs = 'shared/ResponsiveTabs',
+  // Shared Widgets
+  BaseWidget = 'shared/Widget/Base',
+  IFrameWidget = 'shared/Widget/IFrame',
+  PriceChartWidget = 'shared/Widget/PriceChart',
+  CustomiseWidget = 'shared/Widget/Customise',
   // Shared Buttons
   SortButton = 'shared/Button/SortButton',
   SvgIconButton = 'shared/Button/SvgIconButton/SvgIconButton',
@@ -266,8 +280,8 @@ export enum Components {
   SettingsTabs = 'shared/Settings/Tabs',
   SlippageTolerance = 'shared/Settings/SlippageTolerance',
   // Shared Stats
-  StatsCard = 'shared/Stats/StatsCard',
   StatsFilter = 'shared/Stats/StatsFilter',
+  StatsCard = 'shared/Stats/StatsCard',
   // Shared Chart
   ChartSkeleton = 'shared/Chart/ChartSkeleton',
   DataRowSkeleton = 'shared/Skeleton/DataRow',
@@ -441,18 +455,11 @@ export const RewardsChildPages = [
   PageNames.ReferralBonding,
   PageNames.ReferralUnbonding,
 ];
-export const StakingChildPages = [
-  StakingPageNames.Staking,
-  SoraStakingPageNames.Overview,
-  SoraStakingPageNames.NewStake,
-  SoraStakingPageNames.ValidatorsType,
-  SoraStakingPageNames.SelectValidators,
-];
 export const ExploreChildPages = [
-  PageNames.ExploreFarming, // By default
+  PageNames.ExploreTokens, // By default
   PageNames.ExploreStaking,
   PageNames.ExplorePools,
-  PageNames.ExploreTokens,
+  PageNames.ExploreFarming,
   PageNames.ExploreBooks,
 ];
 
@@ -473,6 +480,13 @@ export const AboutTopics = [
 export const MaxUint256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 export const EthAddress = '0x0000000000000000000000000000000000000000';
 
+export enum DsBreakpoints {
+  sm = 640,
+  md = 1024,
+  lg = 1200,
+  xl = 1920,
+}
+
 export enum Breakpoint {
   Mobile = 464,
   LargeMobile = 528,
@@ -490,3 +504,26 @@ export enum BreakpointClass {
   LargeDesktop = 'min-large-desktop',
   HugeDesktop = 'min-huge-desktop',
 }
+
+export const TranslationConsts = {
+  // extending consts
+  ...WALLET_CONSTS.TranslationConsts,
+  AppName: app.name,
+  Ceres: 'Ceres',
+  APR: 'APR', // Annual percentage rate
+  APY: 'APY',
+  TVL: 'TVL',
+  EVM: 'EVM',
+  Substrate: 'Substrate',
+  Kusama: 'Kusama',
+  ROI: 'ROI', // Return of investment
+  mbps: 'mbps',
+  online: 'Online',
+  offline: 'Offline',
+  XCM: 'XCM',
+  Max: 'Max.',
+  XOR: 'XOR',
+  VAL: 'VAL',
+  Kensetsu: 'Kensetsu',
+  LTV: 'LTV',
+} as const;

@@ -1,4 +1,5 @@
 import type { NetworkData } from '@/types/bridge';
+import type { Node } from '@/types/nodes';
 import type { Provider } from '@/utils/ethers-util';
 
 import type { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
@@ -17,7 +18,7 @@ export type EthBridgeSettings = {
   address: EthBridgeContractsAddresses;
 };
 
-export type SubNetworkApps = Partial<Record<SubNetwork, string>>;
+export type SubNetworkApps = Partial<Record<SubNetwork, boolean | Node[]>>;
 
 export type AvailableNetwork = {
   /** disabled on networks list */
@@ -29,7 +30,6 @@ export type Web3State = {
   evmAddress: string;
   subAddress: string;
   subAddressName: string;
-  subSS58: number;
 
   networkType: Nullable<BridgeNetworkType>;
   networkSelected: Nullable<BridgeNetworkId>;
@@ -46,6 +46,7 @@ export type Web3State = {
   ethBridgeEvmNetwork: EvmNetwork;
   ethBridgeContractAddress: EthBridgeContractsAddresses;
 
+  selectSubNodeDialogVisibility: boolean;
   selectNetworkDialogVisibility: boolean;
   selectAccountDialogVisibility: boolean;
   selectProviderDialogVisibility: boolean;

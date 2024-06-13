@@ -1,4 +1,5 @@
 import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
+import { SubNetworkId } from '@sora-substrate/util/build/bridgeProxy/sub/consts';
 import { defineActions } from 'direct-vuex';
 
 import { assetsActionContext } from '@/store/assets';
@@ -9,7 +10,7 @@ import { subBridgeApi } from '@/utils/bridge/sub/api';
 import ethersUtil from '@/utils/ethers-util';
 
 import type { EvmNetwork } from '@sora-substrate/util/build/bridgeProxy/evm/types';
-import type { SubNetwork } from '@sora-substrate/util/build/bridgeProxy/sub/types';
+import type { SubNetwork, SubAssetId } from '@sora-substrate/util/build/bridgeProxy/sub/types';
 import type { ActionContext } from 'vuex';
 
 async function updateEthAssetsData(context: ActionContext<any, any>): Promise<void> {
@@ -70,17 +71,45 @@ async function getEvmRegisteredAssets(
   return registeredAssets;
 }
 
+const getSubAssetIdAddress = (address: SubAssetId, network: SubNetwork): string => {
+  if (network === SubNetworkId.Liberland) {
+    const id = typeof address === 'object' ? address?.Asset?.toString() : '';
+
+    return id ?? '';
+  }
+
+  return '';
+};
+
 async function getSubRegisteredAssets(
   context: ActionContext<any, any>
 ): Promise<Record<string, BridgeRegisteredAsset>[]> {
   const { rootState } = assetsActionContext(context);
 
   const subNetwork = rootState.web3.networkSelected;
-  const networkAssets = await subBridgeApi.getRegisteredAssets(subNetwork as SubNetwork);
+
+  if (!subNetwork) return [];
+
+  const subNetworkId = subNetwork as SubNetwork;
+
+  // [TODO] remove when non ACA tokens are supported
+  if (subNetworkId === SubNetworkId.PolkadotAcala) {
+    return [
+      {
+        '0x001ddbe1a880031da72f7ea421260bec635fa7d1aa72593d5412795408b6b2ba': {
+          address: '',
+          decimals: 12,
+          kind: 'Sidechain',
+        },
+      },
+    ];
+  }
+
+  const networkAssets = await subBridgeApi.getRegisteredAssets(subNetworkId);
   const registeredAssets = Object.entries(networkAssets).map(([soraAddress, assetData]) => {
     return {
       [soraAddress]: {
-        address: '',
+        address: getSubAssetIdAddress(assetData.address, subNetworkId),
         decimals: assetData.decimals,
         kind: assetData.assetKind,
       },
@@ -111,9 +140,9 @@ async function getRegisteredAssets(context: ActionContext<any, any>): Promise<Re
 const actions = defineActions({
   // for common usage
   async getRegisteredAssets(context): Promise<void> {
-    const { commit } = assetsActionContext(context);
+    const { commit, dispatch } = assetsActionContext(context);
 
-    commit.resetRegisteredAssets();
+    commit.setRegisteredAssets();
     commit.setRegisteredAssetsFetching(true);
 
     try {
@@ -121,9 +150,13 @@ const actions = defineActions({
       const registeredAssets = list.reduce((buffer, asset) => ({ ...buffer, ...asset }), {});
 
       commit.setRegisteredAssets(registeredAssets);
+      // update assets data (for Eth bridge)
+      await dispatch.updateRegisteredAssets();
     } catch (error) {
       console.error(error);
-      commit.resetRegisteredAssets();
+      commit.setRegisteredAssets();
+    } finally {
+      commit.setRegisteredAssetsFetching(false);
     }
   },
 

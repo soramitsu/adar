@@ -98,6 +98,15 @@ module.exports = defineConfig({
       attrs: ['test', 'testid', 'test-name'],
     },
   },
+  devServer: {
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false,
+        runtimeErrors: false,
+      },
+    },
+  },
   productionSourceMap: false,
   runtimeCompiler: true,
 });

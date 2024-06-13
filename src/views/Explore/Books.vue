@@ -9,7 +9,7 @@
       class="explore-table"
     >
       <!-- Index -->
-      <s-table-column width="240" label="#" fixed-position="left">
+      <s-table-column width="240" label="#">
         <template #header>
           <div class="explore-table-item-index">
             <span @click="handleResetSort" :class="['explore-table-item-index--head', { active: isDefaultSort }]">
@@ -37,7 +37,7 @@
         </template>
       </s-table-column>
       <!-- Price -->
-      <s-table-column key="price" width="130" header-align="right" align="right">
+      <s-table-column key="price" min-width="130" header-align="right" align="right">
         <template #header>
           <sort-button name="price" :sort="{ order, property }" @change-sort="changeSort">
             <span class="explore-table__primary">Price</span>
@@ -60,7 +60,7 @@
         </template>
       </s-table-column>
       <!-- 1D Price Change -->
-      <s-table-column width="104" header-align="right" align="right">
+      <s-table-column min-width="104" header-align="right" align="right">
         <template #header>
           <sort-button name="priceChangeDay" :sort="{ order, property }" @change-sort="changeSort">
             <span class="explore-table__primary">1D %</span>
@@ -71,7 +71,7 @@
         </template>
       </s-table-column>
       <!-- 1D Volume -->
-      <s-table-column width="104" header-align="right" align="right">
+      <s-table-column min-width="104" header-align="right" align="right">
         <template #header>
           <sort-button name="volumeDay" :sort="{ order, property }" @change-sort="changeSort">
             <span class="explore-table__primary">1D Vol.</span>
@@ -89,7 +89,7 @@
         </template>
       </s-table-column>
       <!-- TVL -->
-      <s-table-column width="104" header-align="right" align="right">
+      <s-table-column min-width="104" header-align="right" align="right">
         <template #header>
           <sort-button name="tvl" :sort="{ order, property }" @change-sort="changeSort">
             <span class="explore-table__primary">{{ TranslationConsts.TVL }}</span>
@@ -126,7 +126,6 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util';
 import { components } from '@soramitsu/soraneo-wallet-web';
-import { SortDirection } from '@soramitsu-ui/ui-vue2/lib/components/Table/consts';
 import { Component, Mixins } from 'vue-property-decorator';
 
 import ExplorePageMixin from '@/components/mixins/ExplorePageMixin';
