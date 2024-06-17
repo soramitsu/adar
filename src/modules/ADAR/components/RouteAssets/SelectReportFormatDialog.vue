@@ -42,17 +42,20 @@ export default class SelectReportFormatDialog extends Mixins(mixins.TransactionM
     return this.inputFile?.name.split('.csv')[0];
   }
 
-  readonly datetime = this.formatDate(new Date().getTime(), 'D-MMM-YYYY--HH-mm-ss');
+  datetime = '';
 
-  readonly initialFileName = `ADAR--${this.datetime}`;
-
-  reportFileName = this.initialFileName;
+  reportFileName = '';
 
   options: string[] = [];
 
+  created() {
+    this.datetime = this.formatDate(new Date().getTime(), 'D-MMM-YYYY--HH-mm-ss');
+    this.reportFileName = `ADAR--${this.datetime}`;
+  }
+
   mounted() {
     this.options.push(
-      this.initialFileName,
+      this.reportFileName,
       `ADAR--${this.inputFileName}`,
       `ADAR--${this.inputFileName}--${this.datetime}`
     );
