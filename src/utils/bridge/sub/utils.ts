@@ -1,4 +1,3 @@
-import { decodeAddress, encodeAddress } from '@polkadot/util-crypto';
 import { FPNumber } from '@sora-substrate/util';
 
 import { subBridgeApi } from '@/utils/bridge/sub/api';
@@ -32,6 +31,8 @@ export const determineTransferType = (network: SubNetwork) => {
     return SubTransferType.SoraParachain;
   } else if (subBridgeApi.isRelayChain(network)) {
     return SubTransferType.Relaychain;
+  } else if (subBridgeApi.isStandalone(network)) {
+    return SubTransferType.Standalone;
   } else {
     return SubTransferType.Parachain;
   }
@@ -47,17 +48,33 @@ export const getBridgeProxyHash = (events: Array<any>, api: ApiPromise): string 
   return bridgeProxyEvent.event.data[0].toString();
 };
 
-export const getDepositedBalance = (events: Array<any>, to: string, api: ApiPromise): string => {
-  // Native token for network
-  const balancesDepositEvent = events.find(
-    (e) =>
-      api.events.balances.Deposit.is(e.event) &&
-      subBridgeApi.formatAddress(e.event.data.who.toString()) === subBridgeApi.formatAddress(to)
-  );
+const isEvent = (e, section: string, method: string) => {
+  return e.event.section === section && e.event.method === method;
+};
 
-  if (!balancesDepositEvent) throw new Error(`Unable to find "balances.Deposit" event`);
+export const getDepositedBalance = (events: Array<any>, to: string, api: ApiPromise): [string, number] => {
+  const recipient = subBridgeApi.formatAddress(to);
 
-  return balancesDepositEvent.event.data.amount.toString();
+  const index = events.findIndex((e) => {
+    let eventRecipient = '';
+
+    if (isEvent(e, 'balances', 'Deposit') || isEvent(e, 'balances', 'Minted') || isEvent(e, 'tokens', 'Deposited')) {
+      eventRecipient = e.event.data.who.toString();
+    } else if (isEvent(e, 'assets', 'Transfer')) {
+      eventRecipient = e.event.data[1].toString();
+    }
+
+    if (!eventRecipient) return false;
+
+    return subBridgeApi.formatAddress(eventRecipient) === recipient;
+  });
+
+  if (index === -1) throw new Error(`Unable to find balance deposit like event`);
+
+  const event = events[index];
+  const balance = event.event.data.amount?.toString() ?? event.event.data[3].toString();
+
+  return [balance, index];
 };
 
 export const getReceivedAmount = (sendedAmount: string, receivedAmount: CodecString, decimals?: number) => {
@@ -70,7 +87,9 @@ export const getReceivedAmount = (sendedAmount: string, receivedAmount: CodecStr
 };
 
 export const getParachainSystemMessageHash = (events: Array<any>, api: ApiPromise) => {
-  const parachainSystemEvent = events.find((e) => api.events.parachainSystem.UpwardMessageSent.is(e.event));
+  const parachainSystemEvent = events.find(
+    (e) => api.events.parachainSystem.UpwardMessageSent.is(e.event) || api.events.xcmpQueue.XcmpMessageSent.is(e.event)
+  );
 
   if (!parachainSystemEvent) {
     throw new Error(`Unable to find "parachainSystem.UpwardMessageSent" event`);
@@ -151,9 +170,33 @@ export const isAssetAddedToChannel = (
   return true;
 };
 
-// [TECH] move to js-lib
-export const formatSubAddress = (address: string, ss58: number): string => {
-  const publicKey = decodeAddress(address, false);
+// Liberland
+export const isSoraBridgeAppBurned = (
+  e: any,
+  asset: RegisteredAccountAsset,
+  from: string,
+  to: string,
+  sended: CodecString,
+  api: ApiPromise
+) => {
+  if (!api.events.soraBridgeApp.Burned.is(e.event)) return false;
 
-  return encodeAddress(publicKey, ss58);
+  const [networkIdCodec, assetIdCodec, senderCodec, recipientCodec, amountCodec] = e.event.data;
+
+  if (!(networkIdCodec.isMainnet && recipientCodec.isSora)) return false;
+
+  const sender = senderCodec.toString();
+  const recipient = recipientCodec.asSora.toString();
+  const assetId = assetIdCodec.isLld ? '' : assetIdCodec.asAsset.toString();
+  const amount = amountCodec.toString();
+
+  // address check
+  if (subBridgeApi.formatAddress(sender) !== subBridgeApi.formatAddress(from)) return false;
+  if (subBridgeApi.formatAddress(recipient) !== subBridgeApi.formatAddress(to)) return false;
+  // asset check
+  if (assetId !== asset.externalAddress) return false;
+  // amount check
+  if (amount !== sended) return false;
+
+  return true;
 };

@@ -1,7 +1,5 @@
 <template>
-  <stats-card>
-    <template #title>{{ t('networkStatisticsText') }}</template>
-
+  <base-widget :title="t('networkStatisticsText')">
     <template #filters>
       <stats-filter :disabled="loading" :filters="filters" :value="filter" @input="changeFilter" />
     </template>
@@ -34,7 +32,7 @@
         </s-card>
       </div>
     </div>
-  </stats-card>
+  </base-widget>
 </template>
 
 <script lang="ts">
@@ -72,7 +70,7 @@ type NetworkStatsColumn = {
 @Component({
   components: {
     PriceChange: lazyComponent(Components.PriceChange),
-    StatsCard: lazyComponent(Components.StatsCard),
+    BaseWidget: lazyComponent(Components.BaseWidget),
     StatsFilter: lazyComponent(Components.StatsFilter),
     FormattedAmount: components.FormattedAmount,
   },
@@ -81,6 +79,7 @@ export default class NetworkStats extends Mixins(mixins.LoadingMixin, Translatio
   readonly FontSizeRate = WALLET_CONSTS.FontSizeRate;
   readonly FontWeightRate = WALLET_CONSTS.FontWeightRate;
   readonly filters = NETWORK_STATS_FILTERS;
+  readonly Arrow = String.fromCodePoint(0x2192);
 
   filter = NETWORK_STATS_FILTERS[0];
 
@@ -93,7 +92,6 @@ export default class NetworkStats extends Mixins(mixins.LoadingMixin, Translatio
 
   get columns() {
     const { Sora, Ethereum } = this.TranslationConsts;
-    const Arrow = String.fromCodePoint(0x2192);
 
     return [
       {
@@ -107,12 +105,12 @@ export default class NetworkStats extends Mixins(mixins.LoadingMixin, Translatio
         prop: 'accounts',
       },
       {
-        title: [Ethereum, Arrow, Sora].join(' '),
+        title: [Ethereum, this.Arrow, Sora].join(' '),
         tooltip: this.t('tooltips.bridgeTransactions', { from: Ethereum, to: Sora }),
         prop: 'bridgeIncomingTransactions',
       },
       {
-        title: [Sora, Arrow, Ethereum].join(' '),
+        title: [Sora, this.Arrow, Ethereum].join(' '),
         tooltip: this.t('tooltips.bridgeTransactions', { from: Sora, to: Ethereum }),
         prop: 'bridgeOutgoingTransactions',
       },
@@ -181,7 +179,6 @@ $gap: $inner-spacing-mini;
   display: flex;
   flex-flow: row wrap;
   gap: $gap;
-  margin-top: $inner-spacing-mini * 2.5;
 
   .stats-column {
     @include columns(2, $gap);
