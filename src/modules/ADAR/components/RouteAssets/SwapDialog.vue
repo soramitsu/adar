@@ -12,14 +12,16 @@ import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
+import { Components } from '@/consts';
+import { lazyComponent } from '@/router';
 import { state } from '@/store/decorators';
 import type { PresetSwapData } from '@/store/routeAssets/types';
-import Swap from '@/views/Swap.vue';
+// import Swap from '@/views/Swap.vue';
 
 @Component({
   components: {
     DialogBase: components.DialogBase,
-    Swap,
+    Swap: lazyComponent(Components.SwapFormWidget),
   },
 })
 export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.DialogMixin) {
@@ -45,7 +47,9 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
           const { assetFrom, assetTo } = this.presetSwapData;
           const isAssetToXor = assetTo.symbol === XOR.symbol;
           const fieldToValue = isAssetToXor ? this.roundedValueTo.add(this.networkSwapFee) : this.roundedValueTo;
-          await swapComponent.setData({ firstAddress: assetFrom.address, secondAddress: assetTo.address });
+          await swapComponent.handleSelectToken(assetTo);
+          swapComponent.isTokenFromSelected = true;
+          await swapComponent.handleSelectToken(assetFrom);
           swapComponent.handleInputFieldTo(`${fieldToValue.toNumber()}`);
           swapComponent.handleFocusField(true);
         }
@@ -69,7 +73,7 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
     box-shadow: none;
   }
 
-  .page-header {
+  .base-widget-block.base-widget-header {
     display: none;
   }
 }

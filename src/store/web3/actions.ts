@@ -6,24 +6,28 @@ import { ethers } from 'ethers';
 
 import { KnownEthBridgeAsset, SmartContracts, SmartContractType } from '@/consts/evm';
 import { web3ActionContext } from '@/store/web3';
-import { SubNetworksConnector, subBridgeConnector } from '@/utils/bridge/sub/classes/adapter';
+import { SubNetworksConnector } from '@/utils/bridge/sub/classes/adapter';
 import ethersUtil, { Provider, PROVIDER_ERROR } from '@/utils/ethers-util';
 
-import type { SubNetworkApps } from './types';
 import type { SubNetwork } from '@sora-substrate/util/build/bridgeProxy/sub/types';
 import type { ActionContext } from 'vuex';
 
+async function connectNetworkType(context: ActionContext<any, any>): Promise<void> {
+  const { state } = web3ActionContext(context);
+
+  if (state.networkType === BridgeNetworkType.Sub) {
+    autoselectSubAddress(context);
+    await connectSubNetwork(context);
+  }
+}
+
 async function connectSubNetwork(context: ActionContext<any, any>): Promise<void> {
-  const { getters, commit } = web3ActionContext(context);
+  const { getters, rootState } = web3ActionContext(context);
   const subNetwork = getters.selectedNetwork;
 
   if (!subNetwork) return;
 
-  await subBridgeConnector.open(subNetwork.id as SubNetwork);
-
-  const ss58 = subBridgeConnector.network.adapter.api.registry.chainSS58;
-
-  if (ss58 !== undefined) commit.setSubSS58(ss58);
+  await rootState.bridge.subBridgeConnector.open(subNetwork.id as SubNetwork);
 }
 
 async function updateProvidedEvmNetwork(context: ActionContext<any, any>, evmNetworkId?: number): Promise<void> {
@@ -75,20 +79,14 @@ async function autoselectBridgeAsset(context: ActionContext<any, any>): Promise<
 }
 
 async function autoselectSubAddress(context: ActionContext<any, any>): Promise<void> {
-  const { commit, rootState, state } = web3ActionContext(context);
+  const { commit, rootState } = web3ActionContext(context);
   const { address, name } = rootState.wallet.account;
-  const { networkType, subAddress } = state;
 
-  if (networkType === BridgeNetworkType.Sub && !subAddress && address) {
+  if (address) {
     commit.setSubAddress({ address, name });
+  } else {
+    commit.setSubAddress({ address: '', name: '' });
   }
-}
-
-async function getRegisteredAssets(context: ActionContext<any, any>): Promise<void> {
-  const { rootDispatch } = web3ActionContext(context);
-
-  await rootDispatch.assets.getRegisteredAssets();
-  await autoselectBridgeAsset(context);
 }
 
 const actions = defineActions({
@@ -127,25 +125,23 @@ const actions = defineActions({
     ethersUtil.disconnectEvmProvider(provider);
   },
 
-  async disconnectExternalNetwork(_context): Promise<void> {
+  async disconnectExternalNetwork(context): Promise<void> {
+    const { rootState } = web3ActionContext(context);
     // SUB
-    await subBridgeConnector.stop();
+    await rootState.bridge.subBridgeConnector.stop();
   },
 
   async selectExternalNetwork(context, { id, type }: { id: BridgeNetworkId; type: BridgeNetworkType }): Promise<void> {
-    const { commit, dispatch } = web3ActionContext(context);
+    const { commit, dispatch, rootDispatch } = web3ActionContext(context);
 
     await dispatch.disconnectExternalNetwork();
 
     commit.setNetworkType(type);
     commit.setSelectedNetwork(id);
 
-    getRegisteredAssets(context);
-    autoselectSubAddress(context);
+    await Promise.allSettled([rootDispatch.assets.getRegisteredAssets(), connectNetworkType(context)]);
 
-    if (type === BridgeNetworkType.Sub) {
-      await connectSubNetwork(context);
-    }
+    await autoselectBridgeAsset(context);
   },
 
   async changeEvmNetworkProvided(context): Promise<void> {
@@ -159,17 +155,19 @@ const actions = defineActions({
   },
 
   async getSupportedApps(context): Promise<void> {
-    const { commit } = web3ActionContext(context);
+    const { commit, getters } = web3ActionContext(context);
     const supportedApps = await api.bridgeProxy.getListApps();
     commit.setSupportedApps(supportedApps);
-  },
 
-  setSubNetworkApps(context, apps: SubNetworkApps): void {
-    const { commit } = web3ActionContext(context);
-    // update apps in store
-    commit.setSubNetworkApps(apps);
-    // update endpoints in SubNetworksConnector class
-    SubNetworksConnector.endpoints = apps;
+    const networks = getters.availableNetworks[BridgeNetworkType.Sub];
+
+    const nodes = Object.entries(networks).reduce((acc, [key, value]) => {
+      if (!value?.data?.nodes) return acc;
+      return { ...acc, [key]: value.data.nodes };
+    }, {});
+
+    // update nodes in SubNetworksConnector class
+    SubNetworksConnector.nodes = nodes;
   },
 
   /**

@@ -65,7 +65,12 @@
             "OrderBookCancelLimitOrder": "Batas pesanan dibatalkan",
             "OrderBookCancelLimitOrders": "Batasi pesanan dibatalkan",
             "Burn": "Terbakar {amount} {symbol}",
-            "Mint": "Dicetak {amount} {symbol} ke {address}"
+            "Mint": "Dicetak {amount} {symbol} ke {address}",
+            "CreateVault": "{symbol}\/{symbol2} Posisi dibuat",
+            "CloseVault": "{symbol}\/{symbol2} Posisi ditutup",
+            "DepositCollateral": "Deposito {amount} {symbol}",
+            "RepayVaultDebt": "Utang dibayar {amount} {symbol}",
+            "BorrowVaultDebt": "Utang dipinjam {amount} {symbol}"
         },
         "error": {
             "Transfer": "Gagal {action} {amount} {symbol} {direction} {address}",
@@ -102,7 +107,12 @@
             "OrderBookCancelLimitOrders": "Gagal membatalkan pesanan batas",
             "OrderBookCancelLimitOrder": "Gagal membatalkan pesanan batas",
             "Burn": "Gagal membakar {amount} {symbol}",
-            "Mint": "Gagal mencetak {amount} {symbol} ke {address}"
+            "Mint": "Gagal mencetak {amount} {symbol} ke {address}",
+            "CreateVault": "Gagal membuat posisi {symbol}\/{symbol2}",
+            "CloseVault": "Gagal menutup posisi {symbol}\/{symbol2}",
+            "DepositCollateral": "Gagal melakukan deposit {amount} {symbol}",
+            "RepayVaultDebt": "Gagal membayar {amount} {symbol} utang",
+            "BorrowVaultDebt": "Gagal meminjam {amount} {symbol} utang"
         },
         "ReferralReserveXor": "Ikatan XOR",
         "ReferralUnreserveXor": "Lepaskan ikatan XOR",
@@ -131,7 +141,12 @@
         "OrderBookCancelLimitOrder": "Batalkan pesanan",
         "OrderBookCancelLimitOrders": "Batalkan Pesanan",
         "Burn": "Membakar",
-        "Mint": "daun mint"
+        "Mint": "daun mint",
+        "CreateVault": "Buat Posisi",
+        "CloseVault": "Tutup Posisi",
+        "DepositCollateral": "Deposit Kolateral",
+        "RepayVaultDebt": "Bayar Utang",
+        "BorrowVaultDebt": "Pinjam Utang"
     },
     "polkadotjs": {
         "noExtensions": "Tidak ada ekstensi {PolkadotJs} yang ditemukan. Silakan instal dan muat ulang halaman ini\n https:\/\/polkadot.js.org\/extension\/",
@@ -385,9 +400,7 @@
         "About": "Tentang",
         "Stats": "Statistik",
         "Wallet": "Dompet",
-        "CreatePair": "Buat Pair",
         "AddLiquidity": "Tambah Likuiditas",
-        "AddLiquidityId": "Tambah Likuiditas",
         "RemoveLiquidity": "Hapus Likuiditas",
         "Rewards": "Hadiah",
         "Explore\/Tokens": "Token",
@@ -397,7 +410,11 @@
         "Staking": "Staking",
         "OrderBook": "Berdagang",
         "Explore\/Books": "@:pageTitle.OrderBook",
-        "Kensetsu": "Kensetsu"
+        "AssetOwner": "Pemilik aset",
+        "AssetOwnerDetails": "@:pageTitle.AssetOwner",
+        "Vaults": "{Kensetsu}",
+        "VaultDetails": "Detail Posisi",
+        "Burn": "Membakar"
     },
     "mainMenu": {
         "Swap": "Swap",
@@ -408,12 +425,13 @@
         "Rewards": "Hadiah",
         "About": "Tentang",
         "Stats": "Statistik",
-        "CreatePair": "Buat Pair",
         "StakingContainer": "Staking",
         "Explore\/Container": "Menjelajahi",
         "SoraCard": "{Sora} Kartu",
         "OrderBook": "Berdagang",
-        "Kensetsu": "Kensetsu"
+        "AssetOwnerContainer": "@:pageTitle.AssetOwner",
+        "VaultsContainer": "@:pageTitle.Vaults",
+        "Burn": "@:pageTitle.Burn"
     },
     "social": {
         "twitter": "Twitter",
@@ -464,13 +482,12 @@
         }
     },
     "selectNodeDialog": {
-        "title": "Pemilihan node {Sora} Network",
+        "title": "Pemilihan node network",
         "addNode": "Tambahkan node kustom",
         "customNode": "Kostum Node",
         "howToSetupOwnNode": "Cara mengatur node {Sora} Anda sendiri",
         "select": "Pilih",
         "connected": "Terhubung",
-        "selectNodeForEnvironment": "Pilih node untuk ekosistem {environment}:",
         "nodeTitle": "{chain} dihosting oleh {name}",
         "messages": {
             "emptyName": "Silakan masukkan nama node",
@@ -591,7 +608,9 @@
         "ethereumAddress": "{Ethereum} alamat",
         "limitMessage": "Saat ini, ada {type} {amount} {symbol} untuk menjembatani guna memastikan stabilitas dan keamanan Jaringan {Sora} . Kami menghargai pengertian Anda.",
         "externalTransferFee": "biaya {network} {XCM}",
-        "externalTransferFeeTooltip": "Saat Anda mengirim transaksi jembatan ke jaringan {network} , sedikit biaya akan diambil dari jumlah yang Anda transfer"
+        "externalTransferFeeTooltip": "Saat Anda mengirim transaksi jembatan ke jaringan {network} , sedikit biaya akan diambil dari jumlah yang Anda transfer",
+        "externalMinDeposit": "{network} menit. menyetorkan",
+        "externalMinDepositTooltip": "Saldo minimum {symbol} yang harus ada di akun {network} Anda setelah transfer jembatan"
     },
     "selectRegisteredAsset": {
         "title": "Pilih token",
@@ -1240,10 +1259,10 @@
         "historyTitle": "sejarah transaksi",
         "moonpayTitle": "Beli ETH melalui MoonPay",
         "moonpayDesc": "Beli token ETH di {Ethereum} dan transfer ke jaringan {SORA} melalui jembatan",
-        "x1Title": "Beli XOR dengan kartu Anda",
-        "x1Btn": "Beli XOR dengan kartu",
         "errorMessage": "Mohon maaf atas ketidaknyamanan ini. Kami bekerja keras untuk menyelesaikan ini. Silakan, coba lagi nanti.",
-        "x1Desc": "Beli token XOR langsung di jaringan {SORA} dengan kartu debit atau kredit Anda"
+        "cedeStoreTitle": "Transfer dari {value}",
+        "cedeStoreDesc": "Transfer token apa pun dari {value1} ke {value2} melalui {value3}",
+        "cedeStoreBtn": "Transfer dari {value1} melalui {value2}"
     },
     "acceptOnScrollText": "Gulir untuk menerima",
     "addressBook": {
@@ -1557,5 +1576,107 @@
         },
         "pricePerToken": "Harga per 1 {token}"
     },
-    "calculatingText": "Menghitung"
+    "calculatingText": "Menghitung",
+    "customisePageText": "Sesuaikan halaman",
+    "priceChartText": "Grafik harga",
+    "editText": "Edit",
+    "resetText": "Reset",
+    "kensetsu": {
+        "addCollateral": "Tambahkan agunan",
+        "addCollateralDescription": "Depositkan lebih banyak aset ke posisi Anda untuk meningkatkan batas pinjaman Anda atau untuk memperbaiki rasio pinjaman-terhadap-nilai Anda. Ini juga dapat membantu mencegah likuidasi.",
+        "depositCollateral": "Deposit agunan",
+        "totalCollateral": "Total agunan",
+        "totalCollateralDescription": "Nilai total dari semua aset yang saat ini didepositkan ke posisi Anda. Nilai ini mempengaruhi kapasitas pinjaman Anda dan risiko likuidasi.",
+        "debtAvailable": "Hutang tersedia",
+        "debtAvailableDescription": "Jumlah dana yang masih dapat Anda tarik dari posisi Anda tanpa melebihi batas pinjaman Anda, berdasarkan jaminan Anda saat ini.",
+        "ltv": "Loan to value ({LTV})",
+        "ltvDescription": "Rasio jumlah yang ditarik terhadap nilai jaminan dalam posisi Anda, dinyatakan sebagai persentase. {LTV} yang lebih tinggi meningkatkan potensi pengembalian tetapi juga risiko, termasuk kemungkinan likuidasi.",
+        "borrowMore": "Pinjam lebih banyak",
+        "borrowMoreDescription": "Tarik dana tambahan dari posisi Anda hingga jumlah maksimum yang tersedia. Pastikan nilai jaminan Anda mendukung peningkatan utang untuk menghindari risiko likuidasi.",
+        "available": "Tersedia",
+        "outstandingDebt": "Hutang yang belum diselesaikan",
+        "outstandingDebtDescription": "Jumlah total yang saat ini Anda miliki dari dana yang ditarik dari posisi Anda, termasuk bunga yang telah jatuh tempo. Ini perlu dibayar untuk menutup posisi Anda atau mempertahankan rasio pinjaman-terhadap-nilai yang sehat.",
+        "createVault": "Buka posisi pinjaman",
+        "createVaultDescription": "Mulai transaksi baru dengan mendepositkan jaminan ke posisi Anda dan menarik dana. Ini menciptakan kewajiban utang yang harus Anda kelola.",
+        "createVaultAction": "Buka posisi",
+        "borrowDebt": "Pinjam hutang",
+        "minDepositCollateral": "Setoran minimum agunan",
+        "minDepositCollateralDescription": "Jumlah minimum aset yang diperlukan untuk membuka posisi. Deposit awal ini mengamankan dana yang ingin Anda pinjam.",
+        "maxAvailableToBorrow": "Maks. tersedia untuk dipinjam",
+        "maxAvailableToBorrowDescription": "Jumlah maksimum yang dapat Anda tarik dari posisi Anda, ditentukan oleh nilai jaminan Anda. Batas ini menyesuaikan seiring perubahan nilai jaminan.",
+        "borrowTax": "Pajak pinjaman",
+        "borrowTaxDescription": "Pajak {value} yang diterapkan pada jumlah yang dipinjam",
+        "repayDebt": "Lunasi hutang",
+        "repayDebtDescription": "Kembalikan dana yang dipinjam untuk mengurangi utang Anda yang masih berjalan. Ini dapat mengurangi biaya bunga dan menurunkan risiko likuidasi.",
+        "closeVault": "Tutup posisi saya",
+        "closeVaultDescription": "Tutup posisi yang dipilih dengan melunasi semua hutang yang belum diselesaikan dan menarik semua agunan",
+        "yourCollateral": "Agunan Anda",
+        "yourCollateralDescription": "Aset yang Anda depositkan ke posisi Anda untuk mengamankan dana yang ditarik. Aset-aset ini dapat dilikuidasi oleh pemberi pinjaman jika Anda gagal mempertahankan rasio pinjaman-terhadap-nilai yang diperlukan.",
+        "yourDebt": "Hutang Anda",
+        "yourDebtDescription": "Jumlah total yang saat ini belum dibayar dalam posisi Anda, termasuk jumlah yang ditarik dan bunga yang telah jatuh tempo. Saldo ini meningkat seiring waktu jika bunga terakumulasi.",
+        "yourDebtTokenBalance": "Saldo {tokenSymbol} Anda",
+        "requiredAmountWithSlippage": "Jumlah yang diperlukan termasuk slippage",
+        "requiredAmountWithSlippageDescription": "Untuk penutupan posisi yang mulus, belilah sedikit lebih banyak {tokenSymbol} daripada {amount} yang diperlukan karena kemungkinan slippage. Anda memerlukan tambahan untuk menutup kekurangan. Tukarkan aset Anda ke {tokenSymbol} untuk memenuhi kebutuhan ini.",
+        "openSwap": "Buka swap",
+        "introTitle": "Buka posisi pinjaman & Hasilkan dengan {Kensetsu}",
+        "introDescription": "Alami peminjaman dan pemberian pinjaman yang aman dan mudah. Buka posisi peminjaman dengan platform {Kensetsu}.",
+        "disclaimerDescription": "Meminjam aset digital melalui {Polkaswap} memiliki risiko signifikan dan sepenuhnya menjadi tanggung jawab Anda sendiri. Nilai aset digital sangat fluktuatif, dan setiap perubahan dalam harga pasar aset yang Anda pinjam atau gunakan sebagai jaminan dapat mengakibatkan kerugian keuangan yang signifikan.",
+        "availableToBorrow": "Tersedia untuk dipinjam",
+        "availableToBorrowDescription": "Jumlah sisa yang memenuhi syarat untuk Anda tarik di bawah kondisi saat ini dari posisi Anda, berdasarkan jaminan yang Anda depositkan dan utang yang ada.",
+        "collateralDetails": "Rincian agunan",
+        "debtDetails": "Rincian hutang",
+        "positionInfo": "Informasi posisi",
+        "liquidationPenalty": "Denda likuidasi",
+        "liquidationPenaltyDescription": "Biaya yang dikenakan jika nilai agunan Anda jatuh di bawah ambang tertentu, mendorong penjualan aset untuk menutupi hutang. Denda ini meningkatkan total hutang Anda.",
+        "positionSafe": "Posisi aman",
+        "liquidationClose": "Tutup likuidasi",
+        "highLiquidationRisk": "Risiko likuidasi tinggi",
+        "error": {
+            "enterCollateral": "Masukkan agunan",
+            "enterBorrow": "Masukkan jumlah pinjaman",
+            "borrowMoreThanAvailable": "Dana yang tersedia melebihi",
+            "insufficientCollateral": "Agunan tidak mencukupi",
+            "enterRepayDebt": "Masukkan hutang yang harus dilunasi",
+            "repayMoreThanDebt": "Utang terbayar lebih"
+        },
+        "interest": "Bunga",
+        "interestDescription": "Biaya tahunan yang dibebankan pada jumlah yang ditarik dari vault Anda, dihitung sebagai persentase. Biaya ini mengkompensasi risiko dan fluktuasi pasar.",
+        "positionHistory": "Riwayat posisi",
+        "liquidated": "Dilikwidasi",
+        "liquidatedMessage": "Dilikwidasi {amount} {symbol}",
+        "status": {
+            "Opened": "Aktif",
+            "Closed": "Tertutup",
+            "Liquidated": "Dilikwidasi"
+        },
+        "readMore": "Baca lebih lanjut",
+        "reopen": "Buka kembali",
+        "totalCollateralReturned": "Total jaminan yang dikembalikan",
+        "totalCollateralReturnedDescription": "Total nilai aset yang dikembalikan kepada Anda setelah menutup posisi Anda, termasuk semua jaminan yang tersisa.",
+        "overallTotalCollateral": "Total jaminan",
+        "overallTotalCollateralDescription": "Total nilai aset yang disetorkan oleh peminjam untuk menjamin posisi pinjaman mereka di platform {Kensetsu}.",
+        "overallTotalDebt": "Total utang",
+        "overallTotalDebtDescription": "Jumlah total utang yang saat ini belum dilunasi di semua posisi pinjaman di platform {Kensetsu}.",
+        "overallBadDebt": "Utang macet",
+        "overallBadDebtDescription": "Bagian dari utang yang kemungkinan besar tidak akan dipulihkan karena gagal bayar oleh peminjam atau jaminan yang tidak mencukupi.",
+        "overallBorrowTax": "Pajak pinjaman",
+        "overallBorrowTaxDescription": "Biaya yang dikenakan pada dana yang dipinjam, dihitung sebagai persentase dari jumlah pinjaman. Pajak pinjaman digunakan untuk program insentif pembelian kembali token {KEN}.",
+        "ltvMaxTooltip": "Jumlah maksimum posisi pinjaman yang dapat disediakan sehubungan dengan nilai yang dinilai dari aset yang digunakan sebagai jaminan."
+    },
+    "accountSettings": {
+        "title": "Pengaturan akun",
+        "hint": "Anda dapat mengaktifkannya kembali di pengaturan akun",
+        "disable": "Nonaktifkan",
+        "disabled": "Dinonaktifkan untuk",
+        "confirmation": {
+            "title": "Nonaktifkan konfirmasi transaksi",
+            "description": "Layar popup yang menampilkan detail transaksi sebelum penandatanganan."
+        },
+        "signature": {
+            "title": "Nonaktifkan konfirmasi kata sandi",
+            "description": "Mengaktifkan atau menonaktifkan kebutuhan untuk memasukkan kata sandi Anda saat munculan tanda tangan dalam transaksi."
+        },
+        "enterPassword": "Masukan kata sandi",
+        "googleOnly": "Khusus akun {Google}"
+    }
 }

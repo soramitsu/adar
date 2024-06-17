@@ -1,7 +1,5 @@
 import { IndexerType } from '@soramitsu/soraneo-wallet-web/lib/consts';
 
-import type { ProviderInterfaceEmitted, ProviderInterfaceEmitCb } from '@polkadot/rpc-provider/types';
-
 export interface Indexer {
   name: string;
   type: IndexerType;
@@ -9,17 +7,10 @@ export interface Indexer {
   online: boolean;
 }
 
-export interface RunConnectionOptions {
-  once?: boolean;
-  timeout?: number;
-  eventListeners?: Array<[ProviderInterfaceEmitted, ProviderInterfaceEmitCb]>;
-}
-
-export interface ConnectToIndexerOptions {
-  indexer?: Nullable<Indexer>;
-  connectionOptions?: RunConnectionOptions;
-  onError?: (error) => void;
-  onReconnect?: (indexer: Indexer) => void;
-  onDisconnect?: (indexer: Indexer) => void;
-  currentIndexerIndex?: number;
-}
+export type FetchVariables = {
+  id?: number | string;
+  first?: number;
+  offset?: number;
+  filter?: any;
+  fromTimestamp?: number;
+};
