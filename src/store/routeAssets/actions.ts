@@ -4,7 +4,8 @@ import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/cons
 import { NumberLike } from '@sora-substrate/math';
 import { FPNumber } from '@sora-substrate/util/build';
 import { Messages } from '@sora-substrate/util/build/logger';
-import { api } from '@soramitsu/soraneo-wallet-web';
+import { api, vuex as walletVuex, beforeTransactionSign } from '@soramitsu/soraneo-wallet-web';
+// import { beforeTransactionSign } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
 import { findLast, groupBy } from 'lodash';
 import Papa from 'papaparse';
@@ -428,7 +429,10 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   // const params = calcTxParams(inputAsset, maxInputAmount, undefined);
   await withLoading(async () => {
     try {
-      await rootDispatch.wallet.transactions.beforeTransactionSign();
+      // await rootDispatch.wallet.transactions.beforeTransactionSign();
+      await beforeTransactionSign(walletVuex.walletModules.wallet as any, api);
+      // const { commit, getters, rootCommit, rootState, rootDispatch } = routeAssetsActionContext(context);
+      // await beforeTransactionSign()
       const time = Date.now();
       await api.swap
         .executeSwapTransferBatch(swapTransferData, inputAsset, maxInputAmount)
@@ -554,4 +558,34 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   };
 }
 
+// async function beforeTransactionSign(
+//   getters, state,
+//   mutationType = 'wallet/transactions/setSignTxDialogVisibility'
+// ): Promise<void> {
+//   const { address, signer } = api;
+
+//   if (!address || signer) return;
+
+//   const password = getters['wallet/account/getPassword'](address);
+//   const confirmDisabled = state.wallet.transactions.isSignTxDialogDisabled;
+
+//   if (password && confirmDisabled) {
+//     api.unlockPair(password);
+//   } else {
+//     store.commit(mutationType, true);
+
+//     await new Promise<void>((resolve) => {
+//       const unsubscribe = store.subscribe((mutation) => {
+//         if (mutationType === mutation.type && mutation.payload === false) {
+//           unsubscribe();
+//           resolve();
+//         }
+//       });
+//     });
+//   }
+
+//   if (api.accountPair?.isLocked) {
+//     throw new Error('Cancelled');
+//   }
+// }
 export default actions;

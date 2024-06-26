@@ -2,16 +2,19 @@
   <header class="header">
     <s-button class="app-menu-button" type="action" primary icon="basic-more-horizontal-24" @click="toggleMenu" />
     <app-logo-button class="app-logo--header" responsive :theme="libraryTheme" @click="goTo(PageNames.Swap)" />
-    <route-assets-navigation v-if="showRouteAssetsNavigation" class="app-controls s-flex route-assets-navigation" />
-    <div class="s-flex app-controls">
-      <balance-widget class="app-controls s-flex balance-widget" />
-      <div class="app-controls app-controls--settings-panel s-flex without-moonpay">
-        <app-account-button :disabled="loading" @click="goTo(PageNames.Wallet)" />
-        <app-header-menu />
-      </div>
+    <div class="app-controls app-controls--middle s-flex">
+      <app-marketing v-show="!isMobile" />
+      <s-button :class="fiatBtnClass" :type="fiatBtnType" size="medium" @click="goTo(PageNames.DepositOptions)">
+        <pair-token-logo class="payment-icon" :first-token="xor" :second-token="eth" :size="fiatBtnSize" />
+        <span v-if="!isAnyMobile">{{ t('moonpay.buttons.buy') }}</span>
+      </s-button>
     </div>
-
+    <div class="app-controls s-flex">
+      <app-account-button :disabled="loading" @click="navigateToWallet" />
+      <app-header-menu />
+    </div>
     <select-language-dialog />
+    <select-currency-dialog />
   </header>
 </template>
 
@@ -20,12 +23,11 @@ import { XOR, ETH } from '@sora-substrate/util/build/assets/consts';
 import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
-import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
-import { PageNames, Components, BreakpointClass } from '@/consts';
-import { AdarComponents } from '@/modules/ADAR/consts';
-import { adarLazyComponent } from '@/modules/ADAR/router';
-import { lazyComponent, goTo } from '@/router';
-import { getter, state } from '@/store/decorators';
+import InternalConnectMixin from '../../../components/mixins/InternalConnectMixin';
+import PolkaswapLogo from '../../../components/shared/Logo/Polkaswap.vue';
+import { PageNames, Components, BreakpointClass } from '../../../consts';
+import { lazyComponent, goTo } from '../../../router';
+import { state, getter } from '../../../store/decorators';
 
 import AppAccountButton from './AppAccountButton.vue';
 import AppHeaderMenu from './AppHeaderMenu.vue';
@@ -36,19 +38,18 @@ import type Theme from '@soramitsu-ui/ui-vue2/lib/types/Theme';
 
 @Component({
   components: {
+    PolkaswapLogo,
     AppAccountButton,
     AppMarketing,
     AppHeaderMenu,
     AppLogoButton,
     SelectLanguageDialog: lazyComponent(Components.SelectLanguageDialog),
+    SelectCurrencyDialog: lazyComponent(Components.SelectCurrencyDialog),
     PairTokenLogo: lazyComponent(Components.PairTokenLogo),
-    RouteAssetsNavigation: adarLazyComponent(AdarComponents.RouteAssetsNavigation),
-    BalanceWidget: adarLazyComponent(AdarComponents.BalanceWidget),
-    TokenLogo: components.TokenLogo,
     WalletAvatar: components.WalletAvatar,
   },
 })
-export default class AppHeader extends Mixins(WalletConnectMixin) {
+export default class AppHeader extends Mixins(InternalConnectMixin) {
   readonly PageNames = PageNames;
   readonly xor = XOR;
   readonly eth = ETH;
@@ -74,10 +75,6 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
       size: WALLET_CONSTS.LogoSize.MEDIUM,
       tokenSymbol: XOR.symbol,
     };
-  }
-
-  get showRouteAssetsNavigation() {
-    return this.$route.path.includes('route-assets');
   }
 
   get fiatBtnClass(): string[] {
@@ -117,17 +114,9 @@ export default class AppHeader extends Mixins(WalletConnectMixin) {
 </style>
 
 <style lang="scss" scoped>
-$app-controls-filter: drop-shadow(-5px -5px 5px rgba(232, 25, 50, 0.05))
-  drop-shadow(1px 1px 25px rgba(232, 25, 50, 0.1));
-$app-controls-shadow: inset 1px 1px 10px #ffffff;
-
-$app-controls-filter--dark: drop-shadow(-5px -5px 5px rgba(232, 25, 50, 0.05))
-  drop-shadow(2px 2px 10px rgba(232, 25, 49, 0.33));
-$app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: $inner-spacing-mini;
   min-height: $header-height;
   position: relative;
@@ -151,26 +140,11 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
 }
 
 .app-controls {
-  &.route-assets-navigation {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    @include tablet(true) {
-      display: none;
-    }
-    @media (max-width: 1550px) and (min-width: 1440px) {
-      left: 40%;
-    }
-  }
-
-  .balance-widget {
-    @media (max-width: 1200px) {
-      display: none;
-    }
-  }
-
   &:not(:last-child) {
+    margin-right: $inner-spacing-mini;
+  }
+
+  & > *:not(:last-child) {
     margin-right: $inner-spacing-mini;
   }
 
@@ -194,18 +168,11 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
   }
 
   @include desktop {
-    // margin-left: auto;
+    margin-left: auto;
   }
 
   &--middle {
     margin-left: auto;
-    box-shadow: $app-controls-shadow;
-    filter: $app-controls-filter;
-    border-radius: var(--s-border-radius-small);
-
-    & > * {
-      box-shadow: none !important;
-    }
 
     @include desktop {
       position: absolute;
@@ -218,31 +185,6 @@ $app-controls-shadow--dark: inset 1px 1px 2px #52523d;
     @media (minmax(1220px, false)) {
       left: 50%;
     }
-  }
-
-  &--settings-panel {
-    filter: $app-controls-filter;
-    border-radius: var(--s-border-radius-small);
-
-    & > * {
-      box-shadow: none !important;
-    }
-    & > *:not(:last-child) {
-      margin-right: 1px;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
-    & > *:not(:first-child) {
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
-    }
-  }
-
-  &--moonpay--dark,
-  &--settings-panel--dark {
-    box-shadow: $app-controls-shadow--dark;
-    filter: $app-controls-filter--dark;
   }
 }
 
