@@ -313,19 +313,24 @@ router.beforeEach((to, from, next) => {
     updateDocumentTitle(to);
   };
   const isLoggedIn = store.getters.wallet.account.isLoggedIn;
+  const isInvitationRoute = to.matched.some((record) => record.meta.isInvitationRoute);
+  const isRequiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
   if (prev !== PageNames.BridgeTransaction && current === PageNames.BridgeTransactionsHistory) {
     store.commit.bridge.setHistoryPage(1);
   }
-  if (to.matched.some((record) => record.meta.isInvitationRoute)) {
-    if (api.validateAddress(to.params.referrerAddress)) {
-      store.commit.referrals.setStorageReferrer(to.params.referrerAddress);
+  if (isInvitationRoute) {
+    const referrerAddress = to.params.referrerAddress;
+
+    if (api.validateAddress(referrerAddress)) {
+      store.commit.referrals.setStorageReferrer(referrerAddress);
     }
     if (isLoggedIn) {
       setRoute(PageNames.ReferralProgram);
       return;
     }
   }
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
+  if (isRequiresAuth) {
     if (BridgeChildPages.includes(current) && isLoggedIn && !store.getters.bridge.externalAccount) {
       setRoute(PageNames.Bridge);
       return;
