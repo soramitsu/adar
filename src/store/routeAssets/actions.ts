@@ -435,7 +435,6 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   const additionalData = {
     rates,
   };
-  console.dir(additionalData);
   await withLoading(async () => {
     try {
       await beforeTransactionSign(walletVuex.walletModules.wallet as any, api);

@@ -6,16 +6,6 @@
         {{ t('adar.routeAssets.stages.done.description') }}
       </div>
       <div class="fields-container">
-        <!-- <div class="field">
-          <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
-          <div class="field__value">
-            <div>{{ inputToken.symbol }}</div>
-            <div>
-              <token-logo class="token-logo" :token="inputToken" />
-            </div>
-          </div>
-        </div>
-        <s-divider /> -->
         <div class="field" v-if="finalAmount">
           <div class="field__label">{{ t('adar.routeAssets.total') }}</div>
           <div class="field__value">

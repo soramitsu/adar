@@ -198,7 +198,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         };
         const outputTxs = tx?.payload?.receivers.map((recipient, idx) => {
           const fpAmount = new FPNumber(recipient.amount);
-          const rate = tx?.payload?.comment?.rates[recipient.asset.symbol] || 0;
+          const rate = tx?.payload?.comment?.rates[recipient.asset.symbol] || '-';
           return [
             `${idx + 1}`,
             //   recipient.name,
