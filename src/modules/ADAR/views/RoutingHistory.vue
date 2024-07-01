@@ -71,7 +71,7 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
-import { api, components, mixins } from '@soramitsu/soraneo-wallet-web';
+import { api, mixins } from '@soramitsu/soraneo-wallet-web';
 import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears, isAfter, compareDesc } from 'date-fns';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
@@ -187,6 +187,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   getReportData(isCsv = false) {
     return this.userTxs
+      .filter((item) => isAfter(new Date((item as any).endTime), this.selectedPeriod.date))
       .map((tx) => {
         const info = {
           txId: tx.txId,
@@ -197,7 +198,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
         };
         const outputTxs = tx?.payload?.receivers.map((recipient, idx) => {
           const fpAmount = new FPNumber(recipient.amount);
-          const rate = tx?.payload?.comment?.rate[1] ?? '-';
+          const rate = tx?.payload?.comment?.rates[recipient.asset.symbol] || 0;
           return [
             `${idx + 1}`,
             //   recipient.name,
@@ -206,7 +207,7 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
             // tx.symbol,
             recipient.asset.symbol,
             isCsv ? fpAmount.toFixed(7) : fpAmount.toLocaleString(),
-            isCsv ? rate.toFixed(7) : rate.toLocaleString(),
+            isCsv ? rate : new FPNumber(rate).toLocaleString(),
             // recipient.status.toString(),
           ];
         });
@@ -217,22 +218,20 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   downloadCSV(fileName: string) {
     let csvContent = 'data:text/csv;charset=utf-8,';
-    this.getReportData(true)
-      .filter((item) => isAfter(item.info.datetime, this.selectedPeriod.date))
-      .forEach((tx) => {
-        const { txId, from, blockNumber, datetime } = tx.info;
-        const txContent =
-          `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
-          `${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}\n` +
-          this.headers.join(',') +
-          `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
-            'adar.routeAssets.stages.done.report.blockNumber'
-          )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
-          '\n' +
-          tx.outputTxs?.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n') +
-          '\n\n';
-        csvContent = csvContent + txContent;
-      });
+    this.getReportData(true).forEach((tx) => {
+      const { txId, from, blockNumber, datetime } = tx.info;
+      const txContent =
+        `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
+        `${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}\n` +
+        this.headers.join(',') +
+        `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
+          'adar.routeAssets.stages.done.report.blockNumber'
+        )},${this.t('adar.routeAssets.stages.done.report.senderWallet')}` +
+        '\n' +
+        tx.outputTxs?.map((e) => `${e.join(',')},${txId},${blockNumber},${from}`).join('\n') +
+        '\n\n';
+      csvContent = csvContent + txContent;
+    });
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -244,43 +243,41 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   downloadPDF(fileName: string) {
     const doc = new JsPDF({ putOnlyUsedFonts: true, orientation: 'landscape' });
-    this.getReportData()
-      .filter((item) => isAfter(item.info.datetime, this.selectedPeriod.date))
-      .forEach((tx) => {
-        const { txId, blockId, from, blockNumber, datetime } = tx.info;
-        doc.setFontSize(12);
-        doc.text(`${this.t('adar.routeAssets.stages.done.report.transactionId')} - ${txId}`, 5, 5);
-        doc.text(`${this.t('adar.routeAssets.stages.done.report.blockNumber')} - ${blockNumber}`, 5, 10);
-        doc.text(`${this.t('adar.routeAssets.stages.done.report.blockId')} - ${blockId}`, 5, 15);
-        doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
-        doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
-        doc.text(`${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}`, 5, 30);
-        autoTable(doc, {
-          head: [this.headers],
-          body: tx.outputTxs as RowInput[],
-          startY: 35,
-          rowPageBreak: 'avoid',
-          margin: { top: 5, left: 5, right: 5, bottom: 5 },
-          styles: {
-            lineColor: [237, 228, 231],
-            lineWidth: 0.3,
-            fontSize: 10,
-          },
-          headStyles: {
-            textColor: [161, 154, 157],
-            fillColor: [253, 247, 251],
-          },
-          bodyStyles: {
-            fillColor: [253, 247, 251],
-            textColor: [38, 38, 45],
-            cellPadding: { top: 10, right: 5, bottom: 10, left: 5 },
-          },
-          alternateRowStyles: {
-            fillColor: [255, 250, 251],
-          },
-        });
-        doc.addPage();
+    this.getReportData().forEach((tx) => {
+      const { txId, blockId, from, blockNumber, datetime } = tx.info;
+      doc.setFontSize(12);
+      doc.text(`${this.t('adar.routeAssets.stages.done.report.transactionId')} - ${txId}`, 5, 5);
+      doc.text(`${this.t('adar.routeAssets.stages.done.report.blockNumber')} - ${blockNumber}`, 5, 10);
+      doc.text(`${this.t('adar.routeAssets.stages.done.report.blockId')} - ${blockId}`, 5, 15);
+      doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
+      doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
+      doc.text(`${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}`, 5, 30);
+      autoTable(doc, {
+        head: [this.headers],
+        body: tx.outputTxs as RowInput[],
+        startY: 35,
+        rowPageBreak: 'avoid',
+        margin: { top: 5, left: 5, right: 5, bottom: 5 },
+        styles: {
+          lineColor: [237, 228, 231],
+          lineWidth: 0.3,
+          fontSize: 10,
+        },
+        headStyles: {
+          textColor: [161, 154, 157],
+          fillColor: [253, 247, 251],
+        },
+        bodyStyles: {
+          fillColor: [253, 247, 251],
+          textColor: [38, 38, 45],
+          cellPadding: { top: 10, right: 5, bottom: 10, left: 5 },
+        },
+        alternateRowStyles: {
+          fillColor: [255, 250, 251],
+        },
       });
+      doc.addPage();
+    });
 
     doc.save(`${fileName}.pdf`);
   }

@@ -6,7 +6,7 @@
         {{ t('adar.routeAssets.stages.done.description') }}
       </div>
       <div class="fields-container">
-        <div class="field">
+        <!-- <div class="field">
           <div class="field__label">{{ t('adar.routeAssets.inputAsset') }}</div>
           <div class="field__value">
             <div>{{ inputToken.symbol }}</div>
@@ -15,11 +15,11 @@
             </div>
           </div>
         </div>
-        <s-divider />
+        <s-divider /> -->
         <div class="field" v-if="finalAmount">
           <div class="field__label">{{ t('adar.routeAssets.total') }}</div>
           <div class="field__value">
-            {{ finalAmountFormatted }} <span class="usd">{{ totalUSD }}</span>
+            <span class="usd">{{ totalUSD }}</span>
           </div>
         </div>
         <div v-else>
