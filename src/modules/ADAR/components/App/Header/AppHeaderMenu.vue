@@ -43,14 +43,6 @@
       >
         <s-icon :name="icon" :size="iconSize" />
       </s-button>
-      <s-button
-        type="action"
-        :tooltip="t('browserNotificationDialog.button')"
-        @click="openNotificationDialog"
-        class="notif-option el-dropdown-menu__item adar-header-menu__item"
-      >
-        <bell-icon class="notif-option__bell notif-option__bell--large"></bell-icon>
-      </s-button>
     </template>
   </s-button-group>
 </template>
@@ -61,7 +53,6 @@ import { switchTheme } from '@soramitsu-ui/ui-vue2/lib/utils';
 import { Component, Mixins, Prop } from 'vue-property-decorator';
 
 import AppAccountButton from '@/components/App/Header/AppAccountButton.vue';
-import BellIcon from '@/components/App/Header/BellIcon.vue';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { PageNames } from '@/consts';
 import { goTo } from '@/router';
@@ -86,7 +77,6 @@ const BREAKPOINT = 1440;
 
 @Component({
   components: {
-    BellIcon,
     AppAccountButton,
   },
 })
@@ -169,6 +159,11 @@ export default class AppHeaderMenu extends Mixins(TranslationMixin) {
         text: this.disclaimerText,
         disabled: this.discalimerDisabled,
       },
+      {
+        value: HeaderMenuType.Notification,
+        icon: 'notifications-bell-24',
+        text: this.t('browserNotificationDialog.title'),
+      },
     ];
   }
 
@@ -207,6 +202,9 @@ export default class AppHeaderMenu extends Mixins(TranslationMixin) {
       case HeaderMenuType.Disclaimer:
         if (this.discalimerDisabled) return;
         this.toggleDisclaimerDialogVisibility();
+        break;
+      case HeaderMenuType.Notification:
+        this.openNotificationDialog();
         break;
     }
   }
