@@ -313,7 +313,8 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
       ? new FPNumber(recipient.amount)
       : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
     const exchangeRate = getAssetUSDPrice(recipient.asset, priceObject);
-    commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate });
+    const rate = recipient.useTransfer ? recipient.usd.div(recipient.amount) : exchangeRate;
+    commit.setRecipientExchangeRate({ id: recipient.id, rate });
     return {
       recipient,
       swapAndSendData: {
@@ -329,7 +330,9 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
         ? new FPNumber(recipient.amount, recipient.asset?.decimals)
         : getTokenEquivalent(priceObject, recipient.asset, recipient.usd);
 
-      commit.setRecipientExchangeRate({ id: recipient.id, rate: exchangeRate });
+      const rate = recipient.useTransfer ? recipient.usd.div(recipient.amount) : exchangeRate;
+
+      commit.setRecipientExchangeRate({ id: recipient.id, rate });
 
       return {
         swapAndSendData: {
@@ -394,6 +397,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       recipientId: item.recipient.id,
       usd: item.recipient.usd,
       useTransfer: item.recipient.useTransfer && item.recipient.asset.address !== inputAsset.address,
+      rate: item.recipient.exchangeRate,
     };
   });
   const groupedData = Object.entries(groupBy(newData, 'assetAddress'));
@@ -402,6 +406,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
     return assetsTable.find((item: WhitelistArrayItem) => item.address === assetName);
   };
   let inputTokenAmount: FPNumber = FPNumber.ZERO;
+  const rates: any = {};
   const swapTransferData = groupedData.map((entry) => {
     const [outcomeAssetId, receivers] = entry;
     let outcomeAssetReuse = FPNumber.ZERO;
@@ -411,9 +416,11 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
       }
       return receiver.useTransfer ? sum : sum.add(new FPNumber(receiver.usd));
     }, FPNumber.ZERO);
-    const dexIdData = getAmountAndDexId(context, inputAsset, findAsset(outcomeAssetId) as unknown as Asset, approxSum);
+    const outcomeAsset = findAsset(outcomeAssetId) as unknown as Asset;
+    const dexIdData = getAmountAndDexId(context, inputAsset, outcomeAsset, approxSum);
     inputTokenAmount = inputTokenAmount.add(dexIdData?.amountFrom);
     const dexId = dexIdData?.bestDexId;
+    rates[outcomeAsset.symbol] = receivers[0].rate.dp(7).toString();
     return {
       outcomeAssetId,
       receivers,
@@ -425,13 +432,15 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   const maxInputAmount = inputTokenAmount.add(
     inputTokenAmount.mul(new FPNumber(getters.slippageTolerance).div(FPNumber.HUNDRED))
   );
-  // const params = calcTxParams(inputAsset, maxInputAmount, undefined);
+  const additionalData = {
+    rates,
+  };
   await withLoading(async () => {
     try {
       await beforeTransactionSign(walletVuex.walletModules.wallet as any, api);
       const time = Date.now();
       await api.swap
-        .executeSwapTransferBatch(swapTransferData, inputAsset, maxInputAmount)
+        .executeSwapTransferBatch(swapTransferData, inputAsset, maxInputAmount, additionalData)
         .then(async () => {
           const lastTx = await getLastTransaction(time);
           rootCommit.wallet.transactions.addActiveTx(lastTx.id as string);
