@@ -115,14 +115,10 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
   get usdVolume() {
     return this.adarTxs.reduce((acc, item) => {
       if (item.payload?.comment?.rates) {
-        const sum = FPNumber.ZERO;
-        item.payload?.receivers.forEach((receiver) => {
+        const sum = item.payload?.receivers.reduce((result, receiver) => {
           const rate = item.payload?.comment?.rates[receiver.asset.symbol];
-          if (rate) {
-            const usd = new FPNumber(rate).mul(receiver.amount);
-            sum.add(usd);
-          }
-        });
+          return rate ? result.add(new FPNumber(rate).mul(receiver.amount)) : result;
+        }, FPNumber.ZERO);
         return sum;
       }
       const assetsTable = this.whitelistArray;
