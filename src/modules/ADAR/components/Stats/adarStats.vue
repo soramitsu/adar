@@ -123,14 +123,12 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
             sum.add(usd);
           }
         });
-        console.dir(item.payload?.comment?.rates);
         return sum;
       }
       const assetsTable = this.whitelistArray;
       const asset = assetsTable.find((asset) => asset.address === item.assetAddress);
       const price = getAssetUSDPrice(asset, this.fiatPriceObject);
       const usd = item?.amount ? price.mul(new FPNumber(item.amount)) : FPNumber.ZERO;
-      console.log(` sums`);
       return acc.add(usd);
     }, FPNumber.ZERO);
   }
