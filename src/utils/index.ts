@@ -135,6 +135,7 @@ export const showMostFittingValue = (
   return toPrecision(value, precision).toLocaleString();
 };
 
+// TODO: export from wallet
 export const getCurrency = (currencyName: Currency, currencies: CurrencyFields[]): CurrencyFields | undefined => {
   return currencies.find((currency) => currency.key === currencyName);
 };
@@ -275,6 +276,7 @@ export const updateDocumentTitle = (to?: Route) => {
   const page = to ?? router.currentRoute;
   const pageName = page?.name;
   const pageTitleKey = `pageTitle.${pageName}`;
+  // TODO: update pageTitle list: remove duplicates, add missed / change logic
   if (pageName && i18n.te(pageTitleKey)) {
     const pageTitleValue = i18n.t(pageTitleKey, TranslationConsts) as string;
     document.title = `${pageTitleValue} - ${app.name}`;
@@ -331,6 +333,7 @@ export const calcPriceChange = (current: FPNumber, prev: FPNumber): FPNumber => 
   return current.sub(prev).div(prev).mul(FPNumber.HUNDRED);
 };
 
+// [TODO]: move to FPNumber
 export const formatAmountWithSuffix = (value: FPNumber, precision = 2): AmountWithSuffix => {
   const val = value.toNumber();
   const format = (value: string) => new FPNumber(value).toLocaleString();
