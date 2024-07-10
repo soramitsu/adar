@@ -64,7 +64,6 @@ export class RelaychainAdapter extends SubAdapter {
 
   public override async getNetworkFee(asset: RegisteredAsset, sender: string, recipient: string): Promise<CodecString> {
     /* Throws error until Substrate 5 migration */
-    // return await super.getNetworkFee(asset, sender, recipient);
     const toCodec = (fee: number) => new FPNumber(fee, asset.externalDecimals).toCodecString();
     // Hardcoded values
     switch (this.subNetwork) {

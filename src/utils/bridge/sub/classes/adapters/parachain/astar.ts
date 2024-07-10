@@ -1,5 +1,4 @@
 import { FPNumber } from '@sora-substrate/util';
-import { formatBalance } from '@sora-substrate/util/build/assets';
 
 import { ZeroStringValue } from '@/consts';
 

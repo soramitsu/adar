@@ -92,7 +92,6 @@ async function getSubRegisteredAssets(
 
   const subNetworkId = subNetwork as SubNetwork;
 
-  // [TODO] remove when non native parachain tokens are supported
   if (subNetworkId === SubNetworkId.PolkadotAcala) {
     return [
       {
