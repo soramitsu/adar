@@ -119,7 +119,7 @@ export default class AdarStats extends Mixins(mixins.LoadingMixin, TranslationMi
           const rate = item.payload?.comment?.rates[receiver.asset.symbol];
           return rate ? result.add(new FPNumber(rate).mul(receiver.amount)) : result;
         }, FPNumber.ZERO);
-        return sum;
+        return acc.add(sum);
       }
       const assetsTable = this.whitelistArray;
       const asset = assetsTable.find((asset) => asset.address === item.assetAddress);
