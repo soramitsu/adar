@@ -416,7 +416,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   }
 
   onTransferAddFundsClick(tokenData: OutcomeAssetsAmount) {
-    const requiredAmount = this.tokenTransferAmountRequired(tokenData.asset, tokenData.amountRequired);
+    const requiredAmount = tokenData.amountRequired;
     let assetFrom: Asset;
     if (this.inputToken.address !== tokenData.asset.address) {
       assetFrom = this.inputToken;
