@@ -230,7 +230,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   getReportData(isCsv = false) {
     return this.recipients.map((recipient, idx) => {
       const usd = recipient.usd.dp(2);
-      const amount = this.getRecipientTransferAmount(recipient.wallet, recipient.asset.address);
+      const amount = recipient.amount ?? FPNumber.ZERO;
       const rate = recipient.exchangeRate ?? FPNumber.ZERO;
       return [
         `${idx + 1}`,
