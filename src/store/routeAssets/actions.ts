@@ -390,6 +390,7 @@ async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> 
   const inputAsset = getters.inputToken;
   const newData = data.map((item) => {
     const targetAmount = item.swapAndSendData.targetAmount;
+    commit.setRecipientTokenAmount({ id: item.recipient.id, amount: targetAmount });
     return {
       accountId: item.swapAndSendData.address,
       targetAmount,
