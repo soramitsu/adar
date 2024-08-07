@@ -24,10 +24,6 @@
             >
               {{ text }}
             </s-dropdown-item>
-            <div @click="openNotificationDialog" class="notif-option el-dropdown-menu__item adar-header-menu__item">
-              <bell-icon class="notif-option__bell notif-option__bell--dropdown" />
-              <span class="notif-option__text">{{ t('browserNotificationDialog.title') }}</span>
-            </div>
           </template>
         </s-dropdown>
       </s-button>

@@ -160,15 +160,15 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return this.txHistoryData?.payload?.receivers || [];
   }
 
-  get finalAmountFormatted() {
-    return new FPNumber(this.finalAmount || 0).dp(4).toLocaleString();
+  get finalAmountFormatted(): string {
+    return new FPNumber(this.finalAmount ?? 0).toLocaleString(4);
   }
 
-  get incompletedRecipientsLength() {
+  get incompletedRecipientsLength(): number {
     return this.incompletedRecipients.length;
   }
 
-  get totalUSD() {
+  get totalUSD(): string {
     if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
     return this.overallUSDNumber;
   }
@@ -181,11 +181,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     return this.recipientsGroupedByToken().map((item) => ({ status: this.getStatus(this.withErrors), ...item }));
   }
 
-  getStatus(withErrors = false) {
+  getStatus(withErrors = false): string {
     return withErrors ? this.t('adar.routeAssets.txStatus.failed') : this.t('adar.routeAssets.txStatus.success');
   }
 
-  getAssetUSDPrice(asset: Asset) {
+  getAssetUSDPrice(asset: Asset): FPNumber {
     return FPNumber.fromCodecValue(this.fiatPriceObject[asset.address] ?? 0, 18);
   }
 
@@ -198,7 +198,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     );
   }
 
-  formatNumber(num: FPNumber, dp = 4) {
+  formatNumber(num: FPNumber, dp = 4): string {
     return num.toLocaleString(dp);
   }
 
