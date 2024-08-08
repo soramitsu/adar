@@ -6,7 +6,7 @@
           <info-line
             :label="t('dexSettings.slippageTolerance')"
             :label-tooltip="t('dexSettings.slippageToleranceHint')"
-            :value="customSlippageTolerance"
+            :value="localeFormattedSlippageTolerance"
           />
         </template>
         <div class="adar-slippage-tolerance s-flex">
@@ -65,6 +65,10 @@ export default class AdarSlippageTolerance extends Mixins(mixins.NumberFormatter
       name: name,
       label: `${this.formatStringValue(name)}%`,
     }));
+  }
+
+  get localeFormattedSlippageTolerance() {
+    return `${this.formatStringValue(this.slippageTolerance)}%`;
   }
 
   get customSlippageTolerance(): string {
