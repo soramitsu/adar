@@ -28,10 +28,11 @@ enum BalanceSubscriptionKeys {
 
 const balanceSubscriptions = new TokenBalanceSubscriptions();
 
-function updateTokenSubscription(context: ActionContext<any, any>): void {
+function updateTokenSubscription(context: ActionContext<any, any>, token?: AccountAsset | Asset): void {
   const { getters, commit, rootGetters } = routeAssetsActionContext(context);
-  const { inputToken } = getters;
   const { setInputTokenBalance } = commit;
+
+  const inputToken = token ?? getters.inputToken;
 
   const updateBalance = (balance: Nullable<AccountBalance>) => setInputTokenBalance(balance);
   balanceSubscriptions.remove(BalanceSubscriptionKeys.adarInputToken);
@@ -40,7 +41,10 @@ function updateTokenSubscription(context: ActionContext<any, any>): void {
     inputToken?.address &&
     !(inputToken.address in rootGetters.wallet.account.accountAssetsAddressTable)
   ) {
-    balanceSubscriptions.add(BalanceSubscriptionKeys.adarInputToken, { updateBalance, token: inputToken });
+    balanceSubscriptions.add(BalanceSubscriptionKeys.adarInputToken, {
+      updateBalance,
+      token: inputToken as AccountAsset,
+    });
   }
 }
 
@@ -58,8 +62,8 @@ const actions = defineActions({
     commit.setInputToken(asset);
     dispatch.subscribeOnReserves();
   },
-  async updateInputTokenSubscription(context): Promise<void> {
-    updateTokenSubscription(context);
+  async updateInputTokenSubscription(context, token?: AccountAsset | Asset): Promise<void> {
+    updateTokenSubscription(context, token);
   },
   async resetInputTokenSubscription(context): Promise<void> {
     balanceSubscriptions.remove(BalanceSubscriptionKeys.adarInputToken);
@@ -174,7 +178,10 @@ const actions = defineActions({
     dispatch.updateInputTokenSubscription();
     const sourceToken = getters.inputToken;
     const tokens = [...new Set<Asset>(getters.recipients.filter((item) => item.asset).map((item) => item.asset))]
-      .map((item: Asset) => item?.address)
+      .map((item: Asset) => {
+        dispatch.updateInputTokenSubscription(item);
+        return item?.address;
+      })
       .filter((item) => item !== sourceToken.address);
     if (!tokens.length && getters.recipients.length) {
       dispatch.updateTokenAmounts();
