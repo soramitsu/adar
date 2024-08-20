@@ -50,7 +50,7 @@
                   <div v-if="evmAddress" class="rewards-account">
                     <div class="rewards-account-group">
                       <img
-                        v-if="changeWalletEvm"
+                        v-if="evmProvider"
                         :src="getEvmProviderIcon(evmProvider)"
                         :alt="evmProvider"
                         class="rewards-account-logo"
@@ -58,7 +58,7 @@
                       <formatted-address :value="evmAddress" :symbols="8" />
                     </div>
                     <div class="rewards-account-group">
-                      <span v-if="changeWalletEvm" class="rewards-account-btn" @click="connectEvmWallet">
+                      <span v-if="changeWalletEvm" v-button class="rewards-account-btn" @click="connectEvmWallet">
                         {{ t('changeAccountText') }}
                       </span>
                       <span v-else>{{ t('connectedText') }}</span>
