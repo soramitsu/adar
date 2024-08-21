@@ -45,14 +45,14 @@
               />
               <info-line
                 :label="`${t('adar.routeAssets.stages.routing.amountText.default')} ${amountInfo.asset.symbol}`"
-                :value="amountInfo.totalAmount.toLocaleString(2)"
+                :value="amountInfo.totalAmount.toLocaleString(5)"
                 :fiat-value="amountInfo.usd.toLocaleString(2)"
                 is-formatted
               />
               <info-line
-                :asset-symbol="amountInfo.asset.symbol"
-                :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
-                :value="amountInfo.userBalance.toLocaleString()"
+                :label="`${t('adar.routeAssets.stages.reviewDetails.swapless.balance')} ${amountInfo.asset.symbol}`"
+                :value="amountInfo.userBalance.toLocaleString(5)"
+                :fiat-value="getFiatAmountByFPNumber(amountInfo.userBalance, amountInfo.asset)"
                 is-formatted
               />
             </div>
@@ -134,7 +134,7 @@
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
 import { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
-import { components } from '@soramitsu/soraneo-wallet-web';
+import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
@@ -155,7 +155,7 @@ import { getAssetBalance } from '@/utils';
     TokenAddress: components.TokenAddress,
   },
 })
-export default class ProcessTemplate extends Mixins(TranslationMixin) {
+export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.FormattedAmountMixin) {
   @getter.routeAssets.file private file!: Nullable<File>;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
   @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
