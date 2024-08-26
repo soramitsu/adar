@@ -1,5 +1,5 @@
 <template>
-  <base-widget title="Supply" :tooltip="t('tooltips.supply')">
+  <base-widget v-bind="$attrs" title="Supply" :tooltip="t('tooltips.supply')">
     <template #filters>
       <stats-filter :filters="filters" :value="filter" @input="changeFilter" />
     </template>
@@ -76,11 +76,10 @@ const getExtremum = (data: readonly ChartData[], prop: string, min = false) => {
     FormattedAmount: components.FormattedAmount,
   },
 })
-export default class StatsSupplyChart extends Mixins(mixins.LoadingMixin, ChartSpecMixin) {
+export default class SupplyChartWidget extends Mixins(mixins.LoadingMixin, ChartSpecMixin) {
   readonly FontSizeRate = WALLET_CONSTS.FontSizeRate;
   readonly FontWeightRate = WALLET_CONSTS.FontWeightRate;
   readonly filters = ASSET_SUPPLY_LINE_FILTERS;
-  readonly tokens = [XOR, VAL, PSWAP, XSTUSD, XST, TBCD];
 
   @Prop({ type: Object }) predefinedToken!: Nullable<Asset>;
 
@@ -96,6 +95,14 @@ export default class StatsSupplyChart extends Mixins(mixins.LoadingMixin, ChartS
 
   get areActionsDisabled(): boolean {
     return this.parentLoading || this.loading;
+  }
+
+  get selectTokenIcon(): Nullable<string> {
+    return !this.areActionsDisabled ? 'chevron-down-rounded-16' : undefined;
+  }
+
+  get tokenTabIndex(): number {
+    return !this.areActionsDisabled ? 0 : -1;
   }
 
   get firstValue(): FPNumber {
