@@ -44,18 +44,6 @@
                 />
               </s-menu-item>
             </s-menu-item-group>
-            <!-- <s-menu-item-group>
-              <app-sidebar-item-content
-                v-button
-                class="menu-item menu-item--bottom el-menu-item s-flex"
-                icon="finance-PSWAP-24"
-                href="https://about.polkaswap.io"
-                tag="a"
-                target="_blank"
-                rel="nofollow noopener"
-                :title="t('mainMenu.About')"
-              />
-            </s-menu-item-group> -->
           </s-menu>
 
           <s-menu
