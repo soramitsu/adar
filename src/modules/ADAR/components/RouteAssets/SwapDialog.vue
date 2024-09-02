@@ -1,8 +1,7 @@
 <template>
   <div class="swap-dialog">
     <dialog-base :visible.sync="isVisible" :title="'Swap'" custom-class="dialog__swap">
-      <Swap v-loading="!ready" ref="swap" />
-      <div class="ninja"></div>
+      <Swap v-loading="swapLoading" ref="swap" />
     </dialog-base>
   </div>
 </template>
@@ -31,7 +30,7 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
 
   @Prop({ default: 0 }) presetSwapData!: PresetSwapData;
 
-  ready = false;
+  swapLoading = true;
 
   get roundedValueTo() {
     const { valueTo } = this.presetSwapData;
@@ -58,7 +57,7 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
           delay(() => {
             swapComponent.handleInputFieldTo(`${fieldToValue.toNumber()}`);
             swapComponent.handleFocusField(true);
-            this.ready = true;
+            this.swapLoading = false;
           }, 500); // hotfix - need time for widget after refresh page & node reconnection ;
         }
       });
