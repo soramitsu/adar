@@ -1,7 +1,7 @@
 <template>
   <div class="swap-dialog">
     <dialog-base :visible.sync="isVisible" :title="'Swap'" custom-class="dialog__swap">
-      <Swap ref="swap" />
+      <Swap v-loading="swapLoading" ref="swap" />
     </dialog-base>
   </div>
 </template>
@@ -10,6 +10,7 @@
 import { FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
+import { delay } from 'lodash';
 import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';
 
 import { Components } from '@/consts';
@@ -28,6 +29,8 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
   @state.wallet.settings.networkFees private networkFees!: NetworkFeesObject;
 
   @Prop({ default: 0 }) presetSwapData!: PresetSwapData;
+
+  swapLoading = true;
 
   get roundedValueTo() {
     const { valueTo } = this.presetSwapData;
@@ -51,8 +54,11 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
           await swapComponent.handleSelectToken(assetTo);
           swapComponent.isTokenFromSelected = true;
           await swapComponent.handleSelectToken(assetFrom);
-          swapComponent.handleInputFieldTo(`${fieldToValue.toNumber()}`);
-          swapComponent.handleFocusField(true);
+          delay(() => {
+            swapComponent.handleInputFieldTo(`${fieldToValue.toNumber()}`);
+            swapComponent.handleFocusField(true);
+            this.swapLoading = false;
+          }, 500); // hotfix - need time for widget after refresh page & node reconnection ;
         }
       });
     }
