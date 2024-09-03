@@ -213,7 +213,7 @@ const getters = defineGetters<RouteAssetsState>()({
     };
   },
   outcomeAssetsAmountsList(...args): Array<OutcomeAssetsAmount> {
-    const { getters, rootState } = routeAssetsGetterContext(args);
+    const { getters } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipients
       .filter((item) => item.useTransfer)
       .map((item) => ({ symbol: item.asset.symbol, ...item }));
@@ -233,8 +233,6 @@ const getters = defineGetters<RouteAssetsState>()({
       const { usd, totalAmount: amount } = reduceData;
       const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
       const asset = assetArray[0].asset;
-      const accountAsset = rootState.wallet.account.accountAssets.find((item) => item.address === asset.address);
-      // const userBalance = FPNumber.fromCodecValue(getAssetBalance(accountAsset), accountAsset?.decimals);
       const userBalance = getters.transferTokenBalance(asset.address);
       const totalAmount = amount.add(adarFee);
       const amountRequired = totalAmount.sub(userBalance);
@@ -265,7 +263,7 @@ const getters = defineGetters<RouteAssetsState>()({
   },
 
   transferTxsAmountInfo(...args): Array<OutcomeAssetsAmount> {
-    const { getters, rootState } = routeAssetsGetterContext(args);
+    const { getters } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipientsTransfer.map((item) => ({
       symbol: item.asset.symbol,
       ...item,
@@ -286,8 +284,6 @@ const getters = defineGetters<RouteAssetsState>()({
       const { usd, totalAmount: amount } = reduceData;
       const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
       const asset = assetArray[0].asset;
-      const accountAsset = rootState.wallet.account.accountAssets.find((item) => item.address === asset.address);
-      // const userBalance = FPNumber.fromCodecValue(getAssetBalance(accountAsset), accountAsset?.decimals);
       const userBalance = getters.transferTokenBalance(asset.address);
       const totalAmount = amount.add(adarFee);
       const amountRequired = totalAmount.sub(userBalance);
@@ -319,7 +315,7 @@ const getters = defineGetters<RouteAssetsState>()({
   },
 
   swapTxsAmountInfo(...args): Array<OutcomeAssetsAmount> {
-    const { getters, rootState } = routeAssetsGetterContext(args);
+    const { getters } = routeAssetsGetterContext(args);
     const recipientsWithUsingExistingTokens = getters.recipientsSwap.map((item) => ({
       symbol: item.asset.symbol,
       ...item,
@@ -340,8 +336,6 @@ const getters = defineGetters<RouteAssetsState>()({
       const { usd, totalAmount: amount } = reduceData;
       const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
       const asset = assetArray[0].asset;
-      const accountAsset = rootState.wallet.account.accountAssets.find((item) => item.address === asset.address);
-      // const userBalance = FPNumber.fromCodecValue(getAssetBalance(accountAsset), accountAsset?.decimals);
       const userBalance = getters.transferTokenBalance(asset.address);
       const totalAmount = amount.add(adarFee);
       const amountRequired = totalAmount.sub(userBalance);
