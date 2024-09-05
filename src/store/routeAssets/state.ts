@@ -22,6 +22,7 @@ export function initialState(): RouteAssetsState {
       currentStageIndex: 0,
       inputToken: XOR,
       inputTokenBalance: null,
+      transferTokenBalances: {},
       datetime: undefined,
       txInfo: undefined,
       status: SwapTransferBatchStatus.INITIAL,

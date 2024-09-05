@@ -30,18 +30,20 @@ const balanceSubscriptions = new TokenBalanceSubscriptions();
 
 function updateTokenSubscription(context: ActionContext<any, any>, token?: AccountAsset | Asset): void {
   const { getters, commit, rootGetters } = routeAssetsActionContext(context);
-  const { setInputTokenBalance } = commit;
+  const { setInputTokenBalance, setTransferTokenBalances } = commit;
 
   const inputToken = token ?? getters.inputToken;
 
-  const updateBalance = (balance: Nullable<AccountBalance>) => setInputTokenBalance(balance);
-  balanceSubscriptions.remove(BalanceSubscriptionKeys.adarInputToken);
+  const updateBalance = token
+    ? (balance: Nullable<AccountBalance>) => setTransferTokenBalances({ balance, address: token.address })
+    : (balance: Nullable<AccountBalance>) => setInputTokenBalance(balance);
+  balanceSubscriptions.remove(inputToken.address);
   if (
     rootGetters.wallet.account.isLoggedIn &&
     inputToken?.address &&
     !(inputToken.address in rootGetters.wallet.account.accountAssetsAddressTable)
   ) {
-    balanceSubscriptions.add(BalanceSubscriptionKeys.adarInputToken, {
+    balanceSubscriptions.add(inputToken.address, {
       updateBalance,
       token: inputToken as AccountAsset,
     });

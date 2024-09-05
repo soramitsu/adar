@@ -45,13 +45,13 @@
               />
               <info-line
                 :label="`${t('adar.routeAssets.stages.routing.amountText.default')} ${amountInfo.asset.symbol}`"
-                :value="amountInfo.totalAmount.toLocaleString(5)"
+                :value="amountInfo.totalAmount.toLocaleString(5, true)"
                 :fiat-value="amountInfo.usd.toLocaleString(2)"
                 is-formatted
               />
               <info-line
                 :label="`${t('adar.routeAssets.stages.reviewDetails.swapless.balance')} ${amountInfo.asset.symbol}`"
-                :value="amountInfo.userBalance.toLocaleString(5)"
+                :value="amountInfo.userBalance.toLocaleString(5, true)"
                 :fiat-value="getFiatAmountByFPNumber(amountInfo.userBalance, amountInfo.asset)"
                 is-formatted
               />
@@ -92,14 +92,14 @@
               />
               <info-line
                 :label="`${t('adar.routeAssets.stages.routing.amountText.default')} ${inputToken.symbol}`"
-                :value="maxInputAmount.totalAmount.toLocaleString(2)"
+                :value="maxInputAmount.totalAmount.toLocaleString(5, true)"
                 :fiat-value="swapDataInfo.usd.toLocaleString(2)"
                 is-formatted
               />
               <info-line
                 :asset-symbol="inputToken.symbol"
                 :label="t('adar.routeAssets.stages.reviewDetails.swapless.balance')"
-                :value="fpBalance.toLocaleString()"
+                :value="fpBalance.toLocaleString(5, true)"
                 is-formatted
               />
             </div>
