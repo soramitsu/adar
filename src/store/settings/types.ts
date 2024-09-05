@@ -1,4 +1,5 @@
-import type { BreakpointClass, MarketAlgorithms } from '@/consts';
+import type { MarketAlgorithms } from '@/consts';
+import type { BreakpointClass } from '@/consts/layout';
 import type { NodesConnection } from '@/utils/connection';
 
 import type { Subscription } from 'rxjs';
@@ -50,4 +51,6 @@ export type SettingsState = {
   screenBreakpointClass: BreakpointClass;
   windowWidth: number;
   adsArray: Array<Ad>;
+  isTMA: boolean;
+  telegramBotUrl: Nullable<string>;
 };

@@ -75,6 +75,9 @@ export type ProcessingState = {
   currentStageIndex: number;
   inputToken: Asset;
   inputTokenBalance: Nullable<AccountBalance>;
+  transferTokenBalances: {
+    [key: string]: AccountBalance;
+  };
   tokensRouted?: Array<RoutedToken>;
   txInfo?: TransactionInfo;
   txHistoryData?: HistoryItem;

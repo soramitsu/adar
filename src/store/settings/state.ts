@@ -1,6 +1,7 @@
 import { connection } from '@soramitsu/soraneo-wallet-web';
 
-import { BreakpointClass, DefaultMarketAlgorithm, DefaultSlippageTolerance, MarketAlgorithms } from '@/consts';
+import { DefaultMarketAlgorithm, DefaultSlippageTolerance, MarketAlgorithms } from '@/consts';
+import { BreakpointClass } from '@/consts/layout';
 import { getLocale } from '@/lang';
 import { NodesConnection } from '@/utils/connection';
 import storage, { settingsStorage } from '@/utils/storage';
@@ -41,6 +42,8 @@ function initialState(): SettingsState {
     screenBreakpointClass: BreakpointClass.LargeDesktop,
     windowWidth: window?.innerWidth ?? 0,
     adsArray: [],
+    isTMA: false,
+    telegramBotUrl: undefined,
   };
 }
 
