@@ -88,12 +88,6 @@ export default class Wallet extends Mixins(TranslationMixin) {
       padding-top: 0;
       padding-right: 0;
       padding-left: 0;
-
-      .base-title_action {
-        > button {
-          display: none;
-        }
-      }
     }
     &__body {
       padding: $inner-spacing-medium 0 0;

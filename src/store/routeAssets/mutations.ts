@@ -24,6 +24,7 @@ const mutations = defineMutations<RouteAssetsState>()({
     state.processingState.status = SwapTransferBatchStatus.INITIAL;
     state.processingState.pricesAreUpdated = true;
     state.processingState.txHistoryData = undefined;
+    state.processingState.transferTokenBalances = {};
   },
   setSubscriptions(state, subscriptions: Array<RouteAssetsSubscription> = []): void {
     state.subscriptions = subscriptions;
@@ -81,6 +82,9 @@ const mutations = defineMutations<RouteAssetsState>()({
   },
   setInputTokenBalance(state, balance: Nullable<AccountBalance>): void {
     state.processingState.inputTokenBalance = balance;
+  },
+  setTransferTokenBalances(state, { balance, address }: { balance: Nullable<AccountBalance>; address: string }): void {
+    if (balance) state.processingState.transferTokenBalances[address] = balance;
   },
   editRecipient(state, { id, name, wallet, usd, amount, asset }) {
     const recipient = state.recipients.find((recipient) => recipient.id === id);
