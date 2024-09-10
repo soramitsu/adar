@@ -76,7 +76,7 @@ import { action, getter, mutation, state } from '@/store/decorators';
 import { getMobileCssClasses, preloadFontFace, updateDocumentTitle } from '@/utils';
 import type { NodesConnection } from '@/utils/connection';
 import { calculateStorageUsagePercentage, clearLocalStorage } from '@/utils/storage';
-import { tmaSdkService } from '@/utils/telegram';
+// import { tmaSdkService } from '@/utils/telegram';
 
 import { AdarPageNames } from './modules/ADAR/consts';
 import { RecipientStatus, SwapTransferBatchStatus, TransactionInfo } from './store/routeAssets/types';
@@ -256,7 +256,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
       }
 
       // To start running as Telegram Web App (desktop capabilities)
-      tmaSdkService.init(data?.TG_BOT_URL);
+      // tmaSdkService.init(data?.TG_BOT_URL);
 
       await this.setApiKeys(data?.API_KEYS);
       // __________ADAR______________________________________________________
@@ -386,7 +386,7 @@ export default class App extends Mixins(mixins.TransactionMixin, NodeErrorMixin)
   async beforeDestroy(): Promise<void> {
     window.removeEventListener('localStorageUpdated', this.handleLocalStorageChange);
     window.removeEventListener('resize', this.setResponsiveClassDebounced);
-    tmaSdkService.destroy();
+    // tmaSdkService.destroy();
     await this.resetInternalSubscriptions();
     await this.resetNetworkSubscriptions();
     this.resetBlockNumberSubscription();

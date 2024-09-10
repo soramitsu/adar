@@ -18,8 +18,7 @@
       "webpack-env",
       "jest",
       "node",
-      "element-ui",
-      "telegram-web-app"
+      "element-ui"
     ],
     "paths": {
       "@/*": [
