@@ -2137,6 +2137,7 @@
     rxjs "^7.8.0"
 
 "@polkadot/api@11.2.1", "polkadotApi@npm:@polkadot/api@11.2.1":
+  name polkadotApi
   version "11.2.1"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-11.2.1.tgz#b19a8e22367703333e71f3613095f76f0dbbca70"
   integrity sha512-NwcWadMt+mrJ3T7RuwpnaIYtH4x0eix+GiKRtLMtIO32uAfhwVyMnqvLtxDxa4XDJ/es2rtSMYG+t0b1BTM+xQ==
@@ -3681,11 +3682,6 @@
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity "sha1-IPGClPeX8iCbX2XI47XI6CYdEnw= sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw=="
-
-"@types/telegram-web-app@^7.3.1":
-  version "7.3.1"
-  resolved "https://registry.yarnpkg.com/@types/telegram-web-app/-/telegram-web-app-7.3.1.tgz#9edf1c18674b29c5abcf8f699fb8f367f6dae8ae"
-  integrity "sha1-nt8cGGdLKcWrz49pn7jzZ/ba6K4= sha512-88VN+61MM6R3G0hhaHGJR+hMAazmNcfg568cn2WcGWZU4iAjzmogWZTgmZmwfaexrCdZ6PLVwoiQRoOX5/Djcg=="
 
 "@types/tough-cookie@*":
   version "4.0.2"
@@ -12503,7 +12499,7 @@ plist@^3.0.1, plist@^3.0.4:
 pngjs@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-5.0.0.tgz#e79dd2b215767fd9c04561c01236df960bce7fbb"
-  integrity sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw==
+  integrity "sha1-553SshV2f9nARWHAEjbflgvOf7s= sha512-40QW5YalBNfQo5yRYmiw7Yz6TKKVr3h6970B2YE+3fQpsWcrbj1PzJgxeJ19DRQjhMbKPIuMY8rFaXc8moolVw=="
 
 portfinder@^1.0.26:
   version "1.0.32"

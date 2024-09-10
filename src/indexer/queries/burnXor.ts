@@ -155,37 +155,6 @@ const getSubsquidXorBurnQuery = (address?: string) => gql<ConnectionQueryRespons
   }
 `;
 
-const SubsquidXorBurnQuery = gql<ConnectionQueryResponse<HistoryElement>>`
-  query XorBurnQuery($start: Int = 0, $end: Int = 0, $after: String = null, $first: Int = 100) {
-    data: historyElementsConnection(
-      orderBy: id_ASC
-      first: $first
-      after: $after
-      where: {
-        AND: [
-          { blockHeight_gte: $start }
-          { blockHeight_lte: $end }
-          { module_eq: "assets" }
-          { method_eq: "burn" }
-          { data_jsonContains: { assetId: "0x0200000000000000000000000000000000000000000000000000000000000000" } }
-        ]
-      }
-    ) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      edges {
-        node {
-          address
-          data
-          blockHeight
-        }
-      }
-    }
-  }
-`;
-
 const parse = (item: HistoryElement): XorBurn => {
   const data = item.data as HistoryElementAssetBurn;
 

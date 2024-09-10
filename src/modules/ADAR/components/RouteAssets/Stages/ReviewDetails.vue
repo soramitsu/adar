@@ -212,6 +212,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   @getter.routeAssets.isLiquidityUnavailable isLiquidityUnavailable!: boolean;
   @getter.wallet.account.assetsDataTable private assetsDataTable!: WALLET_TYPES.AssetsTable;
   @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
+  @getter.routeAssets.transferTokenBalance transferTokenBalance!: (address: string | undefined) => FPNumber;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -310,8 +311,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   }
 
   tokenTransferAmountRequired(asset: Asset, requiredValue: FPNumber) {
-    const userAssetBalanceString = this.getTokenBalance(asset);
-    const userAssetBalance = FPNumber.fromCodecValue(userAssetBalanceString, asset.decimals);
+    const userAssetBalance = this.transferTokenBalance(asset.address);
     return requiredValue.sub(userAssetBalance);
   }
 

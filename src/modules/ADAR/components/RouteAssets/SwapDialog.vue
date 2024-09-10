@@ -1,9 +1,7 @@
 <template>
-  <div class="swap-dialog">
-    <dialog-base :visible.sync="isVisible" :title="'Swap'" custom-class="dialog__swap">
-      <Swap v-loading="swapLoading" ref="swap" />
-    </dialog-base>
-  </div>
+  <dialog-base :visible.sync="isVisible" :title="'Swap'" custom-class="dialog__swap" append-to-body>
+    <Swap v-loading="swapLoading" ref="swap" />
+  </dialog-base>
 </template>
 
 <script lang="ts">
@@ -68,7 +66,6 @@ export default class SwapDialog extends Mixins(mixins.TransactionMixin, mixins.D
 
 <style lang="scss">
 .dialog__swap {
-  z-index: 3000 !important;
   .el-dialog {
     max-width: 500px;
     padding: 20px;
