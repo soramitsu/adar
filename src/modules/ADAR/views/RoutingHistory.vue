@@ -159,8 +159,8 @@ export default class RoutingHistory extends Mixins(mixins.LoadingMixin, Translat
 
   @Watch('address')
   private async addressUpdated(newAddress: string) {
+    this.adarTxs = [];
     if (this.validAddress) {
-      this.adarTxs = [];
       this.adarTxs = await fetchData(this.address);
     }
   }
