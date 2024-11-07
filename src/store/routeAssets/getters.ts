@@ -28,6 +28,10 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.recipients;
   },
+  externalRecipients(...args): Array<Recipient> {
+    const { state } = routeAssetsGetterContext(args);
+    return state.recipients.filter((recipient) => recipient.targetNetwork);
+  },
   validRecipients(...args): Array<Recipient> {
     const { state } = routeAssetsGetterContext(args);
     return state.recipients.filter((recipient) => api.validateAddress(recipient.wallet));
@@ -350,6 +354,23 @@ const getters = defineGetters<RouteAssetsState>()({
         recipientsNumber: assetArray.length,
       };
     });
+  },
+
+  hasBridgeTxs(...args): boolean {
+    const { state } = routeAssetsGetterContext(args);
+    return state.recipients.some((item) => item.targetNetwork);
+  },
+
+  isExternalTransaction(...args): boolean {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.isExternalTransaction;
+  },
+
+  externalTransactionFee(...args): FPNumber {
+    const { state, rootState } = routeAssetsGetterContext(args);
+    const priceObject = rootState.wallet.account.fiatPriceObject;
+    const price = getAssetUSDPrice(state.processingState.bridgeTransactionsState.inputToken, priceObject);
+    return FPNumber.fromCodecValue(state.processingState.bridgeTransactionsState.networkFee).mul(price);
   },
 });
 

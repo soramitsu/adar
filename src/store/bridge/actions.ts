@@ -23,6 +23,7 @@ import {
   getOutgoingEvmTransactionData,
   getIncomingEvmTransactionData,
   waitForApprovedRequest,
+  getMultipleEvmTransactionData,
 } from '@/utils/bridge/eth/utils';
 import evmBridge from '@/utils/bridge/evm';
 import { evmBridgeApi } from '@/utils/bridge/evm/api';
@@ -719,6 +720,45 @@ const actions = defineActions({
       value: tx.amount,
       recipient: tx.to,
       getContractAddress: rootGetters.web3.contractAddress,
+      request,
+    });
+
+    const transaction: ethers.TransactionResponse = await contract[method](...args);
+
+    return transaction;
+  },
+
+  async signEthBridgeOutgoingMultipleEvm(context, id: string): Promise<ethers.TransactionResponse> {
+    const { rootState, rootGetters } = bridgeActionContext(context);
+    const tx = ethBridgeApi.getHistory(id) as Nullable<EthHistory>;
+
+    if (!tx) throw new Error('TX cannot be empty!');
+    if (!tx.id) throw new Error('TX id cannot be empty!');
+    if (!tx.amount) throw new Error('TX amount cannot be empty!');
+    if (!tx.assetAddress) throw new Error('TX assetAddress cannot be empty!');
+    if (!tx.to) throw new Error('TX to cannot be empty!');
+
+    const asset = rootGetters.assets.assetDataByAddress(tx.assetAddress);
+
+    if (!asset?.externalAddress) throw new Error(`Asset not registered: ${tx.assetAddress}`);
+
+    const request = await waitForApprovedRequest(tx);
+
+    if (!ethersUtil.addressesAreEqual(rootState.web3.evmAddress, request.to)) {
+      throw new Error(`Change account in ethereum wallet to ${request.to}`);
+    }
+
+    checkEvmNetwork(context);
+
+    const wallets = rootGetters.routeAssets.externalRecipients.map((item) => item.wallet);
+    const amounts = rootGetters.routeAssets.externalRecipients.map((item) => item.amount?.toCodecString() ?? '');
+
+    const { contract, method, args } = await getMultipleEvmTransactionData({
+      asset,
+      value: tx.amount,
+      recipient: tx.to,
+      recipients: wallets,
+      amounts,
       request,
     });
 

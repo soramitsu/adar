@@ -102,6 +102,18 @@
           </template>
         </s-table-column>
 
+        <!-- IN TOKENS -->
+        <s-table-column>
+          <template #header>
+            <span>{{ 'NETWORK' }}</span>
+          </template>
+          <template v-slot="{ row }">
+            <div>
+              <span class="">{{ row.targetNetwork }}</span>
+            </div>
+          </template>
+        </s-table-column>
+
         <!-- STATUS -->
         <s-table-column prop="status" class="status-property" width="158">
           <template #header>
@@ -144,7 +156,9 @@
       </s-button>
       <div class="total-container">
         <span>{{ t('adar.routeAssets.total') }}:&nbsp;</span>
-        <span class="usd">{{ overallUSDNumber }}</span>
+        <span class="usd">{{ overallUSDNumber }}</span> <br />
+        <span>{{ 'bridge fee' }}:&nbsp;</span>
+        <span class="usd">{{ externalTransactionFee.toLocaleString(2) }}</span>
       </div>
       <s-button type="primary" class="s-typography-button--big" @click.stop="onContinueClick">
         {{ t('adar.routeAssets.continue') }}
@@ -186,6 +200,7 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   @action.routeAssets.processingPreviousStage previousStage!: any;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.externalTransactionFee externalTransactionFee!: FPNumber;
   @mutation.routeAssets.toggleUseTransfer toggleUseTransfer!: (id: string) => void;
 
   showSelectInputAssetDialog = false;
@@ -205,6 +220,11 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
         title: '',
       });
     }
+  }
+
+  randomInt(amount: string) {
+    const numb = new FPNumber(amount).mul(new FPNumber(0.02)).toNumber();
+    return new FPNumber(Math.random() * numb).toLocaleString(2);
   }
 
   pageAmount = 10;

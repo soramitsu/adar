@@ -108,6 +108,25 @@
       </div>
       <div class="buttons-container">
         <s-button
+          v-if="!isLoggedIn"
+          class="s-typography-button--big"
+          data-test-name="connectPolkadot"
+          type="primary"
+          @click="connectWallet(false)"
+        >
+          {{ t('connectWalletText') }}
+        </s-button>
+        <s-button
+          v-else-if="!externalAccount && hasBridgeTxs"
+          class="el-button--connect s-typography-button--big"
+          data-test-name="useMetamaskProvider"
+          type="primary"
+          @click="connectWallet(true)"
+        >
+          {{ t('connectWalletText') }}
+        </s-button>
+        <s-button
+          v-else
           type="primary"
           class="s-typography-button--big"
           :disabled="nextButtonDisabled"
@@ -128,6 +147,7 @@
       @changeIssueIdx="changeIssueIdx"
     ></fix-issues-dialog>
     <select-token :visible.sync="showSelectInputAssetDialog" :connected="isLoggedIn" @select="onInputAssetSelected" />
+    <select-provider-dialog />
   </div>
 </template>
 
@@ -142,7 +162,7 @@ import { Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent } from '@/router';
-import { action, getter, state } from '@/store/decorators';
+import { action, getter, state, mutation } from '@/store/decorators';
 import { MaxInputAmountInfo, OutcomeAssetsAmount, Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 import { getAssetBalance } from '@/utils';
@@ -153,6 +173,7 @@ import { getAssetBalance } from '@/utils';
     InfoLine: components.InfoLine,
     SelectToken: lazyComponent(Components.SelectToken),
     TokenAddress: components.TokenAddress,
+    SelectProviderDialog: lazyComponent(Components.SelectProviderDialog),
   },
 })
 export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.FormattedAmountMixin) {
@@ -164,9 +185,14 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
   @action.routeAssets.processingPreviousStage previousStage!: () => void;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
+  @action.routeAssets.bridgeTransactionsInit bridgeTransactionsInit!: () => void;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
+  @mutation.web3.setSoraAccountDialogVisibility public setSoraAccountDialogVisibility!: (flag: boolean) => void;
+  @mutation.web3.setSelectProviderDialogVisibility setSelectProviderDialogVisibility!: (flag: boolean) => void;
+  @getter.bridge.recipient externalAccount!: string;
+  @getter.routeAssets.hasBridgeTxs hasBridgeTxs!: boolean;
 
   fixIssuesDialog = false;
   isSpinner = true;
@@ -253,7 +279,10 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
 
   nextButtonAction() {
     if (this.incorrectRecipients.length > 0) this.fixIssuesDialog = true;
-    else this.nextStage();
+    else {
+      this.bridgeTransactionsInit();
+      this.nextStage();
+    }
   }
 
   cancelButtonAction() {
@@ -266,6 +295,11 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
 
   changeIssueIdx(newValue) {
     this.currentIssueIdx = newValue;
+  }
+
+  connectWallet(isExternalWallet: boolean): void {
+    if (isExternalWallet) this.setSelectProviderDialogVisibility(true);
+    else this.setSoraAccountDialogVisibility(true);
   }
 
   @Watch('incorrectRecipientsLength', { deep: true })

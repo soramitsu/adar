@@ -27,6 +27,7 @@
         </div>
         <s-divider />
         <div class="transfer-assets-section">
+          <p v-if="isExternalTransaction" class="external-tx-label">EXTERNAL</p>
           <p class="transfer-assets-section__title">
             <s-icon v-if="transferBalanceErrors || amountBalanceError" class="icon-status" name="basic-clear-X-xs-24" />
             {{ t('adar.routeAssets.stages.reviewDetails.useTransferTitle') }}
@@ -213,6 +214,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   @getter.wallet.account.assetsDataTable private assetsDataTable!: WALLET_TYPES.AssetsTable;
   @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
   @getter.routeAssets.transferTokenBalance transferTokenBalance!: (address: string | undefined) => FPNumber;
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -507,6 +509,7 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     border-radius: 10px;
     background: var(--s-color-utility-body);
     padding: 16px;
+    position: relative;
 
     &__title {
       font-weight: 500;
@@ -679,5 +682,22 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
 i.icon-status {
   font-size: 16px !important;
   color: var(--s-color-status-error);
+}
+
+.external-tx-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 6px;
+  color: var(--s-color-base-background);
+  background: linear-gradient(135deg, var(--s-color-theme-accent-hover), var(--s-color-theme-accent));
+  font-weight: bold;
+  font-size: 10px;
+  border-radius: 2px 10px 2px 10px;
+  box-shadow: 0 4px 8px var(--s-color-base-background-hover);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.2s ease-in-out;
+  pointer-events: none;
 }
 </style>

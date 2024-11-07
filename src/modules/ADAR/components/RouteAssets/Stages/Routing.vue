@@ -1,5 +1,6 @@
 <template>
-  <div class="container route-assets-routing-process">
+  <RoutingBridge v-if="hasBridgeTxs" />
+  <div v-else class="container route-assets-routing-process">
     <div>
       <div v-loading="spinner" class="route-assets-routing-process__spinner">
         <div class="status">
@@ -55,6 +56,7 @@ import { components } from '@soramitsu/soraneo-wallet-web';
 import { groupBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
 
+import BridgeTransactionMixin from '@/components/mixins/BridgeTransactionMixin';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { getErrorMessage } from '@/modules/ADAR/utils';
@@ -66,7 +68,9 @@ import {
   SwapTransferBatchStatus,
 } from '@/store/routeAssets/types';
 
-import type { HistoryItem } from '@sora-substrate/util';
+import RoutingBridge from './RoutingBridge.vue';
+
+import type { HistoryItem, IBridgeTransaction } from '@sora-substrate/util';
 
 @Component({
   components: {
@@ -74,9 +78,10 @@ import type { HistoryItem } from '@sora-substrate/util';
     Spinner,
     TokenAddress: components.TokenAddress,
     InfoLine: components.InfoLine,
+    RoutingBridge,
   },
 })
-export default class RoutingAssets extends Mixins(TranslationMixin) {
+export default class RoutingAssets extends Mixins(TranslationMixin, BridgeTransactionMixin) {
   @action.routeAssets.processingNextStage nextStage!: () => void;
   @getter.routeAssets.inputToken inputToken!: Asset;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
@@ -85,9 +90,12 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.transferTxsAmountInfo transferTxsAmountInfo!: Array<OutcomeAssetsAmount>;
   @getter.routeAssets.swapTxsAmountInfo swapTxsAmountInfo!: Array<OutcomeAssetsAmount>;
+  @getter.bridge.historyItem private historyItem!: Nullable<IBridgeTransaction>;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
+
+  @getter.routeAssets.hasBridgeTxs hasBridgeTxs!: boolean;
 
   get continueButtonDisabled() {
     return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);
@@ -160,6 +168,10 @@ export default class RoutingAssets extends Mixins(TranslationMixin) {
 
   get status() {
     return this.batchTxStatus;
+  }
+
+  get tx(): Nullable<IBridgeTransaction> {
+    return this.historyItem;
   }
 }
 </script>
