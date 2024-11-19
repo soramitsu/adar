@@ -228,11 +228,6 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
     }
   }
 
-  randomInt(amount: string) {
-    const numb = new FPNumber(amount).mul(new FPNumber(0.02)).toNumber();
-    return new FPNumber(Math.random() * numb).toLocaleString(2);
-  }
-
   pageAmount = 10;
 
   onUseTransferClick(id: string) {

@@ -162,7 +162,7 @@ import { Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent } from '@/router';
-import { action, getter, state, mutation } from '@/store/decorators';
+import { action, getter, mutation } from '@/store/decorators';
 import { MaxInputAmountInfo, OutcomeAssetsAmount, Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 import { getAssetBalance } from '@/utils';

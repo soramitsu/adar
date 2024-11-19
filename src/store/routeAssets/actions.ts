@@ -84,7 +84,7 @@ const actions = defineActions({
   },
 
   async updateRecipients(context, file?: File): Promise<void> {
-    const { commit, dispatch, rootState, getters, rootDispatch } = routeAssetsActionContext(context);
+    const { commit, dispatch, rootState, getters } = routeAssetsActionContext(context);
 
     if (!file) {
       commit.clearData();

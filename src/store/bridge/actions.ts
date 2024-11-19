@@ -747,7 +747,7 @@ const actions = defineActions({
     checkEvmNetwork(context);
     const { blockId = '', from = '' } = tx;
 
-    const blockNumber = await rootDispatch.routeAssets.getBlockNumber(blockId as string);
+    const blockNumber = await rootDispatch.routeAssets.getBlockNumber(blockId);
     rootCommit.routeAssets.setTxInfo({ txId: id, blockId, from, blockNumber });
     rootCommit.routeAssets.setTxDatetime(new Date());
     rootCommit.routeAssets.updateTxHistoryData(tx);

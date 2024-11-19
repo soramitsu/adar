@@ -21,9 +21,7 @@ import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { getter, action, mutation, state } from '@/store/decorators';
 import { SwapTransferBatchStatus } from '@/store/routeAssets/types';
-import { FeatureFlags } from '@/store/settings/types';
 import { NetworkData } from '@/types/bridge';
-import { SubNetworksConnector } from '@/utils/bridge/sub/classes/adapter';
 
 import AdarStats from '../components/Stats/adarStats.vue';
 

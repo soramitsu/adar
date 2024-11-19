@@ -358,11 +358,6 @@ const getters = defineGetters<RouteAssetsState>()({
     });
   },
 
-  hasBridgeTxs(...args): boolean {
-    const { state } = routeAssetsGetterContext(args);
-    return state.recipients.some((item) => item.targetNetwork);
-  },
-
   isExternalTransaction(...args): boolean {
     const { state } = routeAssetsGetterContext(args);
     return state.processingState.isExternalTransaction;

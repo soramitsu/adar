@@ -202,7 +202,6 @@ export default class RoutingBridge extends Mixins(
   @state.bridge.externalBlockNumber private externalBlockNumber!: number;
   @state.bridge.waitingForApprove private waitingForApprove!: Record<string, boolean>;
   @state.bridge.inProgressIds private inProgressIds!: Record<string, boolean>;
-  @state.router.prev private prevRoute!: Nullable<PageNames>;
 
   @getter.bridge.historyItem private historyItem!: Nullable<IBridgeTransaction>;
   @getter.bridge.externalAccount private externalAccount!: string;
@@ -243,14 +242,6 @@ export default class RoutingBridge extends Mixins(
 
   get amountReceived(): string {
     return this.historyItem?.amount2 ?? this.amount;
-  }
-
-  get amountFiatValue(): Nullable<string> {
-    return this.asset ? this.getFiatAmountByString(this.amount, this.asset) : null;
-  }
-
-  get amountReceivedFiatValue(): Nullable<string> {
-    return this.asset ? this.getFiatAmountByString(this.amountReceived, this.asset) : null;
   }
 
   get formattedAmount(): string {
@@ -329,10 +320,6 @@ export default class RoutingBridge extends Mixins(
 
   get txDate(): string {
     return this.formatDatetime(this.historyItem);
-  }
-
-  get txState(): string {
-    return this.historyItem?.transactionState ?? BridgeTxStatus.Pending;
   }
 
   get isTxFailed(): boolean {
@@ -500,14 +487,6 @@ export default class RoutingBridge extends Mixins(
     if (!this.isOutgoing) return this.txSoraHash;
 
     return this.txSoraHash || this.txInternalBlockId || this.txSoraId;
-  }
-
-  get accountLinks(): LinkData[] {
-    const name = this.t('accountAddressText');
-    const internal = this.getLinkData(this.txInternalAccount, this.internalAccountLinks, name);
-    const external = this.getLinkData(this.txExternalAccount, this.externalAccountLinks, name, this.externalNetworkId);
-
-    return this.sortLinksByTxDirection([internal, external]);
   }
 
   get transactionLinks(): LinkData[] {

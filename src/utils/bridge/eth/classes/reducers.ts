@@ -1,4 +1,4 @@
-import { FPNumber, type IBridgeTransaction } from '@sora-substrate/util';
+import { type IBridgeTransaction } from '@sora-substrate/util';
 import { SUBQUERY_TYPES, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import first from 'lodash/fp/first';
 
