@@ -729,7 +729,7 @@ const actions = defineActions({
   },
 
   async signEthBridgeOutgoingMultipleEvm(context, id: string): Promise<ethers.TransactionResponse> {
-    const { rootState, rootGetters } = bridgeActionContext(context);
+    const { rootDispatch, rootGetters, rootCommit } = bridgeActionContext(context);
     const tx = ethBridgeApi.getHistory(id) as Nullable<EthHistory>;
 
     if (!tx) throw new Error('TX cannot be empty!');
@@ -744,20 +744,21 @@ const actions = defineActions({
 
     const request = await waitForApprovedRequest(tx);
 
-    if (!ethersUtil.addressesAreEqual(rootState.web3.evmAddress, request.to)) {
-      throw new Error(`Change account in ethereum wallet to ${request.to}`);
-    }
-
     checkEvmNetwork(context);
+    const { blockId = '', from = '' } = tx;
 
-    const wallets = rootGetters.routeAssets.externalRecipients.map((item) => item.wallet);
-    const amounts = rootGetters.routeAssets.externalRecipients.map((item) => item.amount?.toCodecString() ?? '');
+    const blockNumber = await rootDispatch.routeAssets.getBlockNumber(blockId as string);
+    rootCommit.routeAssets.setTxInfo({ txId: id, blockId, from, blockNumber });
+    rootCommit.routeAssets.setTxDatetime(new Date());
+    rootCommit.routeAssets.updateTxHistoryData(tx);
+
+    const { recipients, amounts } = tx.payload;
 
     const { contract, method, args } = await getMultipleEvmTransactionData({
       asset,
       value: tx.amount,
       recipient: tx.to,
-      recipients: wallets,
+      recipients,
       amounts,
       request,
     });

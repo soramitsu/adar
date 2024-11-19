@@ -156,10 +156,13 @@ const mutations = defineMutations<RouteAssetsState>()({
   setExternalTxInputToken(state, asset): void {
     state.processingState.bridgeTransactionsState.inputToken = asset;
   },
+  setExternalTotalAmount(state, value: FPNumber): void {
+    state.processingState.bridgeTransactionsState.totalAmount = value;
+  },
   setAdarTransactionExternal(state, isExternal): void {
     state.processingState.isExternalTransaction = isExternal;
   },
-  setBridgeNetworkFee(state, networkFee): void {
+  setExternalNetworkFee(state, networkFee): void {
     state.processingState.bridgeTransactionsState.networkFee = networkFee;
   },
   setTargetNetworkTokenAddress(state, targetNetworkTokenAddress): void {

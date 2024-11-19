@@ -234,7 +234,6 @@ export class Bridge<
     const reducer = transaction.payload.isMultiple
       ? (this.reducers as any).EthBridgeOutgoingMultiple
       : this.reducers[transaction.type];
-    console.dir(reducer);
 
     if (!reducer) {
       throw new Error(`[${this.constructor.name}]: No reducer for operation: '${transaction.type}'`);

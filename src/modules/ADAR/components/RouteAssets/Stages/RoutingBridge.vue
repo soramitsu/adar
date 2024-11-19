@@ -23,35 +23,42 @@
           </formatted-amount>
         </h5>
       </div>
-
-      <div
-        v-for="{ value, formatted, placeholder, tooltip, links } in accountLinks"
-        class="transaction-hash-container transaction-hash-container--with-dropdown"
-        :key="value"
-      >
-        <s-input :placeholder="placeholder" :value="formatted" readonly />
-        <s-button
-          class="s-button--hash-copy"
-          type="action"
-          alternative
-          icon="basic-copy-24"
-          :tooltip="tooltip"
-          @click="handleCopyAddress(value, $event)"
-        />
-        <links-dropdown v-if="links.length" :links="links" />
-      </div>
+      <s-collapse>
+        <s-collapse-item>
+          <template #title>
+            <div class="amount-info__asset-symbol">
+              <i :class="`network-icon network-icon--${getNetworkIcon(externalNetworkId)}`" />
+              <div class="amount-info__asset-info">
+                <div class="amount-info__asset-info-line amount-info__asset-info-line_upper">
+                  <div class="amount-info__asset-label">{{ assetSymbol }}</div>
+                  <div class="amount-info__tx-type">
+                    {{ 'external' }}
+                  </div>
+                </div>
+                <div class="amount-info__asset-info-line">
+                  <span>{{ `${formattedAmount} ${assetSymbol}  ` }}</span>
+                  <span class="usd">{{ overallUSDNumber }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+          <div>
+            <info-line
+              v-for="(recipient, idx) in recipients"
+              :key="idx"
+              :asset-symbol="assetSymbol"
+              :label="formatAddress(recipient.wallet, 16)"
+              :value="recipient.amount?.toLocaleString()"
+              class="transfer-assets-section__asset-data"
+              is-formatted
+            >
+            </info-line>
+          </div>
+        </s-collapse-item>
+      </s-collapse>
 
       <info-line :class="failedClass" :label="t('bridgeTransaction.networkInfo.status')" :value="transactionStatus" />
       <info-line :label="t('bridgeTransaction.networkInfo.date')" :value="txDate" />
-      <info-line
-        v-if="amount"
-        is-formatted
-        value-can-be-hidden
-        :label="t('bridgeTransaction.networkInfo.amount')"
-        :value="formattedAmount"
-        :asset-symbol="assetSymbol"
-        :fiat-value="amountFiatValue"
-      />
       <info-line
         is-formatted
         :label="getNetworkText(t('bridgeTransaction.networkInfo.transactionFee'))"
@@ -137,8 +144,8 @@
         {{ t('bridgeTransaction.approveToken') }}
       </div>
     </div>
-    <s-button v-if="txIsFinilized" class="s-typography-button--large" type="secondary" @click="navigateToBridge">
-      {{ t('bridgeTransaction.newTransaction') }}
+    <s-button v-if="txIsFinilized" class="s-typography-button--large" type="primary" @click="nextStage">
+      {{ t('adar.routeAssets.continue') }}
     </s-button>
   </div>
 </template>
@@ -147,7 +154,7 @@
 import { KnownSymbols } from '@sora-substrate/util/build/assets/consts';
 import { BridgeTxStatus } from '@sora-substrate/util/build/bridgeProxy/consts';
 import { components, mixins, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
-import { Component, Mixins } from 'vue-property-decorator';
+import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import BridgeMixin from '@/components/mixins/BridgeMixin';
 import BridgeTransactionMixin from '@/components/mixins/BridgeTransactionMixin';
@@ -155,6 +162,7 @@ import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
 import { Components, PageNames, ZeroStringValue } from '@/consts';
 import router, { lazyComponent } from '@/router';
 import { action, state, getter, mutation } from '@/store/decorators';
+import { Recipient } from '@/store/routeAssets/types';
 import { hasInsufficientBalance, hasInsufficientXorForFee, hasInsufficientNativeTokenForFee } from '@/utils';
 import { isUnsignedTx } from '@/utils/bridge/common/utils';
 import { subBridgeApi } from '@/utils/bridge/sub/api';
@@ -201,9 +209,12 @@ export default class RoutingBridge extends Mixins(
 
   @action.bridge.removeHistory private removeHistory!: ({ tx, force }: { tx: any; force?: boolean }) => Promise<void>;
   @action.bridge.handleBridgeTransaction private handleBridgeTransaction!: (id: string) => Promise<void>;
+  @action.routeAssets.markTxSuccessfull private markTxSuccessfull!: () => Promise<void>;
   @mutation.bridge.setHistoryId private setHistoryId!: (id?: string) => void;
+  @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
+  @getter.routeAssets.externalRecipients recipients!: Array<Recipient>;
+  @action.routeAssets.processingNextStage nextStage!: () => void;
 
-  // BridgeTransactionMixin override
   get tx(): Nullable<IBridgeTransaction> {
     return this.historyItem;
   }
@@ -485,10 +496,6 @@ export default class RoutingBridge extends Mixins(
     }
   }
 
-  handleBack(): void {
-    router.push({ name: this.prevRoute as string | undefined });
-  }
-
   get txInternalHash(): string {
     if (!this.isOutgoing) return this.txSoraHash;
 
@@ -521,6 +528,11 @@ export default class RoutingBridge extends Mixins(
     );
 
     return this.sortLinksByTxDirection([internal, parachain, external]);
+  }
+
+  @Watch('txIsFinilized')
+  onTxFinishedSuccessfully(value: boolean) {
+    if (value) this.markTxSuccessfull();
   }
 
   private sortLinksByTxDirection(outgoingOrderedLinks: Array<LinkData | null>): LinkData[] {
@@ -602,6 +614,26 @@ $header-font-size: var(--s-heading3-font-size);
         font-weight: 300;
       }
     }
+    .el-collapse.neumorphic .el-icon-arrow-right {
+      transition: transform 0.3s;
+
+      margin-left: 6px;
+      height: 15px;
+      line-height: 15px;
+      width: 15.8px;
+      padding: 0;
+
+      background-color: var(--s-color-base-content-tertiary);
+      color: var(--s-color-base-on-accent) !important;
+      border-radius: var(--s-border-radius-medium);
+      font-size: 16px;
+    }
+
+    .el-collapse-item__header {
+      height: 64px;
+      position: relative;
+      margin-bottom: 12px;
+    }
   }
   &-hash-container {
     .s-button--hash-copy {
@@ -647,6 +679,68 @@ $header-font-size: var(--s-heading3-font-size);
 
 <style lang="scss" scoped>
 $network-title-max-width: 250px;
+
+.amount-info {
+  &__asset-symbol {
+    font-weight: 800;
+    font-size: 18px;
+    @include flex-start;
+    gap: 8px;
+    margin-right: auto;
+  }
+  &__info {
+    margin: 12px auto;
+
+    &-line {
+      @include flex-center;
+      justify-content: space-between;
+    }
+  }
+
+  &__token-selection {
+    font-weight: 600;
+    font-size: var(--s-font-size-medium);
+    @include flex-center;
+    justify-content: space-between;
+  }
+
+  &__asset-info-line {
+    font-style: normal;
+    font-weight: 300;
+    &_upper {
+      font-weight: 600;
+      @include flex-start;
+      gap: 4px;
+    }
+  }
+
+  &__asset-info {
+    @include flex-center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    line-height: var(--s-line-height-base);
+    font-size: 12px;
+  }
+
+  &__tx-type {
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    background-color: var(--s-color-base-on-accent);
+    border-radius: 4px;
+    padding: 2px 4px;
+  }
+  &__asset-label {
+    font-size: 18px;
+    font-weight: 800;
+  }
+  margin: 16px auto;
+  box-shadow: var(--s-shadow-element);
+  border-radius: 30px;
+  background: var(--s-color-utility-body);
+  padding: 16px;
+}
 
 .transaction {
   &-container {
@@ -748,6 +842,14 @@ $network-title-max-width: 250px;
       font-size: var(--s-heading3-font-size);
       font-weight: 300;
     }
+  }
+}
+
+.usd {
+  color: var(--s-color-fiat-value);
+  &::before {
+    content: '$';
+    display: inline;
   }
 }
 </style>

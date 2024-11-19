@@ -52,7 +52,6 @@ export default class RouteAssets extends Mixins(
 ) {
   @action.routeAssets.subscribeOnReserves private subscribeOnReserves!: () => void;
   @action.routeAssets.cleanSwapReservesSubscription private cleanSwapReservesSubscription!: () => void;
-  @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
   @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
@@ -60,7 +59,6 @@ export default class RouteAssets extends Mixins(
   @state.wallet.account.address private address!: string;
   @getter.routeAssets.pricesAreUpdated private pricesAreUpdated!: boolean;
   @state.wallet.transactions.externalHistory private externalHistory!: AccountHistory<HistoryItem>;
-  @state.wallet.transactions.externalHistoryUpdates private externalHistoryUpdates!: AccountHistory<HistoryItem>;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
 
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
@@ -81,13 +79,12 @@ export default class RouteAssets extends Mixins(
   @action.bridge.resetBridgeForm private resetBridgeForm!: AsyncFnWithoutArgs;
   @mutation.bridge.resetBlockUpdatesSubscription private resetBlockUpdatesSubscription!: FnWithoutArgs;
   @mutation.bridge.resetOutgoingMaxLimitSubscription private resetOutgoingMaxLimitSubscription!: FnWithoutArgs;
-  @getter.web3.selectedNetwork private selectedNetwork!: Nullable<NetworkData>;
-  @getter.bridge.externalAccount private externalAccount!: string;
   // bridge transaction signing
   @getter.web3.subAccount public subAccount!: WALLET_TYPES.PolkadotJsAccount;
-  @state.bridge.subBridgeConnector private subBridgeConnector!: SubNetworksConnector;
   @state.bridge.isSignTxDialogVisible public isSignTxDialogVisible!: boolean;
   @mutation.bridge.setSignTxDialogVisibility public setSignTxDialogVisibility!: (flag: boolean) => void;
+  @action.routeAssets.bridgeTransactionsInit bridgeTransactionsInit!: () => Promise<void>;
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   timerId: Nullable<NodeJS.Timeout> = null;
 
@@ -98,6 +95,7 @@ export default class RouteAssets extends Mixins(
 
       this.setStartSubscriptions([this.subscribeOnBlockUpdates, this.updateOutgoingMaxLimit, this.updateBridgeApps]);
       this.setResetSubscriptions([this.resetBlockUpdatesSubscription, this.resetOutgoingMaxLimitSubscription]);
+      if (this.isExternalTransaction) this.bridgeTransactionsInit();
     });
   }
 

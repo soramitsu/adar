@@ -117,7 +117,7 @@
           {{ t('connectWalletText') }}
         </s-button>
         <s-button
-          v-else-if="!externalAccount && hasBridgeTxs"
+          v-else-if="!externalAccount && isExternalTransaction"
           class="el-button--connect s-typography-button--big"
           data-test-name="useMetamaskProvider"
           type="primary"
@@ -153,7 +153,7 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/util/build';
-import { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
+import { Asset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
@@ -185,14 +185,14 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
   @action.routeAssets.processingPreviousStage previousStage!: () => void;
   @action.routeAssets.cancelProcessing private cancelProcessing!: () => void;
   @action.routeAssets.setInputToken setInputToken!: (asset: Asset) => void;
-  @action.routeAssets.bridgeTransactionsInit bridgeTransactionsInit!: () => void;
+  @action.routeAssets.bridgeTransactionsInit bridgeTransactionsInit!: () => Promise<void>;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
   @mutation.web3.setSoraAccountDialogVisibility public setSoraAccountDialogVisibility!: (flag: boolean) => void;
   @mutation.web3.setSelectProviderDialogVisibility setSelectProviderDialogVisibility!: (flag: boolean) => void;
   @getter.bridge.recipient externalAccount!: string;
-  @getter.routeAssets.hasBridgeTxs hasBridgeTxs!: boolean;
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   fixIssuesDialog = false;
   isSpinner = true;
@@ -277,10 +277,10 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
     return FPNumber.fromCodecValue(balance, this.inputToken.decimals);
   }
 
-  nextButtonAction() {
+  async nextButtonAction() {
     if (this.incorrectRecipients.length > 0) this.fixIssuesDialog = true;
     else {
-      this.bridgeTransactionsInit();
+      if (this.isExternalTransaction) await this.bridgeTransactionsInit();
       this.nextStage();
     }
   }

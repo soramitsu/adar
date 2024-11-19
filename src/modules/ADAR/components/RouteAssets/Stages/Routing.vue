@@ -1,5 +1,5 @@
 <template>
-  <RoutingBridge v-if="hasBridgeTxs" />
+  <RoutingBridge v-if="isExternalTransaction" />
   <div v-else class="container route-assets-routing-process">
     <div>
       <div v-loading="spinner" class="route-assets-routing-process__spinner">
@@ -95,7 +95,7 @@ export default class RoutingAssets extends Mixins(TranslationMixin, BridgeTransa
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
 
-  @getter.routeAssets.hasBridgeTxs hasBridgeTxs!: boolean;
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   get continueButtonDisabled() {
     return [SwapTransferBatchStatus.PENDING, SwapTransferBatchStatus.PASSED].includes(this.status);

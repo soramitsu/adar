@@ -13,7 +13,7 @@ import { firstValueFrom } from 'rxjs';
 import { ActionContext } from 'vuex';
 
 import { ZeroStringValue } from '@/consts';
-import { adarFee } from '@/modules/ADAR/consts';
+import { adarFee, bridgeWrapperContractAddress } from '@/modules/ADAR/consts';
 import { bridgeActionContext } from '@/store/bridge';
 import { routeAssetsActionContext } from '@/store/routeAssets';
 import { delay, hasInsufficientNativeTokenForFee } from '@/utils';
@@ -168,8 +168,6 @@ const actions = defineActions({
       dispatch.subscribeOnReserves();
       if (getters.externalRecipients.length) {
         commit.setAdarTransactionExternal(true);
-        const asset = getters.externalRecipients[0].asset;
-        rootDispatch.bridge.setAssetAddress(asset?.address);
       }
     } catch (error) {
       console.error(error);
@@ -275,7 +273,7 @@ const actions = defineActions({
       });
       return getRecipientTransferParams(context, inputAsset, recipient);
     });
-    if (getters.hasBridgeTxs) {
+    if (getters.isExternalTransaction) {
       await dispatch.runBridgeTransaction();
       return;
     }
@@ -333,36 +331,32 @@ const actions = defineActions({
   // ______________________________________________________________________________________________
 
   async runBridgeTransaction(context): Promise<void> {
-    const { rootState, commit, getters, dispatch, rootDispatch, rootGetters } = routeAssetsActionContext(context);
+    const { getters, rootGetters } = routeAssetsActionContext(context);
 
-    const {
-      rootState: bridgeRootState,
-      commit: bridgeCommit,
-      dispatch: bridgeDispatch,
-      getters: bridgeGetters,
-    } = bridgeActionContext(context);
+    const { commit: bridgeCommit, dispatch: bridgeDispatch } = bridgeActionContext(context);
+
+    const amount = getters.externalTotalAmount.toString();
+    const wallets = rootGetters.routeAssets.externalRecipients.map((item) => item.wallet);
+    const amounts = rootGetters.routeAssets.externalRecipients.map((item) => item.amount?.toCodecString() ?? '');
 
     const tx = await bridgeDispatch.generateHistoryItem({
-      payload: { isMultiple: true },
+      payload: { isMultiple: true, recipients: wallets, amounts },
+      amount: amount,
+      amount2: amount,
+      to: bridgeWrapperContractAddress,
     });
 
     bridgeCommit.setHistoryId(tx.id);
-    console.dir(tx);
     await ethBridge.handleTransaction(tx.id ?? '');
   },
 
   async bridgeTransactionsInit(context): Promise<void> {
-    const { rootState, commit, getters, dispatch, rootDispatch, rootGetters } = routeAssetsActionContext(context);
-
-    const {
-      rootState: bridgeRootState,
-      commit: bridgeCommit,
-      dispatch: bridgeDispatch,
-      getters: bridgeGetters,
-    } = bridgeActionContext(context);
+    const { rootState, commit, getters, dispatch, rootDispatch } = routeAssetsActionContext(context);
 
     const asset = getters.externalRecipients[0].asset;
     commit.setExternalTxInputToken(asset);
+    rootDispatch.bridge.setAssetAddress(asset?.address);
+
     const amount = getters.externalRecipients.reduce((result, recipient) => {
       return result.add(recipient.amount ?? FPNumber.ZERO);
     }, FPNumber.ZERO);
@@ -379,37 +373,52 @@ const actions = defineActions({
     if (!isAccountConnected) {
       console.log(`Account for transfer is not connected`);
     }
-    bridgeDispatch.setSendedAmount(amount.toString());
-    await bridgeDispatch.updateExternalBalance();
-    const evmNetworkFee = await dispatch.getEvmNetworkFee();
-    commit.setBridgeNetworkFee(evmNetworkFee);
-    const evmNativeBalance = await ethersUtil.getAccountBalance(bridgeGetters.externalAccount);
-    const hasEthForFee = !hasInsufficientNativeTokenForFee(evmNativeBalance, evmNetworkFee);
-    console.dir(evmNativeBalance);
+    rootDispatch.bridge.setSendedAmount(amount.toString());
+    await rootDispatch.bridge.updateExternalBalance();
+    dispatch.getEvmNetworkFee().then((evmNetworkFee) => {
+      commit.setExternalNetworkFee(evmNetworkFee);
+    });
+  },
+
+  async haveExternalNativeTokenFee(context: ActionContext<any, any>): Promise<boolean> {
+    const { getters, rootGetters } = routeAssetsActionContext(context);
+    const evmNetworkFee = getters.externalNativeTokenNetworkFee;
+    const evmNativeBalance = await ethersUtil.getAccountBalance(rootGetters.bridge.externalAccount);
+    return !hasInsufficientNativeTokenForFee(evmNativeBalance, evmNetworkFee);
+  },
+
+  markTxSuccessfull(context: ActionContext<any, any>) {
+    const { commit, getters } = routeAssetsActionContext(context);
+    commit.setTxStatus(SwapTransferBatchStatus.SUCCESS);
+    getters.recipients.forEach((reciever) => {
+      commit.setRecipientStatus({
+        id: reciever.id,
+        status: RecipientStatus.SUCCESS,
+      });
+      commit.setRecipientCompleted(reciever.id);
+    });
   },
 
   async getEvmNetworkFee(context: ActionContext<any, any>): Promise<string> {
-    const { commit, getters, state, rootState, rootGetters } = bridgeActionContext(context);
-    const { commit: routeAssetsCommit } = routeAssetsActionContext(context);
+    const { getters, state, rootState, rootGetters } = bridgeActionContext(context);
     const { asset, isRegisteredAsset } = getters;
     const { isValidNetwork } = rootGetters.web3;
     const evmAccount = rootState.web3.evmAddress;
     const soraAccount = rootState.wallet.account.address;
 
     let fee = ZeroStringValue;
-    console.log(asset, isRegisteredAsset, isValidNetwork, evmAccount, soraAccount);
 
     if (asset && isRegisteredAsset && isValidNetwork && evmAccount && soraAccount) {
       const bridgeRegisteredAsset = rootState.assets.registeredAssets[asset.address];
       const decimals = asset.decimals;
       // using max balance to not overflow contract calculation
       const maxAmount = FPNumber.fromCodecValue(state.assetSenderBalance ?? 0, decimals);
-      const amount = new FPNumber(state.amountSend ?? 0, decimals);
-      const value = maxAmount.min(amount).toString();
+      const amount = rootGetters.routeAssets.externalTotalAmount;
+      const value = maxAmount.min(amount as FPNumber).toString();
       fee = await getEthNetworkFee(
         asset,
         bridgeRegisteredAsset.kind,
-        () => '0x5b05244ceCB216A4c14E7CE50cba5182e7F4C2a4',
+        () => bridgeWrapperContractAddress,
         value,
         true,
         soraAccount,
@@ -463,41 +472,6 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
     }
   }
 }
-// __________________________OLD_________________________________________
-
-// async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
-//   const { commit } = routeAssetsActionContext(context);
-
-//   async function processArray(transactions) {
-//     for (const tx of transactions) {
-//       try {
-//         await tx
-//           .action()
-//           .then(() => {
-//             commit.setRecipientStatus({
-//               id: tx.recipient.id,
-//               status: RecipientStatus.SUCCESS,
-//             });
-//             commit.setRecipientCompleted(tx.recipient.id);
-//           })
-//           .catch(() => {
-//             commit.setRecipientStatus({
-//               id: tx.recipient.id,
-//               status: RecipientStatus.FAILED,
-//             });
-//           });
-//       } catch (err) {
-//         commit.setRecipientStatus({
-//           id: tx.recipient.id,
-//           status: RecipientStatus.FAILED,
-//         });
-//       }
-//     }
-//   }
-
-//   await processArray(data);
-// }
-// ______________________________________________________________________
 
 async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
   const { commit, getters, rootCommit, rootState, rootDispatch } = routeAssetsActionContext(context);

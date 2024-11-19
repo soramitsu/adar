@@ -4,6 +4,7 @@ import { EthCurrencyType, EthAssetKind } from '@sora-substrate/util/build/bridge
 import { AddressLike, BigNumberish, BytesLike, ethers } from 'ethers';
 
 import { SmartContractType, KnownEthBridgeAsset, SmartContracts } from '@/consts/evm';
+import { bridgeWrapperContractAddress } from '@/modules/ADAR/consts';
 import { asZeroValue } from '@/utils';
 import { ethBridgeApi } from '@/utils/bridge/eth/api';
 import ethersUtil from '@/utils/ethers-util';
@@ -231,8 +232,7 @@ export async function getMultipleEvmTransactionData({
   const coder = ethers.AbiCoder.defaultAbiCoder();
 
   const signer = await ethersUtil.getSigner();
-  const symbol = asset.symbol as KnownEthBridgeAsset;
-  const contractAddress = '0x5b05244ceCB216A4c14E7CE50cba5182e7F4C2a4';
+  const contractAddress = bridgeWrapperContractAddress;
   const contractAbi = SmartContracts[SmartContractType.EthBridge][KnownEthBridgeAsset.MultiSendBridge].abi;
 
   const amount = new FPNumber(value, asset.externalDecimals).toCodecString();
@@ -242,8 +242,6 @@ export async function getMultipleEvmTransactionData({
   const method = 'receiveAndDistribute';
 
   const contract = new ethers.Contract(contractAddress, contractAbi, signer);
-
-  console.dir(request);
 
   const BridgeReceipt: {
     tokenAddress: AddressLike;
@@ -265,13 +263,6 @@ export async function getMultipleEvmTransactionData({
     s: request.s,
   };
 
-  console.dir(BridgeReceipt);
-
-  // const encodedData = coder.encode(
-  //   ['tuple(address tokenAddress, uint256 amount, address from, bytes32 txHash, uint8[] v, bytes32[] r, bytes32[] s)'],
-  //   [BridgeReceipt]
-  // );
-
   const encodedData = coder.encode(
     ['tuple(address tokenAddress, uint256 amount, address from, bytes32 txHash, uint8[] v, bytes32[] r, bytes32[] s)'],
     [
@@ -287,15 +278,7 @@ export async function getMultipleEvmTransactionData({
     ]
   );
 
-  // const decodedData = coder.decode(
-  //   ['tuple(address tokenAddress, uint256 amount, address from, bytes32 txHash, uint8[] v, bytes32[] r, bytes32[] s)'],
-  //   encodedData
-  // );
-
   const args: [BytesLike, AddressLike[], BigNumberish[]] = [encodedData, recipients, amounts];
-
-  console.log('ARGS');
-  console.dir(args);
 
   return {
     contract,

@@ -102,14 +102,14 @@
           </template>
         </s-table-column>
 
-        <!-- IN TOKENS -->
+        <!-- NETWORK -->
         <s-table-column>
           <template #header>
             <span>{{ 'NETWORK' }}</span>
           </template>
           <template v-slot="{ row }">
             <div>
-              <span class="">{{ row.targetNetwork }}</span>
+              <span class="">{{ row.targetNetwork ?? 'SORA' }}</span>
             </div>
           </template>
         </s-table-column>
@@ -157,8 +157,11 @@
       <div class="total-container">
         <span>{{ t('adar.routeAssets.total') }}:&nbsp;</span>
         <span class="usd">{{ overallUSDNumber }}</span> <br />
-        <span>{{ 'bridge fee' }}:&nbsp;</span>
-        <span class="usd">{{ externalTransactionFee.toLocaleString(2) }}</span>
+        <template v-if="isExternalTransaction">
+          <span>{{ t('bridge.ethereumNetworkFee') }}:&nbsp;</span>
+          <spinner v-if="!isBridgeFeeAvailable" />
+          <span v-else class="usd">{{ externalTransactionFee.toLocaleString(2) }}</span>
+        </template>
       </div>
       <s-button type="primary" class="s-typography-button--big" @click.stop="onContinueClick">
         {{ t('adar.routeAssets.continue') }}
@@ -175,6 +178,7 @@ import { Component, Mixins } from 'vue-property-decorator';
 
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { Components, PageNames } from '@/consts';
+import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import router, { lazyComponent } from '@/router';
@@ -191,6 +195,7 @@ import type { Asset } from '@sora-substrate/util/build/assets/types';
     TokenLogo: components.TokenLogo,
     SearchInput: components.SearchInput,
     SelectToken: lazyComponent(Components.SelectToken),
+    Spinner,
   },
 })
 export default class TransactionOverview extends Mixins(TranslationMixin, mixins.PaginationSearchMixin) {
@@ -200,8 +205,9 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   @action.routeAssets.processingPreviousStage previousStage!: any;
   @getter.wallet.account.isLoggedIn isLoggedIn!: boolean;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
-  @getter.routeAssets.externalTransactionFee externalTransactionFee!: FPNumber;
+  @getter.routeAssets.externalTransactionFeeFiat externalTransactionFee!: FPNumber;
   @mutation.routeAssets.toggleUseTransfer toggleUseTransfer!: (id: string) => void;
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   showSelectInputAssetDialog = false;
 
@@ -284,6 +290,10 @@ export default class TransactionOverview extends Mixins(TranslationMixin, mixins
   handleResetSearch(): void {
     this.resetPage();
     this.resetSearch();
+  }
+
+  get isBridgeFeeAvailable() {
+    return this.externalTransactionFee.isGreaterThan(FPNumber.ZERO);
   }
 
   get filteredItems() {

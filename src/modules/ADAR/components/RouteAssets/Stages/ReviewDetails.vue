@@ -53,6 +53,7 @@
               </template>
               <div>
                 <info-line
+                  v-if="!isExternalTransaction"
                   :asset-symbol="tokenData.asset.symbol"
                   :label="t('adar.routeAssets.stages.reviewDetails.swapless.adarFee')"
                   :value="tokenData.adarFee.toLocaleString()"
@@ -76,6 +77,14 @@
                   is-formatted
                 >
                 </info-line>
+                <info-line
+                  v-if="isExternalTransaction"
+                  :asset-symbol="tokenData.asset.symbol"
+                  :label="'external balance'"
+                  :value="externalBalance"
+                  class="transfer-assets-section__asset-data"
+                  is-formatted
+                ></info-line>
                 <div
                   v-if="!isTransferAssetBalanceOk(tokenData)"
                   class="transfer-assets-section__required-amount required-amount"
@@ -96,46 +105,67 @@
             </s-collapse-item>
           </s-collapse>
         </div>
-        <slippage-tolerance
-          :slippages="slippages"
-          :slippageTolerance="currentSlippage"
-          @onSlippageChanged="updatePriceImpact"
-        />
-        <template v-if="xorFeeBalanceError">
-          <div class="field">
-            <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.feeRequired') }}</div>
-            <div class="field__value">
-              <s-button
-                type="primary"
-                class="s-typography-button--mini add-button"
-                @click.stop="onAddFundsClick('fee')"
-              >
-                {{ t('adar.routeAssets.stages.reviewDetails.add') }}
-              </s-button>
-              {{ formatNumber(xorFeeRequired) }}
-              <token-logo class="token-logo" :token="xor" />
+        <template v-if="!isExternalTransaction">
+          <slippage-tolerance
+            :slippages="slippages"
+            :slippageTolerance="currentSlippage"
+            @onSlippageChanged="updatePriceImpact"
+          />
+          <template v-if="xorFeeBalanceError">
+            <div class="field">
+              <div class="field__label">{{ t('adar.routeAssets.stages.reviewDetails.feeRequired') }}</div>
+              <div class="field__value">
+                <s-button
+                  type="primary"
+                  class="s-typography-button--mini add-button"
+                  @click.stop="onAddFundsClick('fee')"
+                >
+                  {{ t('adar.routeAssets.stages.reviewDetails.add') }}
+                </s-button>
+                {{ formatNumber(xorFeeRequired) }}
+                <token-logo class="token-logo" :token="xor" />
+              </div>
             </div>
+            <s-divider />
+          </template>
+          <div class="fields-container">
+            <info-line
+              v-if="isLoggedIn"
+              :label="t('networkFeeText')"
+              :label-tooltip="t('networkFeeTooltipText')"
+              :value="formatNumber(networkFee)"
+              :asset-symbol="xorSymbol"
+              :fiat-value="getFiatAmountByFPNumber(networkFee)"
+              is-formatted
+            />
+            <info-line
+              :label="t('swap.liquidityProviderFee')"
+              :label-tooltip="t('swap.liquidityProviderFeeTooltip')"
+              :value="formatNumber(internalNetworkFee)"
+              :asset-symbol="xorSymbol"
+              is-formatted
+            />
           </div>
-          <s-divider />
         </template>
-        <div class="fields-container">
+        <template v-else>
+          <info-line
+            :label="`${this.networkName} ${this.t('networkFeeText')}`"
+            :label-tooltip="t('bridge.externalTransferFeeTooltip', { network: networkName })"
+            :value="externalNetworkFee"
+            :asset-symbol="externalTxSourceAsset.symbol"
+            :fiat-value="getFiatAmountByString(externalNetworkFee, nativeToken)"
+            is-formatted
+          />
           <info-line
             v-if="isLoggedIn"
-            :label="t('networkFeeText')"
+            :label="t('bridge.soraNetworkFee')"
             :label-tooltip="t('networkFeeTooltipText')"
-            :value="formatNumber(networkFee)"
+            :value="formatNumber(internalNetworkFee)"
             :asset-symbol="xorSymbol"
-            :fiat-value="getFiatAmountByFPNumber(networkFee)"
+            :fiat-value="getFiatAmountByFPNumber(internalNetworkFee)"
             is-formatted
           />
-          <info-line
-            :label="t('swap.liquidityProviderFee')"
-            :label-tooltip="t('swap.liquidityProviderFeeTooltip')"
-            :value="formatNumber(maxInputAmount.totalLiquidityProviderFee)"
-            :asset-symbol="xorSymbol"
-            is-formatted
-          />
-        </div>
+        </template>
         <div class="buttons-container">
           <s-button type="primary" class="s-typography-button--big" :disabled="!noIssues" @click.stop="onContinueClick">
             {{ continueButtonTitle }}
@@ -158,6 +188,7 @@ import { AccountAsset, Asset, RegisteredAccountAsset } from '@sora-substrate/uti
 import { components, mixins, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
+import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
 import { Components } from '@/consts';
 import SlippageTolerance from '@/modules/ADAR/components/App/shared/SlippageTolerance.vue';
 import { AdarComponents, adarFee } from '@/modules/ADAR/consts';
@@ -186,7 +217,11 @@ import WarningMessage from '../WarningMessage.vue';
     SelectToken: lazyComponent(Components.SelectToken),
   },
 })
-export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixins.FormattedAmountMixin) {
+export default class ReviewDetails extends Mixins(
+  mixins.TransactionMixin,
+  mixins.FormattedAmountMixin,
+  NetworkFormatterMixin
+) {
   @getter.routeAssets.inputToken inputToken!: RegisteredAccountAsset;
   @action.routeAssets.processingNextStage nextStage!: () => void;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
@@ -215,6 +250,12 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
   @getter.routeAssets.adarSwapEnabled adarSwapEnabled!: boolean;
   @getter.routeAssets.transferTokenBalance transferTokenBalance!: (address: string | undefined) => FPNumber;
   @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
+  @getter.bridge.asset bridgeAsset!: RegisteredAccountAsset;
+  @getter.routeAssets.externalNativeTokenNetworkFee externalNativeTokenNetworkFee!: string;
+  @state.bridge.soraNetworkFee soraNetworkFee!: CodecString;
+  @getter.routeAssets.externalTxSourceAsset externalTxSourceAsset!: Asset;
+  @getter.bridge.nativeToken nativeToken!: RegisteredAccountAsset;
+  @action.routeAssets.haveExternalNativeTokenFee haveExternalNativeTokenFee!: () => Promise<boolean>;
 
   showSwapDialog = false;
   showSelectInputAssetDialog = false;
@@ -238,6 +279,22 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     return `${isTransfer ? this.t('operations.Transfer') : this.t('operations.Swap')} ${this.t(
       'adar.routeAssets.stages.reviewDetails.swapless.amount'
     )}`;
+  }
+
+  get externalBalance() {
+    return FPNumber.fromCodecValue(this.bridgeAsset?.externalBalance).toLocaleString(7);
+  }
+
+  get externalNetworkFee() {
+    return FPNumber.fromCodecValue(this.externalNativeTokenNetworkFee).toLocaleString(7);
+  }
+
+  get internalNetworkFee() {
+    return FPNumber.fromCodecValue(this.soraNetworkFee);
+  }
+
+  get networkName(): string {
+    return this.formatNetworkShortName(false);
   }
 
   get continueButtonTitle() {
@@ -468,7 +525,17 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
     this.cancelProcessing();
   }
 
-  onContinueClick() {
+  async onContinueClick() {
+    if (this.isExternalTransaction) {
+      const haveEnoughFee = await this.haveExternalNativeTokenFee();
+      if (!haveEnoughFee) {
+        this.showAppAlert(
+          this.t('insufficientBalanceText', { tokenSymbol: this.nativeToken.symbol }),
+          this.t('insufficientBalanceText', { tokenSymbol: this.nativeToken.symbol })
+        );
+        return;
+      }
+    }
     this.runAssetsRouting();
     this.nextStage();
   }
@@ -649,6 +716,10 @@ export default class ReviewDetails extends Mixins(mixins.TransactionMixin, mixin
 
   .field {
     padding: 2px 4px;
+  }
+
+  .transfer-assets-section {
+    margin-bottom: 20px;
   }
 }
 
