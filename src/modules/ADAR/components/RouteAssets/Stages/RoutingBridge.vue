@@ -152,15 +152,14 @@
 
 <script lang="ts">
 import { KnownSymbols } from '@sora-substrate/util/build/assets/consts';
-import { BridgeTxStatus } from '@sora-substrate/util/build/bridgeProxy/consts';
 import { components, mixins, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
 import BridgeMixin from '@/components/mixins/BridgeMixin';
 import BridgeTransactionMixin from '@/components/mixins/BridgeTransactionMixin';
 import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
-import { Components, PageNames, ZeroStringValue } from '@/consts';
-import router, { lazyComponent } from '@/router';
+import { Components, ZeroStringValue } from '@/consts';
+import { lazyComponent } from '@/router';
 import { action, state, getter, mutation } from '@/store/decorators';
 import { Recipient } from '@/store/routeAssets/types';
 import { hasInsufficientBalance, hasInsufficientXorForFee, hasInsufficientNativeTokenForFee } from '@/utils';
