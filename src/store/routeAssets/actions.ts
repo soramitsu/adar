@@ -387,15 +387,15 @@ const actions = defineActions({
     return !hasInsufficientNativeTokenForFee(evmNativeBalance, evmNetworkFee);
   },
 
-  markTxSuccessfull(context: ActionContext<any, any>) {
+  markTxStatus(context: ActionContext<any, any>, status = SwapTransferBatchStatus.SUCCESS) {
     const { commit, getters } = routeAssetsActionContext(context);
-    commit.setTxStatus(SwapTransferBatchStatus.SUCCESS);
+    commit.setTxStatus(status);
     getters.recipients.forEach((reciever) => {
       commit.setRecipientStatus({
         id: reciever.id,
-        status: RecipientStatus.SUCCESS,
+        status,
       });
-      commit.setRecipientCompleted(reciever.id);
+      if (status === SwapTransferBatchStatus.SUCCESS) commit.setRecipientCompleted(reciever.id);
     });
   },
 

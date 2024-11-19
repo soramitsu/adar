@@ -161,7 +161,7 @@ import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
 import { Components, ZeroStringValue } from '@/consts';
 import { lazyComponent } from '@/router';
 import { action, state, getter, mutation } from '@/store/decorators';
-import { Recipient } from '@/store/routeAssets/types';
+import { Recipient, SwapTransferBatchStatus } from '@/store/routeAssets/types';
 import { hasInsufficientBalance, hasInsufficientXorForFee, hasInsufficientNativeTokenForFee } from '@/utils';
 import { isUnsignedTx } from '@/utils/bridge/common/utils';
 import { subBridgeApi } from '@/utils/bridge/sub/api';
@@ -207,7 +207,7 @@ export default class RoutingBridge extends Mixins(
 
   @action.bridge.removeHistory private removeHistory!: ({ tx, force }: { tx: any; force?: boolean }) => Promise<void>;
   @action.bridge.handleBridgeTransaction private handleBridgeTransaction!: (id: string) => Promise<void>;
-  @action.routeAssets.markTxSuccessfull private markTxSuccessfull!: () => Promise<void>;
+  @action.routeAssets.markTxStatus private markTxStatus!: (status?: SwapTransferBatchStatus) => Promise<void>;
   @mutation.bridge.setHistoryId private setHistoryId!: (id?: string) => void;
   @getter.routeAssets.overallUSDNumber overallUSDNumber!: string;
   @getter.routeAssets.externalRecipients recipients!: Array<Recipient>;
@@ -442,11 +442,6 @@ export default class RoutingBridge extends Mixins(
   }
 
   async created(): Promise<void> {
-    if (!this.historyItem) {
-      this.navigateToBridge();
-      return;
-    }
-
     await this.withParentLoading(async () => {
       const withAutoStart = !this.txInProcess && this.isTxPending;
 
@@ -508,9 +503,14 @@ export default class RoutingBridge extends Mixins(
     return this.sortLinksByTxDirection([internal, parachain, external]);
   }
 
-  @Watch('txIsFinilized')
+  @Watch('isTxCompleted')
   onTxFinishedSuccessfully(value: boolean) {
-    if (value) this.markTxSuccessfull();
+    if (value) this.markTxStatus();
+  }
+
+  @Watch('isTxFailed')
+  onTxFinishedFailed(value: boolean) {
+    if (value) this.markTxStatus(SwapTransferBatchStatus.FAILED);
   }
 
   private sortLinksByTxDirection(outgoingOrderedLinks: Array<LinkData | null>): LinkData[] {
