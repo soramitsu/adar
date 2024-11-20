@@ -32,14 +32,6 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.recipients.filter((recipient) => recipient.targetNetwork);
   },
-  validRecipients(...args): Array<Recipient> {
-    const { state } = routeAssetsGetterContext(args);
-    return state.recipients.filter((recipient) => api.validateAddress(recipient.wallet));
-  },
-  completedRecipients(...args): Array<Recipient> {
-    const { state } = routeAssetsGetterContext(args);
-    return state.recipients.filter((recipient) => recipient.isCompleted);
-  },
   incompletedRecipients(...args): Array<Recipient> {
     const { state } = routeAssetsGetterContext(args);
     return state.recipients.filter((recipient) => !recipient.isCompleted);
