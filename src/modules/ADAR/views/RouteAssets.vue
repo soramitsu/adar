@@ -7,20 +7,17 @@
 
 <script lang="ts">
 import { Operation } from '@sora-substrate/util';
-import { mixins, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
+import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import isEmpty from 'lodash/fp/isEmpty';
 import isEqual from 'lodash/fp/isEqual';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
-import BridgeMixin from '@/components/mixins/BridgeMixin';
 import SubscriptionsMixin from '@/components/mixins/SubscriptionsMixin';
-import TranslationMixin from '@/components/mixins/TranslationMixin';
 import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
 import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { getter, action, mutation, state } from '@/store/decorators';
-import { SwapTransferBatchStatus } from '@/store/routeAssets/types';
 import { NetworkData } from '@/types/bridge';
 
 import AdarStats from '../components/Stats/adarStats.vue';
@@ -41,13 +38,7 @@ import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services
     AdarStats,
   },
 })
-export default class RouteAssets extends Mixins(
-  mixins.LoadingMixin,
-  TranslationMixin,
-  WalletConnectMixin,
-  SubscriptionsMixin,
-  BridgeMixin
-) {
+export default class RouteAssets extends Mixins(mixins.LoadingMixin, WalletConnectMixin, SubscriptionsMixin) {
   @action.routeAssets.subscribeOnReserves private subscribeOnReserves!: () => void;
   @action.routeAssets.cleanSwapReservesSubscription private cleanSwapReservesSubscription!: () => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
@@ -59,7 +50,6 @@ export default class RouteAssets extends Mixins(
   @state.wallet.transactions.externalHistory private externalHistory!: AccountHistory<HistoryItem>;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
 
-  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @mutation.wallet.transactions.resetExternalHistory private resetExternalHistory!: FnWithoutArgs;
   @action.wallet.transactions.getExternalHistory private updateExternalHistory!: (
     args?: ExternalHistoryParams
@@ -77,22 +67,20 @@ export default class RouteAssets extends Mixins(
   @action.bridge.resetBridgeForm private resetBridgeForm!: AsyncFnWithoutArgs;
   @mutation.bridge.resetBlockUpdatesSubscription private resetBlockUpdatesSubscription!: FnWithoutArgs;
   @mutation.bridge.resetOutgoingMaxLimitSubscription private resetOutgoingMaxLimitSubscription!: FnWithoutArgs;
-  // bridge transaction signing
-  @getter.web3.subAccount public subAccount!: WALLET_TYPES.PolkadotJsAccount;
-  @state.bridge.isSignTxDialogVisible public isSignTxDialogVisible!: boolean;
-  @mutation.bridge.setSignTxDialogVisibility public setSignTxDialogVisibility!: (flag: boolean) => void;
   @action.routeAssets.bridgeTransactionsInit bridgeTransactionsInit!: () => Promise<void>;
   @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   timerId: Nullable<NodeJS.Timeout> = null;
 
   async created() {
-    this.withApi(async () => {
+    this.setStartSubscriptions([this.subscribeOnBlockUpdates, this.updateOutgoingMaxLimit, this.updateBridgeApps]);
+    this.setResetSubscriptions([this.resetBlockUpdatesSubscription, this.resetOutgoingMaxLimitSubscription]);
+  }
+
+  beforeMount() {
+    this.withApi(() => {
       this.subscribeOnReserves();
       this.initTimer();
-
-      this.setStartSubscriptions([this.subscribeOnBlockUpdates, this.updateOutgoingMaxLimit, this.updateBridgeApps]);
-      this.setResetSubscriptions([this.resetBlockUpdatesSubscription, this.resetOutgoingMaxLimitSubscription]);
       if (this.isExternalTransaction) this.bridgeTransactionsInit();
     });
   }

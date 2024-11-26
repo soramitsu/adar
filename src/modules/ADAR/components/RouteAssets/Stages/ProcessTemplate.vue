@@ -106,6 +106,22 @@
           </div>
         </div>
       </div>
+      <div v-if="externalAccount" class="connect-wallet-panel">
+        <s-divider type="tertiary" />
+        <bridge-account-panel :address="externalAccount" :name="externalAccountName" :tooltip="getCopyTooltip()">
+          <template #icon v-if="evmProvider">
+            <img :src="getEvmProviderIcon(evmProvider)" :alt="evmProvider" class="connect-wallet-logo" />
+          </template>
+        </bridge-account-panel>
+        <div class="connect-wallet-group">
+          <span class="connect-wallet-btn" @click="connectWallet(false)">
+            {{ t('changeAccountText') }}
+          </span>
+          <span v-if="evmProvider" class="connect-wallet-btn disconnect" @click="resetEvmProviderConnection">
+            {{ t('disconnectWalletText') }}
+          </span>
+        </div>
+      </div>
       <div class="buttons-container">
         <s-button
           v-if="!isLoggedIn"
@@ -123,7 +139,15 @@
           type="primary"
           @click="connectWallet(true)"
         >
-          {{ t('connectWalletText') }}
+          {{ t('rewards.action.connectExternalWallet') }}
+        </s-button>
+        <s-button
+          v-else-if="!isValidNetwork && externalAccount && isExternalTransaction"
+          class="el-button--next s-typography-button--big"
+          type="primary"
+          @click="changeEvmNetworkProvided"
+        >
+          {{ t('changeNetworkText') }}
         </s-button>
         <s-button
           v-else
@@ -162,10 +186,11 @@ import { Components } from '@/consts';
 import { AdarComponents } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { lazyComponent } from '@/router';
-import { action, getter, mutation } from '@/store/decorators';
+import { action, getter, mutation, state } from '@/store/decorators';
 import { MaxInputAmountInfo, OutcomeAssetsAmount, Recipient } from '@/store/routeAssets/types';
 import validate from '@/store/routeAssets/utils';
 import { getAssetBalance } from '@/utils';
+import { Provider } from '@/utils/ethers-util';
 @Component({
   components: {
     FixIssuesDialog: adarLazyComponent(AdarComponents.RouteAssetsFixIssuesDialog),
@@ -174,6 +199,7 @@ import { getAssetBalance } from '@/utils';
     SelectToken: lazyComponent(Components.SelectToken),
     TokenAddress: components.TokenAddress,
     SelectProviderDialog: lazyComponent(Components.SelectProviderDialog),
+    BridgeAccountPanel: lazyComponent(Components.BridgeAccountPanel),
   },
 })
 export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.FormattedAmountMixin) {
@@ -192,13 +218,22 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
   @mutation.web3.setSoraAccountDialogVisibility public setSoraAccountDialogVisibility!: (flag: boolean) => void;
   @mutation.web3.setSelectProviderDialogVisibility setSelectProviderDialogVisibility!: (flag: boolean) => void;
   @getter.bridge.recipient externalAccount!: string;
+  @getter.bridge.recipientName externalAccountName!: string;
   @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
+  @getter.web3.isValidNetwork isValidNetwork!: boolean;
+  @action.web3.changeEvmNetworkProvided changeEvmNetworkProvided!: AsyncFnWithoutArgs;
+  @state.web3.evmProvider evmProvider!: Nullable<Provider>;
+  @action.web3.resetEvmProviderConnection resetEvmProviderConnection!: FnWithoutArgs;
 
   fixIssuesDialog = false;
   isSpinner = true;
   currentIssueIdx = 0;
 
   showSelectInputAssetDialog = false;
+
+  getCopyTooltip(): string {
+    return `${this.t('addressText')}`;
+  }
 
   onInputAssetSelected(asset) {
     this.setInputToken(asset);
@@ -300,6 +335,10 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
   connectWallet(isExternalWallet: boolean): void {
     if (isExternalWallet) this.setSelectProviderDialogVisibility(true);
     else this.setSoraAccountDialogVisibility(true);
+  }
+
+  getEvmProviderIcon(provider: Provider): string {
+    return provider ? `/wallet/${provider}.svg` : '';
   }
 
   @Watch('incorrectRecipientsLength', { deep: true })
@@ -434,5 +473,35 @@ export default class ProcessTemplate extends Mixins(TranslationMixin, mixins.For
 .tx-type-title {
   @include flex-center;
   gap: 4px;
+}
+
+.connect-wallet {
+  &-panel {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: var(--s-font-size-mini);
+    line-height: var(--s-line-height-medium);
+    color: var(--s-color-base-content-primary);
+  }
+
+  &-logo {
+    width: 18px;
+    height: 18px;
+  }
+
+  &-group {
+    display: flex;
+    align-items: center;
+    gap: $inner-spacing-mini;
+  }
+
+  &-btn {
+    @include copy-address;
+
+    &.disconnect {
+      color: var(--s-color-status-error);
+    }
+  }
 }
 </style>
