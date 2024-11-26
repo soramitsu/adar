@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { Stages, adarFee as adarFeeMultiplier } from '@/modules/ADAR/consts';
 import { routeAssetsGetterContext } from '@/store/routeAssets';
-import { getAssetBalance } from '@/utils';
+import { getAssetBalance, hasInsufficientNativeTokenForFee } from '@/utils';
 
 import { getAssetUSDPrice } from './utils';
 
@@ -28,13 +28,9 @@ const getters = defineGetters<RouteAssetsState>()({
     const { state } = routeAssetsGetterContext(args);
     return state.recipients;
   },
-  validRecipients(...args): Array<Recipient> {
+  externalRecipients(...args): Array<Recipient> {
     const { state } = routeAssetsGetterContext(args);
-    return state.recipients.filter((recipient) => api.validateAddress(recipient.wallet));
-  },
-  completedRecipients(...args): Array<Recipient> {
-    const { state } = routeAssetsGetterContext(args);
-    return state.recipients.filter((recipient) => recipient.isCompleted);
+    return state.recipients.filter((recipient) => recipient.targetNetwork);
   },
   incompletedRecipients(...args): Array<Recipient> {
     const { state } = routeAssetsGetterContext(args);
@@ -282,7 +278,9 @@ const getters = defineGetters<RouteAssetsState>()({
         }
       );
       const { usd, totalAmount: amount } = reduceData;
-      const adarFee = new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
+      const adarFee = getters.isExternalTransaction
+        ? FPNumber.ZERO
+        : new FPNumber(adarFeeMultiplier).div(FPNumber.HUNDRED).mul(amount);
       const asset = assetArray[0].asset;
       const userBalance = getters.transferTokenBalance(asset.address);
       const totalAmount = amount.add(adarFee);
@@ -350,6 +348,43 @@ const getters = defineGetters<RouteAssetsState>()({
         recipientsNumber: assetArray.length,
       };
     });
+  },
+
+  isExternalTransaction(...args): boolean {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.isExternalTransaction;
+  },
+
+  externalTransactionFeeFiat(...args): FPNumber {
+    const { state, rootState } = routeAssetsGetterContext(args);
+    const priceObject = rootState.wallet.account.fiatPriceObject;
+    const price = getAssetUSDPrice(state.processingState.bridgeTransactionsState.inputToken, priceObject);
+    return FPNumber.fromCodecValue(state.processingState.bridgeTransactionsState.networkFee).mul(price);
+  },
+
+  externalTotalAmount(...args): FPNumber {
+    const { getters } = routeAssetsGetterContext(args);
+    return getters.externalRecipients.reduce((result, recipient) => {
+      return result.add(recipient.amount ?? FPNumber.ZERO);
+    }, FPNumber.ZERO);
+  },
+
+  externalNativeTokenNetworkFee(...args): string {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.bridgeTransactionsState.networkFee;
+  },
+
+  externalTxSourceAsset(...args): Asset {
+    const { state } = routeAssetsGetterContext(args);
+    return state.processingState.bridgeTransactionsState.inputToken;
+  },
+
+  hasInsufficientNativeTokenForFee(...args): boolean {
+    const { state, rootState } = routeAssetsGetterContext(args);
+    return hasInsufficientNativeTokenForFee(
+      rootState.bridge.externalNativeBalance,
+      state.processingState.bridgeTransactionsState.networkFee
+    );
   },
 });
 

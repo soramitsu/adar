@@ -1,3 +1,4 @@
+import { type IBridgeTransaction } from '@sora-substrate/util';
 import { SUBQUERY_TYPES, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import first from 'lodash/fp/first';
 
@@ -14,7 +15,6 @@ import {
 } from '@/utils/bridge/eth/utils';
 import ethersUtil from '@/utils/ethers-util';
 
-import type { IBridgeTransaction } from '@sora-substrate/util';
 import type { RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
 import type { EthHistory } from '@sora-substrate/util/build/bridgeProxy/eth/types';
 
@@ -24,12 +24,14 @@ type EthBridgeReducerOptions<T extends IBridgeTransaction> = IBridgeReducerOptio
   getBridgeHistoryInstance: GetBridgeHistoryInstance<EthBridgeHistory>;
   signExternalOutgoing: SignExternal;
   signExternalIncoming: SignExternal;
+  signExternalMultipleOutgoing: SignExternal;
 };
 
 export class EthBridgeReducer extends BridgeReducer<EthHistory> {
   protected readonly getBridgeHistoryInstance!: GetBridgeHistoryInstance<EthBridgeHistory>;
   protected readonly signExternalOutgoing!: SignExternal;
   protected readonly signExternalIncoming!: SignExternal;
+  protected readonly signExternalMultipleOutgoing: SignExternal;
 
   constructor(options: EthBridgeReducerOptions<EthHistory>) {
     super(options);
@@ -37,6 +39,7 @@ export class EthBridgeReducer extends BridgeReducer<EthHistory> {
     this.getBridgeHistoryInstance = options.getBridgeHistoryInstance;
     this.signExternalOutgoing = options.signExternalOutgoing;
     this.signExternalIncoming = options.signExternalIncoming;
+    this.signExternalMultipleOutgoing = options.signExternalMultipleOutgoing;
   }
 
   async onEvmPending(id: string): Promise<void> {
@@ -260,6 +263,113 @@ export class EthBridgeIncomingReducer extends EthBridgeReducer {
         return await this.handleState(transaction.id, {
           nextState: ETH_BRIDGE_STATES.SORA_PENDING,
           rejectState: ETH_BRIDGE_STATES.SORA_REJECTED,
+        });
+      }
+    }
+  }
+}
+
+export class EthBridgeMultipleOutgoingReducer extends EthBridgeReducer {
+  async changeState(transaction: EthHistory): Promise<void> {
+    if (!transaction.id) throw new Error('[Bridge]: TX ID cannot be empty');
+
+    switch (transaction.transactionState) {
+      case ETH_BRIDGE_STATES.INITIAL:
+      case ETH_BRIDGE_STATES.SORA_REJECTED: {
+        return await this.handleState(transaction.id, {
+          nextState: ETH_BRIDGE_STATES.SORA_SUBMITTED,
+          rejectState: ETH_BRIDGE_STATES.SORA_REJECTED,
+        });
+      }
+
+      case ETH_BRIDGE_STATES.SORA_SUBMITTED: {
+        return await this.handleState(transaction.id, {
+          nextState: ETH_BRIDGE_STATES.SORA_PENDING,
+          rejectState: ETH_BRIDGE_STATES.SORA_REJECTED,
+          handler: async (id: string) => {
+            this.beforeSubmit(id);
+
+            const tx = getTransaction(id);
+
+            // transaction not signed
+            if (!tx.txId) {
+              await this.beforeSign(id);
+              const asset = this.getAssetByAddress(tx.assetAddress as string) as RegisteredAccountAsset;
+              await ethBridgeApi.transfer(asset, tx.to as string, tx.amount as string, id);
+            }
+
+            // signed sora transaction has to be parsed by subquery
+            if (tx.txId && !tx.blockId) {
+              // format account address to sora format
+              const { from: address } = getTransaction(id);
+              const bridgeHistory = await this.getBridgeHistoryInstance();
+              const historyItem = first(await bridgeHistory.fetchHistoryElements(address as string, 0, [tx.txId]));
+
+              if (historyItem) {
+                this.updateTransactionParams(id, {
+                  blockId: historyItem.blockHash,
+                  hash: (historyItem.data as SUBQUERY_TYPES.HistoryElementEthBridgeOutgoing).requestHash,
+                });
+              } else {
+                throw new Error(`[Bridge]: Can not restore TX from Subquery: ${tx.txId}`);
+              }
+            }
+          },
+        });
+      }
+
+      case ETH_BRIDGE_STATES.SORA_PENDING: {
+        return await this.handleState(transaction.id, {
+          nextState: ETH_BRIDGE_STATES.EVM_SUBMITTED,
+          rejectState: ETH_BRIDGE_STATES.SORA_REJECTED,
+          handler: async (id: string) => {
+            await this.waitForTransactionStatus(id);
+            await this.waitForTransactionBlockId(id);
+
+            const { blockId, txId, hash: soraHash } = this.getTransaction(id);
+
+            if (!soraHash) {
+              const transactionEvents = await getTransactionEvents(blockId as string, txId as string, ethBridgeApi.api);
+              const requestEvent = transactionEvents.find((e) =>
+                ethBridgeApi.api.events.ethBridge.RequestRegistered.is(e.event)
+              );
+              const hash = requestEvent.event.data[0].toString();
+
+              this.updateTransactionParams(id, { hash });
+            }
+
+            const tx = this.getTransaction(id);
+
+            const { to } = await waitForApprovedRequest(tx);
+
+            this.updateTransactionParams(id, { to });
+          },
+        });
+      }
+
+      case ETH_BRIDGE_STATES.EVM_SUBMITTED: {
+        return await this.handleState(transaction.id, {
+          nextState: ETH_BRIDGE_STATES.EVM_PENDING,
+          rejectState: ETH_BRIDGE_STATES.EVM_REJECTED,
+          handler: async (id: string) => await this.onEvmSubmitted(id, this.signExternalMultipleOutgoing),
+        });
+      }
+
+      case ETH_BRIDGE_STATES.EVM_PENDING: {
+        return await this.handleState(transaction.id, {
+          nextState: ETH_BRIDGE_STATES.EVM_COMMITED,
+          rejectState: ETH_BRIDGE_STATES.EVM_REJECTED,
+          handler: async (id: string) => {
+            await this.onEvmPending(id);
+            await this.onComplete(id);
+          },
+        });
+      }
+
+      case ETH_BRIDGE_STATES.EVM_REJECTED: {
+        return await this.handleState(transaction.id, {
+          nextState: ETH_BRIDGE_STATES.EVM_SUBMITTED,
+          rejectState: ETH_BRIDGE_STATES.EVM_REJECTED,
         });
       }
     }

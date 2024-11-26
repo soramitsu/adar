@@ -10,14 +10,15 @@ import { Operation } from '@sora-substrate/util';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import isEmpty from 'lodash/fp/isEmpty';
+import isEqual from 'lodash/fp/isEqual';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 
-import TranslationMixin from '@/components/mixins/TranslationMixin';
+import SubscriptionsMixin from '@/components/mixins/SubscriptionsMixin';
+import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
 import { AdarComponents, Stages } from '@/modules/ADAR/consts';
 import { adarLazyComponent } from '@/modules/ADAR/router';
 import { getter, action, mutation, state } from '@/store/decorators';
-import { SwapTransferBatchStatus } from '@/store/routeAssets/types';
-import { FeatureFlags } from '@/store/settings/types';
+import { NetworkData } from '@/types/bridge';
 
 import AdarStats from '../components/Stats/adarStats.vue';
 
@@ -37,10 +38,9 @@ import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services
     AdarStats,
   },
 })
-export default class RouteAssets extends Mixins(mixins.LoadingMixin, TranslationMixin) {
+export default class RouteAssets extends Mixins(mixins.LoadingMixin, WalletConnectMixin, SubscriptionsMixin) {
   @action.routeAssets.subscribeOnReserves private subscribeOnReserves!: () => void;
   @action.routeAssets.cleanSwapReservesSubscription private cleanSwapReservesSubscription!: () => void;
-  @mutation.settings.setFeatureFlags private setFeatureFlags!: (data: FeatureFlags) => void;
   @getter.routeAssets.txHistoryStoreItem txHistoryStoreItem!: HistoryItem;
   @mutation.routeAssets.updateTxHistoryData private updateTxHistoryData!: (data: Nullable<HistoryItem>) => void;
   @state.wallet.account.whitelistArray private whitelistArray!: Array<WhitelistArrayItem>;
@@ -48,10 +48,8 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @state.wallet.account.address private address!: string;
   @getter.routeAssets.pricesAreUpdated private pricesAreUpdated!: boolean;
   @state.wallet.transactions.externalHistory private externalHistory!: AccountHistory<HistoryItem>;
-  @state.wallet.transactions.externalHistoryUpdates private externalHistoryUpdates!: AccountHistory<HistoryItem>;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
 
-  @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
   @mutation.wallet.transactions.resetExternalHistory private resetExternalHistory!: FnWithoutArgs;
   @action.wallet.transactions.getExternalHistory private updateExternalHistory!: (
     args?: ExternalHistoryParams
@@ -61,18 +59,36 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
   @action.routeAssets.processingNextStage nextStage!: any;
   @action.routeAssets.processingPreviousStage previousStage!: any;
 
+  @action.web3.getSupportedApps private getSupportedApps!: AsyncFnWithoutArgs;
+  @action.web3.restoreSelectedNetwork private restoreSelectedNetwork!: AsyncFnWithoutArgs;
+  @action.bridge.updateExternalBalance private updateExternalBalance!: AsyncFnWithoutArgs;
+  @action.bridge.subscribeOnBlockUpdates private subscribeOnBlockUpdates!: AsyncFnWithoutArgs;
+  @action.bridge.updateOutgoingMaxLimit private updateOutgoingMaxLimit!: AsyncFnWithoutArgs;
+  @action.bridge.resetBridgeForm private resetBridgeForm!: AsyncFnWithoutArgs;
+  @mutation.bridge.resetBlockUpdatesSubscription private resetBlockUpdatesSubscription!: FnWithoutArgs;
+  @mutation.bridge.resetOutgoingMaxLimitSubscription private resetOutgoingMaxLimitSubscription!: FnWithoutArgs;
+  @action.routeAssets.bridgeTransactionsInit bridgeTransactionsInit!: () => Promise<void>;
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
+
   timerId: Nullable<NodeJS.Timeout> = null;
 
-  created() {
-    this.withApi(async () => {
+  async created() {
+    this.setStartSubscriptions([this.subscribeOnBlockUpdates, this.updateOutgoingMaxLimit, this.updateBridgeApps]);
+    this.setResetSubscriptions([this.resetBlockUpdatesSubscription, this.resetOutgoingMaxLimitSubscription]);
+  }
+
+  beforeMount() {
+    this.withApi(() => {
       this.subscribeOnReserves();
       this.initTimer();
+      if (this.isExternalTransaction) this.bridgeTransactionsInit();
     });
   }
 
   beforeDestroy(): void {
     this.cleanSwapReservesSubscription();
     if (this.timerId) clearInterval(this.timerId);
+    this.disconnectExternalNetwork();
   }
 
   initTimer() {
@@ -121,6 +137,30 @@ export default class RouteAssets extends Mixins(mixins.LoadingMixin, Translation
       this.resetExternalHistory();
       this.getHistoryElement();
     }
+  }
+
+  @Watch('selectedNetwork')
+  private onSelectedNetworkChange(curr: Nullable<NetworkData>, prev: Nullable<NetworkData>): void {
+    if (curr && prev && !isEqual(curr)(prev)) {
+      this.resetBridgeForm();
+    }
+  }
+
+  trackLogin = false;
+
+  @Watch('soraAddress')
+  @Watch('externalAccount')
+  private onExternalAccountChange(): void {
+    this.updateExternalBalance();
+  }
+
+  /**
+   * This is not subscription, but should be called after reconnect to node - so it's added to subscriptions list
+   */
+  private async updateBridgeApps(): Promise<void> {
+    await this.getSupportedApps();
+    // don't block ui while connecting to external network
+    this.restoreSelectedNetwork();
   }
 }
 </script>

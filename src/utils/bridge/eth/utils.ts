@@ -1,9 +1,10 @@
 import { Operation, FPNumber } from '@sora-substrate/util';
 import { BridgeTxStatus } from '@sora-substrate/util/build/bridgeProxy/consts';
 import { EthCurrencyType, EthAssetKind } from '@sora-substrate/util/build/bridgeProxy/eth/consts';
-import { ethers } from 'ethers';
+import { AddressLike, BigNumberish, BytesLike, ethers } from 'ethers';
 
 import { SmartContractType, KnownEthBridgeAsset, SmartContracts } from '@/consts/evm';
+import { bridgeWrapperContractAddress } from '@/modules/ADAR/consts';
 import { asZeroValue } from '@/utils';
 import { ethBridgeApi } from '@/utils/bridge/eth/api';
 import ethersUtil from '@/utils/ethers-util';
@@ -17,6 +18,15 @@ type EthTxParams = {
   value: string;
   recipient: string;
   getContractAddress: (symbol: KnownEthBridgeAsset) => Nullable<string>;
+  request?: EthApprovedRequest;
+};
+
+type EthMultipleTxParams = {
+  asset: RegisteredAccountAsset;
+  value: string;
+  recipient: string;
+  recipients: Array<string>;
+  amounts: Array<string>;
   request?: EthApprovedRequest;
 };
 
@@ -209,6 +219,74 @@ export async function getOutgoingEvmTransactionData({
   };
 }
 
+export async function getMultipleEvmTransactionData({
+  asset, // outgoing asset
+  value, // amount in toString format
+  recipient, // tx.to - eth address
+  recipients, // addresses[]
+  amounts, // CodecString[]
+  request, // approved request
+}: EthMultipleTxParams) {
+  if (!request) throw new Error('request is required!');
+
+  const coder = ethers.AbiCoder.defaultAbiCoder();
+
+  const signer = await ethersUtil.getSigner();
+  const contractAddress = bridgeWrapperContractAddress;
+  const contractAbi = SmartContracts[SmartContractType.EthBridge][KnownEthBridgeAsset.MultiSendBridge].abi;
+
+  const amount = new FPNumber(value, asset.externalDecimals).toCodecString();
+
+  const isEthereumCurrency = request.currencyType === EthCurrencyType.TokenAddress;
+
+  const method = 'receiveAndDistribute';
+
+  const contract = new ethers.Contract(contractAddress, contractAbi, signer);
+
+  const BridgeReceipt: {
+    tokenAddress: AddressLike;
+    amount: BigNumberish;
+    from: AddressLike;
+    txHash: BytesLike;
+    v: BigNumberish[];
+    r: BytesLike[];
+    s: BytesLike[];
+  } = {
+    tokenAddress: isEthereumCurrency
+      ? asset.externalAddress // address tokenAddress OR
+      : asset.address, // bytes32 assetId,
+    amount: amount,
+    from: request.from,
+    txHash: request.hash,
+    v: request.v,
+    r: request.r,
+    s: request.s,
+  };
+
+  const encodedData = coder.encode(
+    ['tuple(address tokenAddress, uint256 amount, address from, bytes32 txHash, uint8[] v, bytes32[] r, bytes32[] s)'],
+    [
+      [
+        BridgeReceipt.tokenAddress,
+        BridgeReceipt.amount,
+        BridgeReceipt.from,
+        BridgeReceipt.txHash,
+        BridgeReceipt.v,
+        BridgeReceipt.r,
+        BridgeReceipt.s,
+      ],
+    ]
+  );
+
+  const args: [BytesLike, AddressLike[], BigNumberish[]] = [encodedData, recipients, amounts];
+
+  return {
+    contract,
+    method,
+    args,
+  };
+}
+
 const gasLimit = {
   approve: BigInt(45000),
   sendERC20ToSidechain: BigInt(53000),
@@ -219,6 +297,7 @@ const gasLimit = {
     OTHER: BigInt(181000),
   },
   receiveBySidechainAssetId: BigInt(184000),
+  // sendEthToMultipleAccounts: BigInt(86093),
 };
 
 /**

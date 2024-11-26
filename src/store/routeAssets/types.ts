@@ -18,6 +18,7 @@ export type Recipient = {
   exchangeRate?: FPNumber;
   amountInTokens: boolean;
   useTransfer: boolean;
+  targetNetwork?: string;
 };
 
 export type RouteAssetsSubscription = {
@@ -71,6 +72,15 @@ export type MaxInputAmountInfo = {
   asetSymbol: string;
 };
 
+export type BridgeTransactionsState = {
+  inputToken: Asset;
+  totalAmount: FPNumber;
+  wallets: Array<string>;
+  amounts: Array<string>;
+  networkFee: string;
+  targetNetworkTokenAddress: string;
+};
+
 export type ProcessingState = {
   currentStageIndex: number;
   inputToken: Asset;
@@ -86,6 +96,8 @@ export type ProcessingState = {
   slippageTolerance: string;
   maxInputAmount: MaxInputAmount;
   pricesAreUpdated: boolean;
+  isExternalTransaction: boolean;
+  bridgeTransactionsState: BridgeTransactionsState;
 };
 
 export type Stage = {

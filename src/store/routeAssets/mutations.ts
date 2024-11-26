@@ -2,6 +2,7 @@ import { FPNumber } from '@sora-substrate/util/build';
 import { XOR } from '@sora-substrate/util/build/assets/consts';
 import { defineMutations } from 'direct-vuex';
 
+import { initialState } from './state';
 import { SwapTransferBatchStatus } from './types';
 
 import type { RouteAssetsState, Recipient, TransactionInfo, RouteAssetsSubscription } from './types';
@@ -17,14 +18,15 @@ const mutations = defineMutations<RouteAssetsState>()({
   clearData(state) {
     state.file = null;
     state.recipients = [];
-    state.processingState.currentStageIndex = 0;
-    state.processingState.inputToken = XOR;
-    state.processingState.txInfo = undefined;
-    state.processingState.datetime = undefined;
-    state.processingState.status = SwapTransferBatchStatus.INITIAL;
-    state.processingState.pricesAreUpdated = true;
-    state.processingState.txHistoryData = undefined;
-    state.processingState.transferTokenBalances = {};
+    // state.processingState.currentStageIndex = 0;
+    // state.processingState.inputToken = XOR;
+    // state.processingState.txInfo = undefined;
+    // state.processingState.datetime = undefined;
+    // state.processingState.status = SwapTransferBatchStatus.INITIAL;
+    // state.processingState.pricesAreUpdated = true;
+    // state.processingState.txHistoryData = undefined;
+    // state.processingState.transferTokenBalances = {};
+    state.processingState = initialState().processingState;
   },
   setSubscriptions(state, subscriptions: Array<RouteAssetsSubscription> = []): void {
     state.subscriptions = subscriptions;
@@ -150,6 +152,23 @@ const mutations = defineMutations<RouteAssetsState>()({
     const recipient = state.recipients.find((recipient) => recipient.id === id);
     if (!recipient) return;
     recipient.useTransfer = !recipient.useTransfer;
+  },
+
+  // _________________________________BRIDGE TXS___________________________________________
+  setExternalTxInputToken(state, asset): void {
+    state.processingState.bridgeTransactionsState.inputToken = asset;
+  },
+  setExternalTotalAmount(state, value: FPNumber): void {
+    state.processingState.bridgeTransactionsState.totalAmount = value;
+  },
+  setAdarTransactionExternal(state, isExternal): void {
+    state.processingState.isExternalTransaction = isExternal;
+  },
+  setExternalNetworkFee(state, networkFee): void {
+    state.processingState.bridgeTransactionsState.networkFee = networkFee;
+  },
+  setTargetNetworkTokenAddress(state, targetNetworkTokenAddress): void {
+    state.processingState.bridgeTransactionsState.targetNetworkTokenAddress = targetNetworkTokenAddress;
   },
 });
 

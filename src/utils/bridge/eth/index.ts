@@ -6,7 +6,11 @@ import { Bridge } from '@/utils/bridge/common/classes';
 import type { GetBridgeHistoryInstance, IBridgeConstructorOptions, SignExternal } from '@/utils/bridge/common/types';
 import { ethBridgeApi } from '@/utils/bridge/eth/api';
 import type { EthBridgeHistory } from '@/utils/bridge/eth/classes/history';
-import { EthBridgeOutgoingReducer, EthBridgeIncomingReducer } from '@/utils/bridge/eth/classes/reducers';
+import {
+  EthBridgeOutgoingReducer,
+  EthBridgeIncomingReducer,
+  EthBridgeMultipleOutgoingReducer,
+} from '@/utils/bridge/eth/classes/reducers';
 import type { EthBridgeReducer } from '@/utils/bridge/eth/classes/reducers';
 import { getTransaction, updateTransaction } from '@/utils/bridge/eth/utils';
 
@@ -26,6 +30,7 @@ const ethBridge: EthBridge = new Bridge({
   reducers: {
     [Operation.EthBridgeIncoming]: EthBridgeIncomingReducer,
     [Operation.EthBridgeOutgoing]: EthBridgeOutgoingReducer,
+    EthBridgeOutgoingMultiple: EthBridgeMultipleOutgoingReducer,
   },
   boundaryStates: {
     [Operation.EthBridgeIncoming]: {
@@ -54,6 +59,7 @@ const ethBridge: EthBridge = new Bridge({
   // custom
   getBridgeHistoryInstance: () => store.dispatch.bridge.getEthBridgeHistoryInstance(),
   signExternalOutgoing: (id: string) => store.dispatch.bridge.signEthBridgeOutgoingEvm(id),
+  signExternalMultipleOutgoing: (id: string) => store.dispatch.bridge.signEthBridgeOutgoingMultipleEvm(id),
   signExternalIncoming: (id: string) => store.dispatch.bridge.signEthBridgeIncomingEvm(id),
 });
 

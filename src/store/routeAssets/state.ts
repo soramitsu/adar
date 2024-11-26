@@ -35,6 +35,15 @@ export function initialState(): RouteAssetsState {
         updateDate: new Date(),
       },
       txHistoryData: undefined,
+      isExternalTransaction: false,
+      bridgeTransactionsState: {
+        inputToken: XOR,
+        totalAmount: FPNumber.ZERO,
+        wallets: [],
+        amounts: [],
+        networkFee: '',
+        targetNetworkTokenAddress: '',
+      },
     },
   };
 }

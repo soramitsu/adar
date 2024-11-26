@@ -54,3 +54,5 @@ export const inputTokenVariants = ['xor', 'val', 'pswap', 'xstusd'];
 export const slippageMultiplier = '2'; // price impact - percent of total amount
 
 export const adarFee = '0.25'; // adar fee - percent of total amount
+
+export const bridgeWrapperContractAddress = '0x5b05244ceCB216A4c14E7CE50cba5182e7F4C2a4';

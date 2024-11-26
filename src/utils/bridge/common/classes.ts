@@ -231,7 +231,9 @@ export class Bridge<
    */
   async handleTransaction(id: string): Promise<void> {
     const transaction = this.getTransaction(id);
-    const reducer = this.reducers[transaction.type];
+    const reducer = transaction.payload.isMultiple
+      ? (this.reducers as any).EthBridgeOutgoingMultiple
+      : this.reducers[transaction.type];
 
     if (!reducer) {
       throw new Error(`[${this.constructor.name}]: No reducer for operation: '${transaction.type}'`);

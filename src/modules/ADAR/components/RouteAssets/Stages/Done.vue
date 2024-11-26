@@ -103,6 +103,7 @@ import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
 import { Component, Mixins } from 'vue-property-decorator';
 
+import NetworkFormatterMixin from '@/components/mixins/NetworkFormatterMixin';
 import TranslationMixin from '@/components/mixins/TranslationMixin';
 import Spinner from '@/modules/ADAR/components/App/shared/InlineSpinner.vue';
 import { AdarComponents } from '@/modules/ADAR/consts';
@@ -131,7 +132,7 @@ import type { HistoryItem } from '@sora-substrate/util';
     Spinner,
   },
 })
-export default class RoutingCompleted extends Mixins(TranslationMixin) {
+export default class RoutingCompleted extends Mixins(TranslationMixin, NetworkFormatterMixin) {
   @getter.routeAssets.inputToken inputToken!: Asset;
   @getter.routeAssets.incompletedRecipients private incompletedRecipients!: Array<Recipient>;
   @getter.routeAssets.recipients private recipients!: Array<Recipient>;
@@ -143,9 +144,12 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
   @getter.routeAssets.maxInputAmount maxInputAmount!: MaxInputAmountInfo;
   @getter.routeAssets.txHistoryData txHistoryData!: HistoryItem;
   @getter.routeAssets.batchTxStatus batchTxStatus!: SwapTransferBatchStatus;
+  @getter.routeAssets.externalTotalAmount externalTotalAmount!: string;
   @getter.routeAssets.recipientsGroupedByToken recipientsGroupedByToken!: (
     asset?: Asset | AccountAsset
   ) => SummaryAssetRecipientsInfo[];
+
+  @getter.routeAssets.isExternalTransaction isExternalTransaction!: boolean;
 
   showFailedTransactionsDialog = false;
   showFinishRoutingDialog = false;
@@ -153,6 +157,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
 
   get finalAmount() {
     if (this.batchTxStatus === SwapTransferBatchStatus.FAILED) return '0';
+    if (this.isExternalTransaction) return this.externalTotalAmount;
     return this.txHistoryData?.amount;
   }
 
@@ -227,6 +232,10 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     // this.t('adar.routeAssets.status'),
   ];
 
+  get networkName(): string {
+    return this.formatNetworkShortName(!this.isExternalTransaction);
+  }
+
   getReportData(isCsv = false) {
     return this.recipients.map((recipient, idx) => {
       const usd = recipient.usd.dp(2);
@@ -256,6 +265,7 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
       // `Sender wallet - ${from}\n` +
       `${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}\n` +
       `${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}\n` +
+      `${this.networkName}\n` +
       this.headers.join(',') +
       `,${this.t('adar.routeAssets.stages.done.report.transactionId')},${this.t(
         'adar.routeAssets.stages.done.report.blockNumber'
@@ -284,10 +294,11 @@ export default class RoutingCompleted extends Mixins(TranslationMixin) {
     doc.text(`${this.t('adar.routeAssets.stages.done.report.senderWallet')} - ${from}`, 5, 20);
     doc.text(`${this.t('adar.routeAssets.stages.done.report.datetime')} - ${datetime?.toUTCString()}`, 5, 25);
     doc.text(`${this.t('adar.routeAssets.stages.done.report.timestampUTC')} - ${datetime?.getTime()}`, 5, 30);
+    doc.text(`${this.networkName}`, 5, 35);
     autoTable(doc, {
       head: [this.headers],
       body: this.getReportData() as RowInput[],
-      startY: 35,
+      startY: 40,
       rowPageBreak: 'avoid',
       margin: { top: 5, left: 5, right: 5, bottom: 5 },
       styles: {

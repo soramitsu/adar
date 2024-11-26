@@ -3,6 +3,7 @@ import { assert } from '@polkadot/util';
 import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
 import { NumberLike } from '@sora-substrate/math';
 import { FPNumber } from '@sora-substrate/util/build';
+import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
 import { Messages } from '@sora-substrate/util/build/logger';
 import { api, vuex as walletVuex, beforeTransactionSign } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
@@ -11,9 +12,14 @@ import Papa from 'papaparse';
 import { firstValueFrom } from 'rxjs';
 import { ActionContext } from 'vuex';
 
-import { adarFee } from '@/modules/ADAR/consts';
+import { ZeroStringValue } from '@/consts';
+import { adarFee, bridgeWrapperContractAddress } from '@/modules/ADAR/consts';
+import { bridgeActionContext } from '@/store/bridge';
 import { routeAssetsActionContext } from '@/store/routeAssets';
-import { delay } from '@/utils';
+import { delay, hasInsufficientNativeTokenForFee } from '@/utils';
+import ethBridge from '@/utils/bridge/eth';
+import { getEthNetworkFee } from '@/utils/bridge/eth/utils';
+import ethersUtil from '@/utils/ethers-util';
 import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
 
 import { RecipientStatus, SwapTransferBatchStatus, Recipient } from './types';
@@ -95,6 +101,7 @@ const actions = defineActions({
     const processRow = (row: ParseStepRelult) => {
       const amountInTokens = row.data[4] ? JSON.parse(row.data[4].toLowerCase()) : false;
       const useTransfer = row.data[5] ? JSON.parse(row.data[5].toLowerCase()) : false;
+      const network = row.data[6] ? 'SEPOLIA' : null;
       const csvAmount = row.data[2]?.replace(/,/g, '');
       const asset = findAsset(row.data[3]);
       const amount = amountInTokens
@@ -115,6 +122,7 @@ const actions = defineActions({
         isCompleted: false,
         amountInTokens,
         useTransfer: getters.adarSwapEnabled ? useTransfer : true,
+        targetNetwork: network,
       };
       return recipient;
     };
@@ -158,6 +166,9 @@ const actions = defineActions({
       commit.setData({ file, recipients: recipientsData as Array<Recipient> });
       commit.setTxStatus(SwapTransferBatchStatus.INITIAL);
       dispatch.subscribeOnReserves();
+      if (getters.externalRecipients.length) {
+        commit.setAdarTransactionExternal(true);
+      }
     } catch (error) {
       console.error(error);
       return Promise.reject(new Error('Parsing failed'));
@@ -252,7 +263,7 @@ const actions = defineActions({
   },
 
   async runAssetsRouting(context): Promise<void> {
-    const { getters, commit } = routeAssetsActionContext(context);
+    const { getters, commit, dispatch } = routeAssetsActionContext(context);
     const inputAsset = getters.inputToken;
     commit.setTxStatus(SwapTransferBatchStatus.PENDING);
     const data = getters.incompletedRecipients.map((recipient) => {
@@ -262,6 +273,10 @@ const actions = defineActions({
       });
       return getRecipientTransferParams(context, inputAsset, recipient);
     });
+    if (getters.isExternalTransaction) {
+      await dispatch.runBridgeTransaction();
+      return;
+    }
 
     await executeBatchSwapAndSend(context, data);
   },
@@ -312,6 +327,106 @@ const actions = defineActions({
       console.groupEnd();
     }
   },
+
+  // ______________________________________________________________________________________________
+
+  async runBridgeTransaction(context): Promise<void> {
+    const { getters, rootGetters } = routeAssetsActionContext(context);
+
+    const { commit: bridgeCommit, dispatch: bridgeDispatch } = bridgeActionContext(context);
+
+    const amount = getters.externalTotalAmount.toString();
+    const wallets = rootGetters.routeAssets.externalRecipients.map((item) => item.wallet);
+    const amounts = rootGetters.routeAssets.externalRecipients.map((item) => item.amount?.toCodecString() ?? '');
+
+    const tx = await bridgeDispatch.generateHistoryItem({
+      payload: { isMultiple: true, recipients: wallets, amounts },
+      amount: amount,
+      amount2: amount,
+      to: bridgeWrapperContractAddress,
+    });
+
+    bridgeCommit.setHistoryId(tx.id);
+    await ethBridge.handleTransaction(tx.id ?? '');
+  },
+
+  async bridgeTransactionsInit(context): Promise<void> {
+    const { rootState, commit, getters, dispatch, rootDispatch } = routeAssetsActionContext(context);
+
+    const asset = getters.externalRecipients[0].asset;
+    commit.setExternalTxInputToken(asset);
+    rootDispatch.bridge.setAssetAddress(asset?.address);
+
+    const amount = getters.externalRecipients.reduce((result, recipient) => {
+      return result.add(recipient.amount ?? FPNumber.ZERO);
+    }, FPNumber.ZERO);
+
+    const evmAccount = rootState.web3.evmAddress;
+    await rootDispatch.web3.selectExternalNetwork({
+      id: rootState.web3.ethBridgeEvmNetwork,
+      type: BridgeNetworkType.Eth,
+    });
+
+    // check connection to account
+    const isAccountConnected = await ethersUtil.checkAccountIsConnected(evmAccount);
+
+    if (!isAccountConnected) {
+      console.log(`Account for transfer is not connected`);
+    }
+    rootDispatch.bridge.setSendedAmount(amount.toString());
+    await rootDispatch.bridge.updateExternalBalance();
+    dispatch.getEvmNetworkFee().then((evmNetworkFee) => {
+      commit.setExternalNetworkFee(evmNetworkFee);
+    });
+  },
+
+  async haveExternalNativeTokenFee(context: ActionContext<any, any>): Promise<boolean> {
+    const { getters, rootGetters } = routeAssetsActionContext(context);
+    const evmNetworkFee = getters.externalNativeTokenNetworkFee;
+    const evmNativeBalance = await ethersUtil.getAccountBalance(rootGetters.bridge.externalAccount);
+    return !hasInsufficientNativeTokenForFee(evmNativeBalance, evmNetworkFee);
+  },
+
+  markTxStatus(context: ActionContext<any, any>, status = SwapTransferBatchStatus.SUCCESS) {
+    const { commit, getters } = routeAssetsActionContext(context);
+    commit.setTxStatus(status);
+    getters.recipients.forEach((reciever) => {
+      commit.setRecipientStatus({
+        id: reciever.id,
+        status,
+      });
+      if (status === SwapTransferBatchStatus.SUCCESS) commit.setRecipientCompleted(reciever.id);
+    });
+  },
+
+  async getEvmNetworkFee(context: ActionContext<any, any>): Promise<string> {
+    const { getters, state, rootState, rootGetters } = bridgeActionContext(context);
+    const { asset, isRegisteredAsset } = getters;
+    const { isValidNetwork } = rootGetters.web3;
+    const evmAccount = rootState.web3.evmAddress;
+    const soraAccount = rootState.wallet.account.address;
+
+    let fee = ZeroStringValue;
+
+    if (asset && isRegisteredAsset && isValidNetwork && evmAccount && soraAccount) {
+      const bridgeRegisteredAsset = rootState.assets.registeredAssets[asset.address];
+      const decimals = asset.decimals;
+      // using max balance to not overflow contract calculation
+      const maxAmount = FPNumber.fromCodecValue(state.assetSenderBalance ?? 0, decimals);
+      const amount = rootGetters.routeAssets.externalTotalAmount;
+      const value = maxAmount.min(amount as FPNumber).toString();
+      fee = await getEthNetworkFee(
+        asset,
+        bridgeRegisteredAsset.kind,
+        () => bridgeWrapperContractAddress,
+        value,
+        true,
+        soraAccount,
+        evmAccount
+      );
+    }
+    return fee;
+  },
 });
 
 function getRecipientTransferParams(context, inputAsset, recipient) {
@@ -357,41 +472,6 @@ function getRecipientTransferParams(context, inputAsset, recipient) {
     }
   }
 }
-// __________________________OLD_________________________________________
-
-// async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
-//   const { commit } = routeAssetsActionContext(context);
-
-//   async function processArray(transactions) {
-//     for (const tx of transactions) {
-//       try {
-//         await tx
-//           .action()
-//           .then(() => {
-//             commit.setRecipientStatus({
-//               id: tx.recipient.id,
-//               status: RecipientStatus.SUCCESS,
-//             });
-//             commit.setRecipientCompleted(tx.recipient.id);
-//           })
-//           .catch(() => {
-//             commit.setRecipientStatus({
-//               id: tx.recipient.id,
-//               status: RecipientStatus.FAILED,
-//             });
-//           });
-//       } catch (err) {
-//         commit.setRecipientStatus({
-//           id: tx.recipient.id,
-//           status: RecipientStatus.FAILED,
-//         });
-//       }
-//     }
-//   }
-
-//   await processArray(data);
-// }
-// ______________________________________________________________________
 
 async function executeBatchSwapAndSend(context, data: Array<any>): Promise<any> {
   const { commit, getters, rootCommit, rootState, rootDispatch } = routeAssetsActionContext(context);
