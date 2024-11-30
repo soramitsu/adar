@@ -1,4 +1,17 @@
-# adar
+# ADAR
+
+<div align="center">
+  <div align=center><img src="https://adar.com/i/adar-logo-new.svg" width=" 500 "></div>
+  <h3 align="center"> Advanced Digital Asset Routing</h3>
+  <br />
+ <a href="https://www.adar.com/">Website</a>｜<a href="https://sora.org">SORA blockchain</a>
+</div>
+
+# Docs
+
+[Get started (testnet)](./docs/GUIDES.md)
+
+# Development
 
 ## Project deploy info
 There is `public/env.json` file which contains `BASE_API_URL` and `DEFAULT_NETWORKS` variables.
