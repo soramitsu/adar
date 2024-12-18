@@ -7,8 +7,8 @@
 </template>
 
 <script lang="ts">
-import { CodecString, FPNumber } from '@sora-substrate/util/build';
-import { RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
+import { CodecString, FPNumber } from '@sora-substrate/sdk/build';
+import { RegisteredAccountAsset } from '@sora-substrate/sdk/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { Component, Vue } from 'vue-property-decorator';
 

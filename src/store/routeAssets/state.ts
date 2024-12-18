@@ -1,5 +1,5 @@
-import { FPNumber } from '@sora-substrate/util/build';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { XOR } from '@sora-substrate/sdk/build/assets/consts';
 
 import { slippageMultiplier } from '@/modules/ADAR/consts';
 

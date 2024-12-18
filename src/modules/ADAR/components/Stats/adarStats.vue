@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util';
+import { FPNumber } from '@sora-substrate/sdk';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { SSkeleton, SSkeletonItem } from '@soramitsu-ui/ui-vue2/lib/components/Skeleton';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -69,8 +69,8 @@ import { lazyComponent } from '@/router';
 import { state } from '@/store/decorators';
 import { getAssetUSDPrice } from '@/store/routeAssets/utils';
 
-import type { HistoryItem } from '@sora-substrate/util';
-import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
+import type { HistoryItem } from '@sora-substrate/sdk';
+import type { WhitelistArrayItem } from '@sora-substrate/sdk/build/assets/types';
 import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 @Component({

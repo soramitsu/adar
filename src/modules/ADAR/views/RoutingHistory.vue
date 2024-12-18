@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
+import { FPNumber } from '@sora-substrate/sdk/build';
 import { api, mixins } from '@soramitsu/soraneo-wallet-web';
 import { startOfWeek, startOfMonth, subWeeks, subMonths, startOfYear, subYears, isAfter, compareDesc } from 'date-fns';
 import { jsPDF as JsPDF } from 'jspdf';
@@ -81,7 +81,7 @@ import TranslationMixin from '@/components/mixins/TranslationMixin';
 import { fetchData } from '@/modules/ADAR/indexer/queries/adarStats';
 import { state } from '@/store/decorators';
 
-import type { HistoryItem } from '@sora-substrate/util';
+import type { HistoryItem } from '@sora-substrate/sdk';
 
 @Component({
   components: {},

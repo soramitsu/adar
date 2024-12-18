@@ -1,11 +1,11 @@
-import { FPNumber } from '@sora-substrate/util/build';
-import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { Asset, AccountAsset } from '@sora-substrate/sdk/build/assets/types';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 import { Recipient } from './types';
 
-import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
+import type { WhitelistArrayItem } from '@sora-substrate/sdk/build/assets/types';
 
 export default {
   validate(recipient: Recipient) {
