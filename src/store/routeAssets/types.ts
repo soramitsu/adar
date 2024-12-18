@@ -1,9 +1,9 @@
-import { FPNumber } from '@sora-substrate/util/build';
-import { Asset, AccountAsset, AccountBalance } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { Asset, AccountAsset, AccountBalance } from '@sora-substrate/sdk/build/assets/types';
 import { Subscription } from 'rxjs';
 
 import type { SwapQuote, PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
-import type { HistoryItem } from '@sora-substrate/util';
+import type { HistoryItem } from '@sora-substrate/sdk';
 
 export type Recipient = {
   name: string;

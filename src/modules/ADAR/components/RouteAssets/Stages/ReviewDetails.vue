@@ -151,9 +151,9 @@
 </template>
 
 <script lang="ts">
-import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
-import { XOR, VAL } from '@sora-substrate/util/build/assets/consts';
-import { AccountAsset, Asset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
+import { CodecString, FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/sdk/build';
+import { XOR, VAL } from '@sora-substrate/sdk/build/assets/consts';
+import { AccountAsset, Asset, RegisteredAccountAsset } from '@sora-substrate/sdk/build/assets/types';
 import { components, mixins, WALLET_TYPES } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 

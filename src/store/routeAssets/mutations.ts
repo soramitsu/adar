@@ -1,13 +1,13 @@
-import { FPNumber } from '@sora-substrate/util/build';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { XOR } from '@sora-substrate/sdk/build/assets/consts';
 import { defineMutations } from 'direct-vuex';
 
 import { SwapTransferBatchStatus } from './types';
 
 import type { RouteAssetsState, Recipient, TransactionInfo, RouteAssetsSubscription } from './types';
 import type { PrimaryMarketsEnabledAssets } from '@sora-substrate/liquidity-proxy/build/types';
-import type { HistoryItem } from '@sora-substrate/util';
-import type { AccountBalance } from '@sora-substrate/util/build/assets/types';
+import type { HistoryItem } from '@sora-substrate/sdk';
+import type { AccountBalance } from '@sora-substrate/sdk/build/assets/types';
 
 const mutations = defineMutations<RouteAssetsState>()({
   setData(state, { file, recipients }: { file: File; recipients: Array<Recipient> }): void {

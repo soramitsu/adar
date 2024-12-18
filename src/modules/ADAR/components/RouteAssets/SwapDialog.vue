@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import { FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/util/build';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { FPNumber, NetworkFeesObject, Operation } from '@sora-substrate/sdk/build';
+import { XOR } from '@sora-substrate/sdk/build/assets/consts';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { delay } from 'lodash';
 import { Component, Mixins, Prop, Watch } from 'vue-property-decorator';

@@ -132,8 +132,8 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
-import { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/sdk/build/assets/types';
 import { components, mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins, Watch } from 'vue-property-decorator';
 

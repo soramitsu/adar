@@ -1,8 +1,8 @@
-import { Operation } from '@sora-substrate/util';
+import { Operation } from '@sora-substrate/sdk';
 
 import { evmBridgeApi } from '@/utils/bridge/evm/api';
 
-import type { EvmHistory } from '@sora-substrate/util/build/bridgeProxy/evm/types';
+import type { EvmHistory } from '@sora-substrate/sdk/build/bridgeProxy/evm/types';
 
 export const isUnsignedTx = (tx: EvmHistory): boolean => {
   if (tx.type === Operation.EvmOutgoing) {
