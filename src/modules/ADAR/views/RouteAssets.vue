@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { Operation } from '@sora-substrate/util';
+import { Operation } from '@sora-substrate/sdk';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { ExternalHistoryParams } from '@soramitsu/soraneo-wallet-web/lib/types/history';
 import isEmpty from 'lodash/fp/isEmpty';
@@ -21,8 +21,8 @@ import { FeatureFlags } from '@/store/settings/types';
 
 import AdarStats from '../components/Stats/adarStats.vue';
 
-import type { AccountHistory, HistoryItem } from '@sora-substrate/util';
-import type { WhitelistArrayItem } from '@sora-substrate/util/build/assets/types';
+import type { AccountHistory, HistoryItem } from '@sora-substrate/sdk';
+import type { WhitelistArrayItem } from '@sora-substrate/sdk/build/assets/types';
 import type { FiatPriceObject } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/types';
 
 @Component({

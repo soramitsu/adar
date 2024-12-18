@@ -19,7 +19,7 @@ import type {
   TransactionHandlerPayload,
 } from '@/utils/bridge/common/types';
 
-import type { IBridgeTransaction } from '@sora-substrate/util';
+import type { IBridgeTransaction } from '@sora-substrate/sdk';
 
 const { BLOCK_PRODUCE_TIME } = WALLET_CONSTS;
 

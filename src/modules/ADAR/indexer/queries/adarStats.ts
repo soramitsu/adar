@@ -2,7 +2,7 @@ import { api, getCurrentIndexer, WALLET_CONSTS } from '@soramitsu/soraneo-wallet
 import { SubqueryIndexer } from '@soramitsu/soraneo-wallet-web/lib/services/indexer';
 import { gql } from '@urql/core';
 
-import type { HistoryItem } from '@sora-substrate/util';
+import type { HistoryItem } from '@sora-substrate/sdk';
 import type { ConnectionQueryResponse } from '@soramitsu/soraneo-wallet-web/lib/services/indexer/subquery/types';
 
 const { IndexerType } = WALLET_CONSTS;

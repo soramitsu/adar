@@ -1,4 +1,4 @@
-import { FPNumber } from '@sora-substrate/util/build';
+import { FPNumber } from '@sora-substrate/sdk/build';
 import { api } from '@soramitsu/soraneo-wallet-web';
 import { defineGetters } from 'direct-vuex';
 import { groupBy } from 'lodash';
@@ -20,8 +20,8 @@ import type {
   SwapTransferBatchStatus,
   TransactionInfo,
 } from './types';
-import type { HistoryItem } from '@sora-substrate/util';
-import type { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
+import type { HistoryItem } from '@sora-substrate/sdk';
+import type { Asset, AccountAsset, RegisteredAccountAsset } from '@sora-substrate/sdk/build/assets/types';
 
 const getters = defineGetters<RouteAssetsState>()({
   recipients(...args): Array<Recipient> {

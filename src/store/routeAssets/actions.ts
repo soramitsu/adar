@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { assert } from '@polkadot/util';
 import { LiquiditySourceTypes } from '@sora-substrate/liquidity-proxy/build/consts';
-import { NumberLike } from '@sora-substrate/math';
-import { FPNumber } from '@sora-substrate/util/build';
-import { Messages } from '@sora-substrate/util/build/logger';
+import { CodecString, NumberLike } from '@sora-substrate/math';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { Messages } from '@sora-substrate/sdk/build/logger';
 import { api, vuex as walletVuex, beforeTransactionSign } from '@soramitsu/soraneo-wallet-web';
 import { defineActions } from 'direct-vuex';
 import { findLast, groupBy } from 'lodash';
@@ -19,7 +19,7 @@ import { TokenBalanceSubscriptions } from '@/utils/subscriptions';
 import { RecipientStatus, SwapTransferBatchStatus, Recipient } from './types';
 import { getTokenEquivalent, getAssetUSDPrice } from './utils';
 
-import type { WhitelistArrayItem, Asset, AccountAsset, AccountBalance } from '@sora-substrate/util/build/assets/types';
+import type { WhitelistArrayItem, Asset, AccountAsset, AccountBalance } from '@sora-substrate/sdk/build/assets/types';
 import type { ParseStepRelult, Parser } from 'papaparse';
 
 enum BalanceSubscriptionKeys {
@@ -567,7 +567,7 @@ function getAmountAndDexId(context: any, assetFrom: Asset, assetTo: Asset, usd: 
   return {
     amountFrom: FPNumber.fromCodecValue(amount),
     amountTo: tokenEquivalent,
-    liquidityProviderFee: FPNumber.fromCodecValue(fee),
+    liquidityProviderFee: FPNumber.fromCodecValue(fee as CodecString),
     exchangeRate,
     bestDexId: dexId,
   };

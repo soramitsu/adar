@@ -1,12 +1,12 @@
-import { FPNumber } from '@sora-substrate/util';
-import { formatBalance } from '@sora-substrate/util/build/assets';
+import { FPNumber } from '@sora-substrate/sdk';
+import { formatBalance } from '@sora-substrate/sdk/build/assets';
 
 import { ZeroStringValue } from '@/consts';
 
 import { SubAdapter } from '../substrate';
 
-import type { CodecString } from '@sora-substrate/util';
-import type { RegisteredAsset } from '@sora-substrate/util/build/assets/types';
+import type { CodecString } from '@sora-substrate/sdk';
+import type { RegisteredAsset } from '@sora-substrate/sdk/build/assets/types';
 
 type IAstarAssetMetadata = {
   id: string;

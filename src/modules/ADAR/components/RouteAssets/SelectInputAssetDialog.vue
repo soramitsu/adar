@@ -68,8 +68,8 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
-import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { AccountAsset, Asset } from '@sora-substrate/sdk/build/assets/types';
 import { mixins, components } from '@soramitsu/soraneo-wallet-web';
 import { WhitelistIdsBySymbol } from '@soramitsu/soraneo-wallet-web/lib/types/common';
 import { Component, Mixins } from 'vue-property-decorator';
