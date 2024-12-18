@@ -56,7 +56,7 @@
 
 <script lang="ts">
 import { FPNumber } from '@sora-substrate/math';
-import { XOR } from '@sora-substrate/util/build/assets/consts';
+import { XOR } from '@sora-substrate/sdk/build/assets/consts';
 import { mixins } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 

@@ -96,8 +96,8 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
-import { AccountAsset, Asset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { AccountAsset, Asset } from '@sora-substrate/sdk/build/assets/types';
 import { components, api } from '@soramitsu/soraneo-wallet-web';
 import { jsPDF as JsPDF } from 'jspdf';
 import autoTable, { RowInput } from 'jspdf-autotable';
@@ -119,7 +119,7 @@ import {
 
 import WarningMessage from '../WarningMessage.vue';
 
-import type { HistoryItem } from '@sora-substrate/util';
+import type { HistoryItem } from '@sora-substrate/sdk';
 
 @Component({
   components: {

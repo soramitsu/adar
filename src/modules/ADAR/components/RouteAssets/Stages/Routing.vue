@@ -49,8 +49,8 @@
 </template>
 
 <script lang="ts">
-import { FPNumber } from '@sora-substrate/util/build';
-import { Asset, AccountAsset } from '@sora-substrate/util/build/assets/types';
+import { FPNumber } from '@sora-substrate/sdk/build';
+import { Asset, AccountAsset } from '@sora-substrate/sdk/build/assets/types';
 import { components } from '@soramitsu/soraneo-wallet-web';
 import { groupBy } from 'lodash';
 import { Component, Mixins } from 'vue-property-decorator';
@@ -66,7 +66,7 @@ import {
   SwapTransferBatchStatus,
 } from '@/store/routeAssets/types';
 
-import type { HistoryItem } from '@sora-substrate/util';
+import type { HistoryItem } from '@sora-substrate/sdk';
 
 @Component({
   components: {

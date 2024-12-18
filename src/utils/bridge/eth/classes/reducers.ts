@@ -14,9 +14,9 @@ import {
 } from '@/utils/bridge/eth/utils';
 import ethersUtil from '@/utils/ethers-util';
 
-import type { IBridgeTransaction } from '@sora-substrate/util';
-import type { RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
-import type { EthHistory } from '@sora-substrate/util/build/bridgeProxy/eth/types';
+import type { IBridgeTransaction } from '@sora-substrate/sdk';
+import type { RegisteredAccountAsset } from '@sora-substrate/sdk/build/assets/types';
+import type { EthHistory } from '@sora-substrate/sdk/build/bridgeProxy/eth/types';
 
 const { ETH_BRIDGE_STATES } = WALLET_CONSTS;
 

@@ -18,7 +18,16 @@ import WalletConnectMixin from '@/components/mixins/WalletConnectMixin';
 import { state } from '@/store/decorators';
 import { Provider } from '@/utils/ethers-util';
 
-import type { WalletInfo } from '@sora-test/wallet-connect/types';
+type EvmWalletInfo = {
+  extensionName: string;
+  title: string;
+  logo: {
+    src: string;
+    alt: string;
+  };
+  installed?: boolean;
+  installUrl?: string;
+};
 
 @Component({
   components: {
@@ -46,7 +55,7 @@ export default class SelectProviderDialog extends Mixins(WalletConnectMixin) {
     return Object.keys(Provider).map((key) => Provider[key]);
   }
 
-  get wallets(): WalletInfo[] {
+  get wallets(): EvmWalletInfo[] {
     return this.allowedProviders.map((provider) => {
       return {
         extensionName: provider,
@@ -65,7 +74,7 @@ export default class SelectProviderDialog extends Mixins(WalletConnectMixin) {
     return this.evmProviderLoading ?? this.evmProvider;
   }
 
-  handleSelectProvider(wallet: WalletInfo): void {
+  handleSelectProvider(wallet: EvmWalletInfo): void {
     this.connectEvmProvider(wallet.extensionName as Provider);
     this.visibility = false;
   }

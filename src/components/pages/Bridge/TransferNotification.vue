@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { BridgeNetworkType } from '@sora-substrate/util/build/bridgeProxy/consts';
+import { BridgeNetworkType } from '@sora-substrate/sdk/build/bridgeProxy/consts';
 import { components, WALLET_CONSTS } from '@soramitsu/soraneo-wallet-web';
 import { Component, Mixins } from 'vue-property-decorator';
 
@@ -28,9 +28,9 @@ import { getter, state, mutation } from '@/store/decorators';
 import { isOutgoingTransaction } from '@/utils/bridge/common/utils';
 import ethersUtil from '@/utils/ethers-util';
 
-import type { IBridgeTransaction } from '@sora-substrate/util';
-import type { Whitelist, RegisteredAccountAsset } from '@sora-substrate/util/build/assets/types';
-import type { BridgeNetworkId } from '@sora-substrate/util/build/bridgeProxy/types';
+import type { IBridgeTransaction } from '@sora-substrate/sdk';
+import type { Whitelist, RegisteredAccountAsset } from '@sora-substrate/sdk/build/assets/types';
+import type { BridgeNetworkId } from '@sora-substrate/sdk/build/bridgeProxy/types';
 
 @Component({
   components: {
