@@ -157,27 +157,23 @@
         "connectionError": "Une erreur s'est produite lors de la connexion du portefeuille. Vous pouvez réessayer de connecter le portefeuille via {extension}"
     },
     "connection": {
-        "text": "Afin de gérer des actifs et de signer des transactions sur {Sora}, un compte doit être connecté. Les comptes {Sora} peuvent être créés et connectés à l'aide de nos portefeuilles intégrés ou extensions de navigateur.",
-        "noAccounts": "Aucun compte n'a été trouvé dans votre extension de navigateur {extension} Veuillez ajouter un compte et réessayer.",
         "selectAccount": "Sélectionnez le compte approprié",
         "action": {
-            "install": "Installer l'extension",
-            "learnMore": "En savoir plus",
-            "connect": "Connecter un compte",
+            "learnMore": "En savoir plus sur la connexion au portefeuille",
             "refresh": "Rafraîchir"
         },
-        "selectWallet": "Sélectionnez un portefeuille avec lequel travailler",
         "wallet": {
             "install": "Installer",
             "connected": "Connecté",
-            "notConnected": "Pas connecté"
+            "recommended": "Recommandé"
         },
         "internalTitle": "Connectez-vous avec {wallet}",
         "internalText": "Vous pouvez créer ou importer un compte {Sora} existant pour vous connecter à votre compte {wallet}. Toutes les données stockées par {wallet} sont cryptées à l'aide du cryptage avancé intégré.",
         "list": {
             "integrated": "Intégré",
             "extensions": "Rallonges"
-        }
+        },
+        "disclaimer": "Veuillez noter que certains portefeuilles peuvent ne pas être entièrement pris en charge."
     },
     "wallet": {
         "WalletAssets": "Actifs",
