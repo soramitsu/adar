@@ -157,27 +157,23 @@
         "connectionError": "Ocurrió un error al conectar la billetera. Puede intentar conectar la billetera a través de {extension} nuevamente"
     },
     "connection": {
-        "text": "Para administrar activos y firmar transacciones en {Sora}, se debe conectar una cuenta. Las cuentas {Sora} se pueden crear y conectar utilizando nuestras carteras integradas o extensiones de navegador.",
-        "noAccounts": "No se ha encontrado ninguna cuenta en su extensión de navegador {extension}. Por favor añade una cuenta e inténtalo de nuevo.",
         "selectAccount": "Seleccione la cuenta con la que desea trabajar",
         "action": {
-            "install": "Instalar extensión",
-            "learnMore": "Aprende más",
-            "connect": "Conectar cuenta",
+            "learnMore": "Obtenga más información sobre la conexión de billetera",
             "refresh": "Actualizar"
         },
-        "selectWallet": "Seleccione una billetera con la que trabajar",
         "wallet": {
             "install": "Instalar",
             "connected": "Conectado",
-            "notConnected": "No conectado"
+            "recommended": "Recomendado"
         },
         "internalTitle": "Conectar con {wallet}",
         "internalText": "Puede crear o importar una cuenta {Sora} existente para conectarse con su cuenta {wallet}. Todos los datos almacenados por {wallet} se cifran mediante el cifrado avanzado incorporado.",
         "list": {
             "integrated": "Integrado",
             "extensions": "Extensiones"
-        }
+        },
+        "disclaimer": "Tenga en cuenta que es posible que algunas billeteras no sean totalmente compatibles."
     },
     "wallet": {
         "WalletAssets": "Activos",
