@@ -157,26 +157,22 @@
         "connectionError": "An error occured while connecting the wallet. You can try to connect the wallet via {extension} again"
     },
     "connection": {
-        "text": "In order to manage assets and sign transactions on {Sora}, an account must be connected. {Sora} accounts can be created and connected using our integrated wallets or browser extensions.",
-        "noAccounts": "No account found in your {extension} browser extension. Please add an account and try again.",
-        "selectAccount": "Select account to work with",
         "action": {
-            "install": "Install extension",
-            "learnMore": "Learn more",
-            "connect": "Connect account",
+            "learnMore": "Learn more about wallet connection",
             "refresh": "Refresh"
         },
-        "selectWallet": "Select a wallet to work with",
-        "wallet": {
-            "install": "Install",
-            "connected": "Connected",
-            "notConnected": "Not connected"
-        },
-        "internalTitle": "Connect with {wallet}",
+        "disclaimer": "Please note that certain wallets may not be fully supported.",
         "internalText": "You can create or import an existing {Sora} account to connect with your {wallet} account. All data that is stored by {wallet} is encrypted using built-in advanced encryption.",
+        "internalTitle": "Connect with {wallet}",
         "list": {
-            "integrated": "Integrated",
-            "extensions": "Extensions"
+            "extensions": "Extensions",
+            "integrated": "Integrated"
+        },
+        "selectAccount": "Select account to work with",
+        "wallet": {
+            "connected": "Connected",
+            "install": "Install",
+            "recommended": "Recommended"
         }
     },
     "wallet": {
@@ -575,8 +571,6 @@
         "soraAddress": "{Sora} address",
         "ethereumAddress": "{Ethereum} address",
         "limitMessage": "Currently, there's a {type} {amount} {symbol} for bridging to ensure the stability and security of the {Sora} Network. We appreciate your understanding.",
-        "externalTransferFee": "{network} {XCM} fee",
-        "externalTransferFeeTooltip": "When you send a bridge transaction to the {network} network, a minor fee is taken from the amount you are transferring",
         "externalMinDeposit": "{network} min. deposit",
         "externalMinDepositTooltip": "Minimum balance {symbol} that must be on your {network} account after the bridge transfer"
     },
